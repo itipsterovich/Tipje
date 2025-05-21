@@ -1,0 +1,19 @@
+[
+  {
+    "id": "fun",
+    "items": [
+      { "id": "reward_001", "title": "Extra 30 minutes of screen time.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_002", "title": "Choose a dessert for dinner.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_003", "title": "Stay up 30 minutes later.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_004", "title": "Pick a family movie for movie night.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_005", "title": "Get a new coloring book.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_006", "title": "Choose a fun weekend activity.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_007", "title": "Have a friend over for a playdate.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_008", "title": "Get a small toy from the store.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_009", "title": "Choose a board game for family game night.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_010", "title": "Have a picnic in the backyard.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_011", "title": "Get a special outing with a parent.", "peanuts": 10, "category": "fun" },
+      { "id": "reward_012", "title": "Pick a favorite meal for dinner.", "peanuts": 10, "category": "fun" }
+    ]
+  }
+] 

@@ -6,14 +6,109 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		62C4C52C2DDDE08A001CAB3B /* TipjeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */; };
+		62C4C5882DDDE0A2001CAB3B /* success.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C54D2DDDE0A2001CAB3B /* success.aiff */; };
+		62C4C58F2DDDE0A2001CAB3B /* reward.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C54C2DDDE0A2001CAB3B /* reward.aiff */; };
+		62C4C5962DDDE0A2001CAB3B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C54B2DDDE0A2001CAB3B /* README.md */; };
+		62C4C5AE2DDDE8BA001CAB3B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		62C4C3F22DDDC962001CAB3B /* Tipje.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tipje.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipjeApp.swift; sourceTree = "<group>"; };
+		62C4C54B2DDDE0A2001CAB3B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		62C4C54C2DDDE0A2001CAB3B /* reward.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = reward.aiff; sourceTree = "<group>"; };
+		62C4C54D2DDDE0A2001CAB3B /* success.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = success.aiff; sourceTree = "<group>"; };
+		62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		62C4C59C2DDDE0A2001CAB3B /* Exceptions for "Models" folder in "Tipje" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Category+Color.swift",
+				Store.swift,
+				Task.swift,
+			);
+			target = 62C4C3F12DDDC962001CAB3B /* Tipje */;
+		};
+		62C4C59D2DDDE0A2001CAB3B /* Exceptions for "Resources" folder in "Tipje" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CustomUI/confetti.lottie,
+				CustomUI/icon_close.svg,
+				CustomUI/icon_delete.svg,
+				CustomUI/icon_peanut.svg,
+				CustomUI/icon_plus.svg,
+				CustomUI/mascot_empty_chores.png,
+				"CustomUI/mascot_empty_rules 2.png",
+				CustomUI/mascot_excited.png,
+				CustomUI/mascot_happy.png,
+				CustomUI/mascot_like.png,
+				CustomUI/mascot_peanuts.png,
+				CustomUI/mascot_ticket.png,
+				Localizable.strings,
+				SeedData/chores.json,
+				SeedData/rewards.json,
+				SeedData/rules.json,
+				Tipje_instrustions.md,
+			);
+			target = 62C4C3F12DDDC962001CAB3B /* Tipje */;
+		};
+		62C4C59E2DDDE0A2001CAB3B /* Exceptions for "Views" folder in "Tipje" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Admin/AddRewardModal.swift,
+				Admin/AddTaskModal.swift,
+				Admin/AdminView.swift,
+				Admin/CatalogueModal.swift,
+				Components/BalanceChip.swift,
+				Components/ChoreAdultCard.swift,
+				Components/ConfettiOverlay.swift,
+				Components/MascotModal.swift,
+				Components/PaywallModal.swift,
+				Components/RewardAdultCard.swift,
+				Components/RuleAdultCard.swift,
+				Components/TaskCard.swift,
+				Home/HomeView.swift,
+				OnboardingView.swift,
+				PinLockView.swift,
+				Settings/SettingsView.swift,
+				Shop/ShopView.swift,
+			);
+			target = 62C4C3F12DDDC962001CAB3B /* Tipje */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		62C4C3F42DDDC962001CAB3B /* Tipje */ = {
+		62C4C53E2DDDE0A2001CAB3B /* Models */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Tipje;
+			exceptions = (
+				62C4C59C2DDDE0A2001CAB3B /* Exceptions for "Models" folder in "Tipje" target */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		62C4C5552DDDE0A2001CAB3B /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				62C4C59D2DDDE0A2001CAB3B /* Exceptions for "Resources" folder in "Tipje" target */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		62C4C5592DDDE0A2001CAB3B /* Services */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Services;
+			sourceTree = "<group>";
+		};
+		62C4C5702DDDE0A2001CAB3B /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				62C4C59E2DDDE0A2001CAB3B /* Exceptions for "Views" folder in "Tipje" target */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +127,15 @@
 		62C4C3E92DDDC962001CAB3B = {
 			isa = PBXGroup;
 			children = (
-				62C4C3F42DDDC962001CAB3B /* Tipje */,
+				62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */,
+				62C4C54B2DDDE0A2001CAB3B /* README.md */,
+				62C4C54C2DDDE0A2001CAB3B /* reward.aiff */,
+				62C4C54D2DDDE0A2001CAB3B /* success.aiff */,
+				62C4C53E2DDDE0A2001CAB3B /* Models */,
+				62C4C5552DDDE0A2001CAB3B /* Resources */,
+				62C4C5592DDDE0A2001CAB3B /* Services */,
+				62C4C5702DDDE0A2001CAB3B /* Views */,
+				62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */,
 				62C4C3F32DDDC962001CAB3B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,7 +164,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				62C4C3F42DDDC962001CAB3B /* Tipje */,
+				62C4C5592DDDE0A2001CAB3B /* Services */,
 			);
 			name = Tipje;
 			packageProductDependencies = (
@@ -109,6 +212,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62C4C5AE2DDDE8BA001CAB3B /* Assets.xcassets in Resources */,
+				62C4C58F2DDDE0A2001CAB3B /* reward.aiff in Resources */,
+				62C4C5962DDDE0A2001CAB3B /* README.md in Resources */,
+				62C4C5882DDDE0A2001CAB3B /* success.aiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +226,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62C4C52C2DDDE08A001CAB3B /* TipjeApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

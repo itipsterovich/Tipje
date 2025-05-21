@@ -1,0 +1,24 @@
+[
+  {
+    "id": "security",
+    "items": [
+      { "id": "rule_001", "title": "Always say 'please' and 'thank you.'", "peanuts": 2, "category": "security" },
+      { "id": "rule_002", "title": "Finish your homework before playtime.", "peanuts": 2, "category": "security" },
+      { "id": "rule_003", "title": "Brush your teeth twice a day.", "peanuts": 2, "category": "security" },
+      { "id": "rule_004", "title": "Put toys away after playing.", "peanuts": 2, "category": "security" },
+      { "id": "rule_005", "title": "Be kind to siblings and friends.", "peanuts": 2, "category": "security" },
+      { "id": "rule_006", "title": "Help set the table for meals.", "peanuts": 2, "category": "security" }
+    ]
+  },
+  {
+    "id": "respect",
+    "items": [
+      { "id": "rule_007", "title": "Keep your room tidy.", "peanuts": 2, "category": "respect" },
+      { "id": "rule_008", "title": "Listen when someone else is talking.", "peanuts": 2, "category": "respect" },
+      { "id": "rule_009", "title": "Follow bedtime routines.", "peanuts": 2, "category": "respect" },
+      { "id": "rule_010", "title": "Say sorry if you hurt someone's feelings.", "peanuts": 2, "category": "respect" },
+      { "id": "rule_011", "title": "Share with others.", "peanuts": 2, "category": "respect" },
+      { "id": "rule_012", "title": "Tell a parent where you are going.", "peanuts": 2, "category": "respect" }
+    ]
+  }
+] 

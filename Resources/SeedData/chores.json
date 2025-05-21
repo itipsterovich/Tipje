@@ -1,0 +1,19 @@
+[
+  {
+    "id": "respect",
+    "items": [
+      { "id": "chore_001", "title": "Make your bed each morning.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_002", "title": "Put dirty clothes in the hamper.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_003", "title": "Water the houseplants.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_004", "title": "Feed the pet.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_005", "title": "Help load the dishwasher.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_006", "title": "Wipe down the kitchen table.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_007", "title": "Sort the recycling.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_008", "title": "Sweep the floor in one room.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_009", "title": "Help pack lunch for school.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_010", "title": "Dust a piece of furniture.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_011", "title": "Put away groceries.", "peanuts": 1, "category": "respect" },
+      { "id": "chore_012", "title": "Help take out the trash.", "peanuts": 1, "category": "respect" }
+    ]
+  }
+] 
