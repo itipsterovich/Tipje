@@ -159,7 +159,50 @@ Add `kidID` later for multi‑profile.
    - **Closing the modal** saves the selection and updates the interface accordingly.
 
 
+#Home Page
 
+**Overview**: The home screen will display the user's selected rule and chore cards from the admin screen, making it easy to track family rules and chores.
+
+**Admin Screen Integration**: When a user selects rule or chore cards in the admin screen, these items will appear in the corresponding sections of the home screen.
+
+-Tabs: The home screen will have two main tabs:
+
+-Tab 1: Displays **Family rules**.
+
+-Tab 2: Displays **Chores**.
+
+**Peanut Balance**: At the top of the home screen, there will be a display showing the child's balance of "peanuts" earned by completing tasks. Each completed task adds a specific number of peanuts to this balance. For example, completing a task like "always say please and thank you" (worth 2 peanuts) will increase the balance by 2 peanuts. The balance updates dynamically based on tasks completed.
+
+**Daily Refresh**: Tasks will refresh every day. Completed tasks will show their completed state for the current day, and the next day the tasks will reset so the child can earn peanuts again by completing them.
+
+----
+### Admin and Shop Synchronization
+
+#### Admin:
+- In the Admin interface, parents select which rewards are available for the kid to choose from.
+- These selected rewards are then displayed in the "Shop" tab of the Reward Shop page.
+- This mirrors the behavior already established between the Admin and the Home page.
+
+#### Shop:
+- The "Shop" tab shows the rewards chosen in the Admin, just like how items are shown on the Home page.
+- The kid can tap a reward to "purchase" it, which deducts the cost from their balance and moves the item to the "Basket" tab.
+- The UI and interaction are consistent with the Home page, ensuring a seamless experience.
+
+
+### Reward Purchase Behavior
+
+1. **Tapping a Reward:**
+   - When the kid taps on a reward in the "Shop" tab, the cost in peanuts is deducted from the balance.
+   - The selected reward moves to the "Basket" tab.
+
+2. **Visual Confirmation (Optional):**
+   - Display a brief confirmation message, e.g., "Reward added to basket!" or highlight the basket icon.
+
+3. **Persistent Basket Items:**
+   - Items in the "Basket" remain until the parent or the kid clears them, confirming the reward has been given.
+
+4. **Clearing the Basket:**
+   - Add a clear action for the parent or kid to clear the basket once the reward is delivered, e.g., a button or swipe gesture.
 
 
 ### Catalogue Data Source

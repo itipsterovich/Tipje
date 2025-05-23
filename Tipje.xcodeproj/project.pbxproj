@@ -14,6 +14,19 @@
 		62C4C5AE2DDDE8BA001CAB3B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		62C4C5C52DE09E74001CAB3B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		62C4C3F22DDDC962001CAB3B /* Tipje.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tipje.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipjeApp.swift; sourceTree = "<group>"; };
@@ -36,7 +49,7 @@
 		62C4C59D2DDDE0A2001CAB3B /* Exceptions for "Resources" folder in "Tipje" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				CustomUI/confetti.lottie,
+				"Animation - 1747993547108.json",
 				CustomUI/icon_close.svg,
 				CustomUI/icon_delete.svg,
 				CustomUI/icon_peanut.svg,
@@ -66,12 +79,19 @@
 				Components/BalanceChip.swift,
 				Components/ChoreAdultCard.swift,
 				Components/ConfettiOverlay.swift,
+				Components/IconRoundButton.swift,
+				Components/MainButton.swift,
+				Components/MainTabBar.swift,
 				Components/MascotModal.swift,
+				Components/PageTitle.swift,
 				Components/PaywallModal.swift,
 				Components/RewardAdultCard.swift,
+				Components/RewardKidCard.swift,
 				Components/RuleAdultCard.swift,
+				Components/SubTabBar.swift,
 				Components/TaskCard.swift,
 				Home/HomeView.swift,
+				MainView.swift,
 				OnboardingView.swift,
 				PinLockView.swift,
 				Settings/SettingsView.swift,
@@ -158,6 +178,7 @@
 				62C4C3EE2DDDC962001CAB3B /* Sources */,
 				62C4C3EF2DDDC962001CAB3B /* Frameworks */,
 				62C4C3F02DDDC962001CAB3B /* Resources */,
+				62C4C5C52DE09E74001CAB3B /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -197,6 +218,8 @@
 			);
 			mainGroup = 62C4C3E92DDDC962001CAB3B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 62C4C3F32DDDC962001CAB3B /* Products */;
 			projectDirPath = "";

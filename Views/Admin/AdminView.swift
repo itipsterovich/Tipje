@@ -26,47 +26,54 @@ struct AdminView: View {
     
     var body: some View {
         VStack(spacing: 14) {
-            // Header + Mascot
-            HStack {
-                Text("Your mindful home")
-                    .font(.custom("Inter-Medium", size: 24))
-                Spacer()
-                Image("mascot_happy")
-                    .resizable()
-                    .frame(width: 48, height: 48)
-            }
-            .padding(.top, 14)
-            // Local SegmentedControl
-            Picker("Tab", selection: $selectedTab) {
-                ForEach(AdminTab.allCases) { tab in
-                    Text(tab.rawValue).tag(tab)
+            PageTitle("Your mindful home") {
+                if !filteredTasks.isEmpty {
+                    IconRoundButton(iconName: "icon_plus") {
+                        syncSelectedTemplates()
+                        showCatalogueModal = true
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(.vertical, 8)
-            // Add New Button
-            Button(action: {
-                showCatalogueModal = true
-            }) {
-                Text("Add New")
-                    .font(.custom("Inter-Medium", size: 24))
-                    .padding(.vertical, 14)
-                    .padding(.horizontal, 24)
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(20)
-            }
+            // Local SegmentedControl
+            SubTabBar(
+                tabs: AdminTab.allCases,
+                selectedTab: $selectedTab,
+                title: { $0.rawValue }
+            )
             .padding(.vertical, 8)
             // List or Empty State
             if filteredTasks.isEmpty {
-                VStack(spacing: 14) {
-                    Image(selectedTab == .rules ? "mascot_empty_rules" : selectedTab == .chores ? "mascot_empty_rules" : "mascot_empty_rules")
-                        .resizable()
-                        .frame(width: 120, height: 120)
-                    Text(emptyStateText)
-                        .font(.custom("Inter-Medium", size: 24))
+                GeometryReader { geometry in
+                    let mascotHeight = min(geometry.size.height * 0.45, 500)
+                    VStack(spacing: 24) {
+                        Image(selectedTab == .rules ? "mascot_empty" : selectedTab == .chores ? "mascot_ticket" : "mascot_reward")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: mascotHeight)
+                        Text(emptyStateText)
+                            .font(.custom("Inter-Medium", size: 24))
+                            .foregroundColor(Color(hex: "#8E9293"))
+                        Button(action: {
+                            syncSelectedTemplates()
+                            showCatalogueModal = true
+                        }) {
+                            Text("Add New")
+                                .font(.custom("Inter-Medium", size: 24))
+                                .foregroundColor(Color(hex: "#799B44"))
+                                .padding(.vertical, 14)
+                                .padding(.horizontal, 24)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                        .fill(Color(hex: "#EAF3EA"))
+                                )
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.vertical, 8)
+                    }
+                    .padding(.top, 32)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .padding(.top, 32)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
                     VStack(spacing: 14) {
@@ -112,7 +119,7 @@ struct AdminView: View {
     }
     private func syncSelectedTemplates() {
         let kind = currentKind
-        selectedTemplates = Set(store.tasks.filter { $0.kind == kind && $0.isSelected }.map { $0.id.uuidString })
+        selectedTemplates = Set(store.tasks.filter { $0.kind == kind && $0.isSelected }.compactMap { $0.templateID })
     }
 }
 

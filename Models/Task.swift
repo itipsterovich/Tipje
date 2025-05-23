@@ -12,9 +12,10 @@ final class Task: Identifiable {
     var isSelected: Bool
     var isCompleted: Bool
     var inBasket: Bool
+    var templateID: String?
     // TODO: Add kidID for multi-profile support
     
-    init(kind: TaskKind, title: String, peanuts: Int, category: Category, createdAt: Date = Date(), isSelected: Bool = false, isCompleted: Bool = false, inBasket: Bool = false) {
+    init(kind: TaskKind, title: String, peanuts: Int, category: Category, createdAt: Date = Date(), isSelected: Bool = false, isCompleted: Bool = false, inBasket: Bool = false, templateID: String? = nil) {
         self.kind = kind
         self.title = title
         self.peanuts = peanuts
@@ -23,6 +24,7 @@ final class Task: Identifiable {
         self.isSelected = isSelected
         self.isCompleted = isCompleted
         self.inBasket = inBasket
+        self.templateID = templateID
     }
 }
 

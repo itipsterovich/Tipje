@@ -33,21 +33,10 @@ struct CatalogueModal: View {
         ZStack(alignment: .topTrailing) {
             Color(.systemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0) {
-                HStack(alignment: .center) {
-                    Text(modalTitle)
-                        .font(.custom("Inter-Medium", size: 24))
-                        .foregroundColor(Color.titlePrimary)
-                        .padding(.leading, 24)
-                        .padding(.vertical, 16)
-                    Spacer()
-                    Button(action: onClose) {
-                        Image("icon_close")
-                            .resizable()
-                            .frame(width: 32, height: 32)
-                            .padding(16)
-                    }
+                PageTitle(modalTitle) {
+                    IconRoundButton(iconName: "icon_close", action: onClose)
                 }
-                .zIndex(1)
+                .padding(.horizontal, 24)
                 ScrollView {
                     VStack(spacing: 24) {
                         ForEach(catalogue) { cat in

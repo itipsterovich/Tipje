@@ -10,8 +10,7 @@ struct AddRewardModal: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                Text("Add Reward")
-                    .font(.custom("Inter-Medium", size: 24))
+                PageTitle("Add reward")
                 TextField("Title", text: $title)
                     .padding(.vertical, 14)
                     .padding(.horizontal, 24)
@@ -30,15 +29,18 @@ struct AddRewardModal: View {
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
-                Button(action: save) {
+                Button(action: { save() }) {
                     Text("Save")
                         .font(.custom("Inter-Medium", size: 24))
+                        .foregroundColor(Color(hex: "#799B44"))
                         .padding(.vertical, 14)
                         .padding(.horizontal, 24)
-                        .background(Color.accentColor)
-                        .foregroundColor(.white)
-                        .cornerRadius(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                .fill(Color(hex: "#EAF3EA"))
+                        )
                 }
+                .buttonStyle(PlainButtonStyle())
                 .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .padding(24)

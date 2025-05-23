@@ -17,7 +17,7 @@ struct RuleAdultCard: View {
                     .foregroundColor(task.isSelected ? .white : task.category.defaultTextColor)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
-            // Dashed line, always visible
+            // Dashed line, always visible, inside right section
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
                 path.addLine(to: CGPoint(x: 0.75, y: 60))

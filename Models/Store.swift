@@ -2,9 +2,17 @@ import Foundation
 import SwiftData
 import Combine
 
+struct BasketEntry: Identifiable, Codable {
+    let id: UUID = UUID()
+    let rewardID: UUID
+    let timestamp: Date
+}
+
 @MainActor
 class Store: ObservableObject {
     @Published var tasks: [Task] = []
+    @Published var basket: [BasketEntry] = []
+    @Published var kidName: String = "Marsel"
     // TODO: Add CloudKit sync logic
     // TODO: Add CRUD methods
     // TODO: Add balance calculation
@@ -14,8 +22,16 @@ class Store: ObservableObject {
     }
     
     var balance: Int {
-        // TODO: Calculate balance as SUM(peanuts) WHERE isCompleted == true
-        0
+        let completedTasks = tasks.filter { ($0.kind == .rule || $0.kind == .chore) && $0.isCompleted }
+        let completedPeanuts = completedTasks.map { $0.peanuts }.reduce(0, +)
+        let spentPeanuts = basket.reduce(0) { sum, entry in
+            if let reward = tasks.first(where: { $0.id == entry.rewardID }) {
+                return sum + reward.peanuts
+            } else {
+                return sum
+            }
+        }
+        return completedPeanuts - spentPeanuts
     }
     
     func addTask(_ task: Task) {
@@ -36,18 +52,25 @@ class Store: ObservableObject {
     
     func addTaskFromTemplate(_ template: TaskTemplate, kind: TaskKind) {
         // Only add if not already present
-        guard !tasks.contains(where: { $0.id.uuidString == template.id }) else { return }
-        let task = Task(kind: kind, title: template.title, peanuts: template.peanuts, category: template.category, isSelected: true)
-        // Use template.id as UUID if possible
-        if let uuid = UUID(uuidString: template.id) {
-            task.id = uuid
-        }
+        guard !tasks.contains(where: { $0.templateID == template.id }) else { return }
+        let task = Task(kind: kind, title: template.title, peanuts: template.peanuts, category: template.category, isSelected: true, templateID: template.id)
         tasks.append(task)
         // TODO: Save to SwiftData/CloudKit
     }
     
     func deleteTaskByTemplateID(_ templateID: String) {
-        tasks.removeAll { $0.id.uuidString == templateID }
+        tasks.removeAll { $0.templateID == templateID }
         // TODO: Delete from SwiftData/CloudKit
+    }
+
+    func purchaseReward(_ reward: Task) {
+        guard balance >= reward.peanuts else { return }
+        basket.append(BasketEntry(rewardID: reward.id, timestamp: Date()))
+        // TODO: Save basket to SwiftData/CloudKit
+    }
+
+    func clearBasket() {
+        basket.removeAll()
+        // TODO: Save basket to SwiftData/CloudKit
     }
 } 
