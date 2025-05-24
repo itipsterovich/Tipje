@@ -52,7 +52,8 @@ struct ShopView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 14) {
-                            ForEach(availableRewards) { reward in
+                            ForEach(Array(availableRewards.enumerated()), id: \ .element.id) { index, reward in
+                                let color = colorForTemplateID(reward.templateID)
                                 RewardKidCard(task: reward, onTap: {
                                     if store.balance >= reward.peanuts {
                                         withAnimation(.spring()) {
@@ -67,7 +68,7 @@ struct ShopView: View {
                                     } else {
                                         showNotEnoughPeanuts = true
                                     }
-                                })
+                                }, backgroundColor: color)
                             }
                         }
                         .padding(.top, 8)
@@ -93,12 +94,13 @@ struct ShopView: View {
                 } else {
                     ScrollView {
                         VStack(spacing: 14) {
-                            ForEach(basketEntries) { entry in
+                            ForEach(Array(basketEntries.enumerated()), id: \ .element.id) { index, entry in
                                 if let reward = store.tasks.first(where: { $0.id == entry.rewardID }) {
+                                    let color = colorForTemplateID(reward.templateID)
                                     RewardKidCard(task: reward, onTap: {
                                         pendingBasketEntry = entry
                                         showConfettiOverlay = true
-                                    }, basketMode: true)
+                                    }, basketMode: true, backgroundColor: color)
                                 }
                             }
                         }

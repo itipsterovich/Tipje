@@ -4,11 +4,12 @@ struct RewardKidCard: View {
     @Bindable var task: Task
     var onTap: (() -> Void)? = nil
     var basketMode: Bool = false
+    var backgroundColor: Color
     var body: some View {
         HStack(spacing: 0) {
             // Left section: Text with left rounded corners
             ZStack(alignment: .leading) {
-                (task.inBasket ? task.category.selectedColor.opacity(0.65) : task.category.selectedColor)
+                backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 Text(task.title)
                     .lineLimit(2)
@@ -24,12 +25,12 @@ struct RewardKidCard: View {
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
             }
             .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
-            .foregroundColor(task.inBasket ? task.category.selectedColor : task.category.selectedColor)
+            .foregroundColor(backgroundColor)
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
             // Right section: fixed width (120pt)
             ZStack {
-                (task.inBasket ? task.category.selectedColor.opacity(0.65) : task.category.selectedColor)
+                backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
@@ -77,7 +78,7 @@ extension View {
 #if DEBUG
 struct RewardKidCard_Previews: PreviewProvider {
     static var previews: some View {
-        RewardKidCard(task: .init(kind: .reward, title: "Extra screen time", peanuts: 10, category: .fun))
+        RewardKidCard(task: .init(kind: .reward, title: "Extra screen time", peanuts: 10, category: .fun), backgroundColor: .blue)
             .previewLayout(.sizeThatFits)
     }
 }

@@ -4,11 +4,12 @@ struct TaskCard: View {
     @Bindable var task: Task
     var isAdult: Bool
     var onTap: (() -> Void)? = nil
+    var backgroundColor: Color
     var body: some View {
         HStack(spacing: 0) {
             // Left section: Text with left rounded corners
             ZStack(alignment: .leading) {
-                (task.isSelected ? task.category.selectedColor : task.category.defaultColor)
+                backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 Text(task.title)
                     .lineLimit(2)
@@ -24,12 +25,12 @@ struct TaskCard: View {
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
             }
             .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
-            .foregroundColor(task.isSelected ? task.category.selectedColor : task.category.defaultColor)
+            .foregroundColor(backgroundColor)
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
             // Right section: fixed width (120pt)
             ZStack {
-                (task.isCompleted ? task.category.selectedColor.opacity(0.65) : (task.isSelected ? task.category.selectedColor : task.category.defaultColor))
+                backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
@@ -56,15 +57,12 @@ struct TaskCard: View {
         .frame(height: 90)
         .onTapGesture { onTap?() }
     }
-    private var backgroundColor: Color {
-        task.isCompleted || task.inBasket ? task.category.selectedColor : task.category.defaultColor
-    }
 }
 
 #if DEBUG
 struct TaskCard_Previews: PreviewProvider {
     static var previews: some View {
-        TaskCard(task: .init(kind: .rule, title: "Respect bedtime", peanuts: 3, category: .security), isAdult: true)
+        TaskCard(task: .init(kind: .rule, title: "Respect bedtime", peanuts: 3, category: .security), isAdult: true, backgroundColor: .black)
             .previewLayout(.sizeThatFits)
     }
 }

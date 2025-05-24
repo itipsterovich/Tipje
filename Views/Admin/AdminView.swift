@@ -77,14 +77,15 @@ struct AdminView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 14) {
-                        ForEach(filteredTasks) { task in
+                        ForEach(Array(filteredTasks.enumerated()), id: \ .element.id) { index, task in
+                            let color = colorForTemplateID(task.templateID)
                             switch selectedTab {
                             case .rules:
-                                RuleAdultCard(task: task)
+                                RuleAdultCard(task: task, backgroundColor: color)
                             case .chores:
-                                ChoreAdultCard(task: task)
+                                ChoreAdultCard(task: task, backgroundColor: color)
                             case .shop:
-                                RewardAdultCard(task: task)
+                                RewardAdultCard(task: task, backgroundColor: color)
                             }
                         }
                     }

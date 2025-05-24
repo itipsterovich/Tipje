@@ -45,16 +45,26 @@ struct CatalogueModal: View {
                                     .font(.custom("Inter-Medium", size: 24))
                                     .foregroundColor(cat.category.selectedColor)
                                     .padding(.bottom, 4)
-                                ForEach(cat.items) { template in
-                                    CatalogueRow(template: template, isSelected: selectedTemplates.contains(template.id)) {
-                                        if selectedTemplates.contains(template.id) {
-                                            selectedTemplates.remove(template.id)
-                                            store.deleteTaskByTemplateID(template.id)
-                                        } else {
-                                            selectedTemplates.insert(template.id)
-                                            store.addTaskFromTemplate(template, kind: kind)
+                                ForEach(Array(cat.items.enumerated()), id: \ .element.id) { index, template in
+                                    let isSelected = selectedTemplates.contains(template.id)
+                                    let baseColor = colorForTemplateID(template.id)
+                                    let backgroundColor = isSelected ? baseColor : baseColor.opacity(0.3)
+                                    let textColor = isSelected ? Color.white : baseColor
+                                    CatalogueRow(
+                                        template: template,
+                                        isSelected: isSelected,
+                                        backgroundColor: backgroundColor,
+                                        textColor: textColor,
+                                        onTap: {
+                                            if isSelected {
+                                                selectedTemplates.remove(template.id)
+                                                store.deleteTaskByTemplateID(template.id)
+                                            } else {
+                                                selectedTemplates.insert(template.id)
+                                                store.addTaskFromTemplate(template, kind: kind)
+                                            }
                                         }
-                                    }
+                                    )
                                 }
                             }
                             .padding(.horizontal, 24)
@@ -100,19 +110,21 @@ struct CatalogueModal: View {
 struct CatalogueRow: View {
     let template: TaskTemplate
     let isSelected: Bool
+    let backgroundColor: Color
+    let textColor: Color
     let onTap: () -> Void
     var body: some View {
         HStack(spacing: 0) {
             // Left section: flexible width
             ZStack(alignment: .leading) {
-                (isSelected ? template.category.selectedColor : template.category.defaultColor)
+                backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 Text(template.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
                     .padding(.vertical, 14)
-                    .foregroundColor(isSelected ? .white : template.category.defaultTextColor)
+                    .foregroundColor(textColor)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
             // Dashed line, always visible
@@ -121,29 +133,29 @@ struct CatalogueRow: View {
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
             }
             .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
-            .foregroundColor(isSelected ? template.category.selectedColor : template.category.defaultColor)
+            .foregroundColor(backgroundColor)
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
             // Right section: fixed width (144pt)
             ZStack {
-                (isSelected ? template.category.selectedColor : template.category.defaultColor)
+                backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
                     Text("\(template.peanuts)")
-                        .foregroundColor(isSelected ? .white : template.category.defaultTextColor)
+                        .foregroundColor(textColor)
                         .frame(width: 20)
                     Spacer().frame(width: 4)
                     Image("icon_peanut")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .foregroundColor(isSelected ? .white : template.category.defaultTextColor)
+                        .foregroundColor(textColor)
                     Spacer().frame(width: 24)
                     Button(action: onTap) {
                         Image(isSelected ? "icon_delete" : "icon_plus")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .foregroundColor(isSelected ? .white : template.category.defaultTextColor)
+                            .foregroundColor(textColor)
                     }
                     .buttonStyle(PlainButtonStyle())
                     Spacer().frame(width: 24)

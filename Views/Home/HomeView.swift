@@ -39,12 +39,13 @@ struct HomeView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 14) {
-                        ForEach(filteredTasks) { task in
+                        ForEach(Array(filteredTasks.enumerated()), id: \ .element.id) { index, task in
+                            let color = colorForTemplateID(task.templateID)
                             TaskCard(task: task, isAdult: false, onTap: {
                                 withAnimation(.spring()) {
                                     task.isCompleted.toggle()
                                 }
-                            })
+                            }, backgroundColor: color)
                         }
                     }
                     .padding(.top, 8)
