@@ -11,49 +11,62 @@ struct HomeView: View {
     var body: some View {
         let kidName = store.kidName
         let weekday = DateFormatter().weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1]
-        VStack(spacing: 16) {
-            PageTitle("\(kidName)'s \(weekday)")
-            BalanceChip(balance: store.balance)
-                .padding(.top, 24)
-            SubTabBar(
-                tabs: [TaskKind.rule, TaskKind.chore],
-                selectedTab: $selectedTab,
-                title: { $0 == .rule ? "Family Rules" : "Chores" }
-            )
-            if filteredTasks.isEmpty {
-                GeometryReader { geometry in
-                    let mascotHeight = min(geometry.size.height * 0.45, 500)
-                    VStack(spacing: 24) {
-                        Image(selectedTab == .rule ? "mascot_empty" : "mascot_ticket")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: mascotHeight)
-                        Text(selectedTab == .rule ? "You don't have family rules yet" : "You don't have chores yet")
-                            .font(.custom("Inter-Medium", size: 24))
-                            .foregroundColor(Color(hex: "#8E9293"))
-                    }
-                    .padding(.top, 32)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+        BannerPanelLayout(
+            bannerColor: Color(hex: "#A9C6C0"),
+            bannerHeight: 400,
+            bannerContent: {
+                VStack {
+                    BalanceChip(balance: store.balance)
+                        .padding(.top, 32)
+                    Spacer()
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    VStack(spacing: 14) {
-                        ForEach(Array(filteredTasks.enumerated()), id: \ .element.id) { index, task in
-                            let color = colorForTemplateID(task.templateID)
-                            TaskCard(task: task, isAdult: false, onTap: {
-                                withAnimation(.spring()) {
-                                    task.isCompleted.toggle()
+                .frame(height: 400)
+            },
+            content: {
+                VStack(spacing: 16) {
+                    PageTitle("\(kidName)'s \(weekday)")
+                        .padding(.top, 24)
+                    SubTabBar(
+                        tabs: [TaskKind.rule, TaskKind.chore],
+                        selectedTab: $selectedTab,
+                        title: { $0 == .rule ? "Family Rules" : "Chores" }
+                    )
+                    if filteredTasks.isEmpty {
+                        GeometryReader { geometry in
+                            let mascotHeight = min(geometry.size.height * 0.45, 500)
+                            VStack(spacing: 24) {
+                                Image(selectedTab == .rule ? "mascot_empty" : "mascot_ticket")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: mascotHeight)
+                                Text(selectedTab == .rule ? "You don't have family rules yet" : "You don't have chores yet")
+                                    .font(.custom("Inter-Medium", size: 24))
+                                    .foregroundColor(Color(hex: "#8E9293"))
+                            }
+                            .padding(.top, 32)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 14) {
+                                ForEach(Array(filteredTasks.enumerated()), id: \ .element.id) { index, task in
+                                    let color = colorForTemplateID(task.templateID)
+                                    TaskCard(task: task, isAdult: false, onTap: {
+                                        withAnimation(.spring()) {
+                                            task.isCompleted.toggle()
+                                        }
+                                    }, backgroundColor: color)
                                 }
-                            }, backgroundColor: color)
+                            }
+                            .padding(.top, 8)
                         }
                     }
-                    .padding(.top, 8)
                 }
+                .padding(.horizontal, 24)
+                .font(.custom("Inter-Medium", size: 24))
             }
-        }
-        .padding(.horizontal, 24)
-        .font(.custom("Inter-Medium", size: 24))
+        )
     }
 }
 

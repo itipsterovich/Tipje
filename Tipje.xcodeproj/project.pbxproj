@@ -77,6 +77,7 @@
 				Admin/AdminView.swift,
 				Admin/CatalogueModal.swift,
 				Components/BalanceChip.swift,
+				Components/BannerPanelLayout.swift,
 				Components/ChoreAdultCard.swift,
 				Components/ConfettiOverlay.swift,
 				Components/IconRoundButton.swift,
