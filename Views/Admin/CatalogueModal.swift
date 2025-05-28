@@ -28,52 +28,62 @@ struct CatalogueModal: View {
         case .reward: return "Add Rewards"
         }
     }
-    
+    private var bannerColor: Color {
+        switch kind {
+        case .rule: return Color(hex: "#A2AFC1")
+        case .chore: return Color(hex: "#C3BCA5")
+        case .reward: return Color(hex: "#A5ADC3")
+        }
+    }
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            Color(.systemBackground).edgesIgnoringSafeArea(.all)
-            VStack(spacing: 0) {
-                PageTitle(modalTitle) {
-                    IconRoundButton(iconName: "icon_close", action: onClose)
-                }
-                .padding(.horizontal, 24)
-                ScrollView {
-                    VStack(spacing: 24) {
-                        ForEach(catalogue) { cat in
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(categoryTitle(cat.category))
-                                    .font(.custom("Inter-Medium", size: 24))
-                                    .foregroundColor(cat.category.selectedColor)
-                                    .padding(.bottom, 4)
-                                ForEach(Array(cat.items.enumerated()), id: \ .element.id) { index, template in
-                                    let isSelected = selectedTemplates.contains(template.id)
-                                    let baseColor = colorForTemplateID(template.id)
-                                    let backgroundColor = isSelected ? baseColor : baseColor.opacity(0.3)
-                                    let textColor = isSelected ? Color.white : baseColor
-                                    CatalogueRow(
-                                        template: template,
-                                        isSelected: isSelected,
-                                        backgroundColor: backgroundColor,
-                                        textColor: textColor,
-                                        onTap: {
-                                            if isSelected {
-                                                selectedTemplates.remove(template.id)
-                                                store.deleteTaskByTemplateID(template.id)
-                                            } else {
-                                                selectedTemplates.insert(template.id)
-                                                store.addTaskFromTemplate(template, kind: kind)
-                                            }
-                                        }
-                                    )
-                                }
-                            }
-                            .padding(.horizontal, 24)
-                        }
+        BannerPanelLayout(
+            bannerColor: bannerColor,
+            bannerHeight: 100,
+            content: {
+                VStack(spacing: 0) {
+                    PageTitle(modalTitle) {
+                        IconRoundButton(iconName: "icon_close", action: onClose)
                     }
-                    .padding(.vertical, 24)
+                    .padding(.top, 24)
+                    .padding(.horizontal, 24)
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            ForEach(catalogue) { cat in
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(categoryTitle(cat.category))
+                                        .font(.custom("Inter-Medium", size: 24))
+                                        .foregroundColor(cat.category.selectedColor)
+                                        .padding(.bottom, 4)
+                                    ForEach(Array(cat.items.enumerated()), id: \ .element.id) { index, template in
+                                        let isSelected = selectedTemplates.contains(template.id)
+                                        let baseColor = colorForIndex(index)
+                                        let backgroundColor = isSelected ? baseColor : baseColor.opacity(0.3)
+                                        let textColor = isSelected ? Color.white : baseColor
+                                        CatalogueRow(
+                                            template: template,
+                                            isSelected: isSelected,
+                                            backgroundColor: backgroundColor,
+                                            textColor: textColor,
+                                            onTap: {
+                                                if isSelected {
+                                                    selectedTemplates.remove(template.id)
+                                                    store.deleteTaskByTemplateID(template.id)
+                                                } else {
+                                                    selectedTemplates.insert(template.id)
+                                                    store.addTaskFromTemplate(template, kind: kind)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                            }
+                        }
+                        .padding(.vertical, 24)
+                    }
                 }
             }
-        }
+        )
         .onAppear(perform: loadCatalogue)
     }
     private func categoryTitle(_ category: Category) -> String {
@@ -113,6 +123,8 @@ struct CatalogueRow: View {
     let backgroundColor: Color
     let textColor: Color
     let onTap: () -> Void
+    @State private var isTapped: Bool = false
+    @EnvironmentObject private var store: Store
     var body: some View {
         HStack(spacing: 0) {
             // Left section: flexible width
@@ -136,36 +148,44 @@ struct CatalogueRow: View {
             .foregroundColor(backgroundColor)
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
-            // Right section: fixed width (144pt)
+            // Right section: fixed width (144pt for rule/chore, 160pt for reward)
             ZStack {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
                     Text("\(template.peanuts)")
-                        .foregroundColor(textColor)
+                        .foregroundColor(.white)
                         .frame(width: 20)
                     Spacer().frame(width: 4)
                     Image("icon_peanut")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .foregroundColor(textColor)
+                        .foregroundColor(.white)
                     Spacer().frame(width: 24)
-                    Button(action: onTap) {
-                        Image(isSelected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(textColor)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    Image(isSelected ? "icon_delete" : "icon_plus")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.white)
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
             }
-            .frame(width: 144, height: 90)
+            .frame(width: template.category == .fun ? 168 : 144, height: 90)
         }
         .font(.custom("Inter-Medium", size: 24))
         .frame(height: 90)
         .frame(maxWidth: .infinity)
+        .scaleEffect(isTapped ? 0.96 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .onTapGesture {
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+                isTapped = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                isTapped = false
+                onTap()
+            }
+        }
     }
 } 

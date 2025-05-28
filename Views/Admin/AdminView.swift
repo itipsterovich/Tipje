@@ -25,77 +25,98 @@ struct AdminView: View {
     }
     
     var body: some View {
-        VStack(spacing: 14) {
-            PageTitle("Your mindful home") {
-                if !filteredTasks.isEmpty {
-                    IconRoundButton(iconName: "icon_plus") {
-                        syncSelectedTemplates()
-                        showCatalogueModal = true
-                    }
+        BannerPanelLayout(
+            bannerColor: Color(hex: "#A2AFC1"),
+            bannerHeight: 300,
+            bannerContent: {
+                ZStack {
+                    // Illustration at the back, aligned to top
+                    Image("il_admin")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 300 * 1.1)
+                        .frame(maxWidth: .infinity, alignment: .top)
+                        .clipped()
+                        .offset(x: 14, y: 10 )
                 }
-            }
-            // Local SegmentedControl
-            SubTabBar(
-                tabs: AdminTab.allCases,
-                selectedTab: $selectedTab,
-                title: { $0.rawValue }
-            )
-            .padding(.vertical, 8)
-            // List or Empty State
-            if filteredTasks.isEmpty {
-                GeometryReader { geometry in
-                    let mascotHeight = min(geometry.size.height * 0.45, 500)
-                    VStack(spacing: 24) {
-                        Image(selectedTab == .rules ? "mascot_empty" : selectedTab == .chores ? "mascot_ticket" : "mascot_reward")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: mascotHeight)
-                        Text(emptyStateText)
-                            .font(.custom("Inter-Medium", size: 24))
-                            .foregroundColor(Color(hex: "#8E9293"))
-                        Button(action: {
-                            syncSelectedTemplates()
-                            showCatalogueModal = true
-                        }) {
-                            Text("Add New")
-                                .font(.custom("Inter-Medium", size: 24))
-                                .foregroundColor(Color(hex: "#799B44"))
-                                .padding(.vertical, 14)
-                                .padding(.horizontal, 24)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                                        .fill(Color(hex: "#EAF3EA"))
-                                )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.vertical, 8)
-                    }
-                    .padding(.top, 32)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                ScrollView {
-                    VStack(spacing: 14) {
-                        ForEach(Array(filteredTasks.enumerated()), id: \ .element.id) { index, task in
-                            let color = colorForTemplateID(task.templateID)
-                            switch selectedTab {
-                            case .rules:
-                                RuleAdultCard(task: task, backgroundColor: color)
-                            case .chores:
-                                ChoreAdultCard(task: task, backgroundColor: color)
-                            case .shop:
-                                RewardAdultCard(task: task, backgroundColor: color)
+                .frame(height: 300)
+            },
+            content: {
+                VStack(spacing: 14) {
+                    PageTitle("Your mindful home") {
+                        if !filteredTasks.isEmpty {
+                            IconRoundButton(iconName: "icon_plus") {
+                                syncSelectedTemplates()
+                                showCatalogueModal = true
                             }
                         }
                     }
-                    .padding(.top, 8)
+                    .padding(.top, 24)
+                    SubTabBar(
+                        tabs: AdminTab.allCases,
+                        selectedTab: $selectedTab,
+                        title: { $0.rawValue }
+                    )
+                    .padding(.vertical, 8)
+                    if filteredTasks.isEmpty {
+                        GeometryReader { geometry in
+                            let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
+                            VStack(spacing: 24) {
+                                Image(selectedTab == .rules ? "mascot_empty" : selectedTab == .chores ? "mascot_ticket" : "mascot_shoping")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: mascotHeight)
+                                    .padding(.top, -35)
+                                Text(emptyStateText)
+                                    .font(.custom("Inter-Medium", size: 24))
+                                    .foregroundColor(Color(hex: "#8E9293"))
+                                Button(action: {
+                                    syncSelectedTemplates()
+                                    showCatalogueModal = true
+                                }) {
+                                    Text("Add New")
+                                        .font(.custom("Inter-Medium", size: 24))
+                                        .foregroundColor(Color(hex: "#799B44"))
+                                        .padding(.vertical, 14)
+                                        .padding(.horizontal, 24)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                                .fill(Color(hex: "#EAF3EA"))
+                                        )
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .padding(.vertical, 8)
+                            }
+                            .padding(.top, 32)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 14) {
+                                ForEach(Array(filteredTasks.enumerated()), id: \ .element.id) { index, task in
+                                    let color = colorForIndex(index)
+                                    switch selectedTab {
+                                    case .rules:
+                                        RuleAdultCard(task: task, backgroundColor: color)
+                                    case .chores:
+                                        ChoreAdultCard(task: task, backgroundColor: color)
+                                    case .shop:
+                                        RewardAdultCard(task: task, backgroundColor: color)
+                                    }
+                                }
+                            }
+                            .padding(.top, 8)
+                        }
+                    }
                 }
+                .padding(.horizontal, 24)
+                .font(.custom("Inter-Medium", size: 24))
             }
-        }
-        .padding(.horizontal, 24)
-        .font(.custom("Inter-Medium", size: 24))
-        .fullScreenCover(isPresented: $showCatalogueModal) {
+        )
+        .fullScreenCover(isPresented: $showCatalogueModal, onDismiss: {
+            syncSelectedTemplates()
+        }) {
             CatalogueModal(kind: currentKind, selectedTemplates: $selectedTemplates) {
                 showCatalogueModal = false
             }

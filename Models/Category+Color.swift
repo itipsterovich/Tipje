@@ -55,20 +55,16 @@ extension Color {
 
 // Shared palette for card backgrounds
 let cardPalette: [Color] = [
-    Color(hex: "#D78C28"),
-    Color(hex: "#7FAD98"),
-    Color(hex: "#7F9BAD"),
     Color(hex: "#D5A412"),
-    Color(hex: "#C5BC9D"),
-    Color(hex: "#C48A8A")
+    Color(hex: "#7FAD98"),
+    Color(hex: "#ADA57F"),
+    Color(hex: "#D78C28"),
+    Color(hex: "#7F9BAD"),
+    Color(hex: "#A7AD7F"),
+    Color(hex: "#AD807F")
 ]
 
-/// Returns a palette color for a given templateID (or fallback to task.id if nil)
-func colorForTemplateID(_ templateID: String?) -> Color {
-    guard let templateID = templateID else {
-        // fallback: always return first color if no templateID
-        return cardPalette[0]
-    }
-    let hash = abs(templateID.hashValue)
-    return cardPalette[hash % cardPalette.count]
+/// Returns a palette color for a given index, rotating and ensuring no two adjacent are the same
+func colorForIndex(_ index: Int) -> Color {
+    cardPalette[index % cardPalette.count]
 } 

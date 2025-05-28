@@ -5,6 +5,7 @@ struct RewardKidCard: View {
     var onTap: (() -> Void)? = nil
     var basketMode: Bool = false
     var backgroundColor: Color
+    @State private var isTapped: Bool = false
     var body: some View {
         HStack(spacing: 0) {
             // Left section: Text with left rounded corners
@@ -58,8 +59,14 @@ struct RewardKidCard: View {
             .frame(width: 120, height: 90)
         }
         .frame(height: 90)
-        .if(!basketMode) { view in
-            view.onTapGesture { onTap?() }
+        .scaleEffect(isTapped ? 0.96 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .onTapGesture {
+            isTapped = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                isTapped = false
+            }
+            onTap?()
         }
     }
 }

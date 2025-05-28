@@ -4,6 +4,9 @@ struct RuleAdultCard: View {
     @EnvironmentObject var store: Store
     let task: Task
     let backgroundColor: Color
+    var onTap: (() -> Void)? = nil
+    @State private var isTapped: Bool = false
+    @State private var isButtonTapped: Bool = false
     var body: some View {
         HStack(spacing: 0) {
             // Left section: flexible width
@@ -42,13 +45,10 @@ struct RuleAdultCard: View {
                         .frame(width: 24, height: 24)
                         .foregroundColor(.white)
                     Spacer().frame(width: 24)
-                    Button(action: { store.toggleSelection(for: task) }) {
-                        Image(task.isSelected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(.white)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    Image(task.isSelected ? "icon_delete" : "icon_plus")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.white)
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
@@ -57,5 +57,17 @@ struct RuleAdultCard: View {
         }
         .frame(height: 90)
         .frame(maxWidth: .infinity)
+        .scaleEffect(isTapped ? 0.96 : 1.0)
+        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .onTapGesture {
+            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+                isTapped = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                isTapped = false
+                store.toggleSelection(for: task)
+                onTap?()
+            }
+        }
     }
 } 

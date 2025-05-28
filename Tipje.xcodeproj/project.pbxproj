@@ -91,6 +91,7 @@
 				Components/RuleAdultCard.swift,
 				Components/SubTabBar.swift,
 				Components/TaskCard.swift,
+				Components/VisualEffectBlur.swift,
 				Home/HomeView.swift,
 				MainView.swift,
 				OnboardingView.swift,

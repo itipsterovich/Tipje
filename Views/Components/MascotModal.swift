@@ -8,7 +8,7 @@ struct MascotModal: View {
                 // TODO: Add mascot image/animation
                 Image("mascot_happy")
                     .resizable()
-                    .frame(width: 120, height: 120)
+                    .frame(width: 160, height: 120)
                 Text(headline)
                     .font(.custom("Inter-Medium", size: 24))
                 // TODO: Add Button S to close
