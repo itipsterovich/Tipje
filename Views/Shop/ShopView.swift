@@ -41,12 +41,12 @@ struct ShopView: View {
                     // Left and right illustrations attached to edges
               
                     // Top center mascot (same as HomeView)
-                    Image("il_home")
+                    Image("il_shop_0")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 240)
+                        .frame(height: 300)
                         .frame(maxWidth: .infinity, alignment: .top)
-                        .offset(y: -40) // Move mascot higher
+                        .offset(y: -25) // Move mascot higher
                     // Large balance display, centered and floating
                     VStack(spacing: 0) {
                         Spacer()

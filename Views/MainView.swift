@@ -16,6 +16,8 @@ struct MainView: View {
                     AdminView().environmentObject(store)
                 case .settings:
                     SettingsView()
+                case .debug:
+                    DebugView().environmentObject(store)
                 }
             }
             Spacer(minLength: 0)

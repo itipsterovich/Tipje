@@ -31,7 +31,7 @@ class Store: ObservableObject {
                 return sum
             }
         }
-        return completedPeanuts - spentPeanuts
+        return max(0, completedPeanuts - spentPeanuts)
     }
     
     func addTask(_ task: Task) {

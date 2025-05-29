@@ -96,6 +96,7 @@
 				MainView.swift,
 				OnboardingView.swift,
 				PinLockView.swift,
+				Settings/DebugView.swift,
 				Settings/SettingsView.swift,
 				Shop/ShopView.swift,
 			);

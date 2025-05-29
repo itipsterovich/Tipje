@@ -4,6 +4,7 @@ struct RewardAdultCard: View {
     @EnvironmentObject var store: Store
     let task: Task
     let backgroundColor: Color
+    var textColor: Color = .white
     var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     @State private var isButtonTapped: Bool = false
@@ -18,7 +19,7 @@ struct RewardAdultCard: View {
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
                     .padding(.vertical, 14)
-                    .foregroundColor(.white)
+                    .foregroundColor(task.isSelected ? .white : textColor)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
             // Dash + right section: fixed width group
@@ -59,6 +60,7 @@ struct RewardAdultCard: View {
             }
             .fixedSize() // Ensures dash + right section never shrink
         }
+        .font(.custom("Inter-Medium", size: 24))
         .frame(height: 90)
         .frame(maxWidth: .infinity)
         .scaleEffect(isTapped ? 0.96 : 1.0)

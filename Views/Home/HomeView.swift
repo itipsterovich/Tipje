@@ -20,12 +20,12 @@ struct HomeView: View {
              
                     // Top center mascot
                     // Top center mascot (same as HomeView)
-                    Image("il_home")
+                    Image("il_home_2")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 240)
+                        .frame(height: 300)
                         .frame(maxWidth: .infinity, alignment: .top)
-                        .offset(y: -40) // Move mascot higher
+                        .offset(y: -25) // Move mascot higher
                     // Balance display (unchanged)
                     VStack(spacing: 0) {
                         Spacer()

@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum MainTab: Int, CaseIterable, Identifiable {
-    case home, shop, admin, settings
+    case home, shop, admin, settings, debug
     var id: Int { rawValue }
     var iconName: String {
         switch self {
@@ -9,6 +9,7 @@ enum MainTab: Int, CaseIterable, Identifiable {
         case .shop: return "icon_shop"
         case .admin: return "icon_admin"
         case .settings: return "icon_settings"
+        case .debug: return "icon_debug"
         }
     }
 }

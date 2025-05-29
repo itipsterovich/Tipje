@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 struct TaskTemplate: Identifiable, Codable, Equatable {
     let id: String
@@ -59,21 +60,47 @@ struct CatalogueModal: View {
                                         let baseColor = colorForIndex(index)
                                         let backgroundColor = isSelected ? baseColor : baseColor.opacity(0.3)
                                         let textColor = isSelected ? Color.white : baseColor
-                                        CatalogueRow(
-                                            template: template,
-                                            isSelected: isSelected,
-                                            backgroundColor: backgroundColor,
-                                            textColor: textColor,
-                                            onTap: {
-                                                if isSelected {
-                                                    selectedTemplates.remove(template.id)
-                                                    store.deleteTaskByTemplateID(template.id)
-                                                } else {
-                                                    selectedTemplates.insert(template.id)
-                                                    store.addTaskFromTemplate(template, kind: kind)
+                                        if kind == .reward {
+                                            // Use RewardAdultCard for rewards, pass textColor
+                                            RewardAdultCard(
+                                                task: Task(
+                                                    kind: .reward,
+                                                    title: template.title,
+                                                    peanuts: template.peanuts,
+                                                    category: template.category,
+                                                    isSelected: isSelected,
+                                                    templateID: template.id
+                                                ),
+                                                backgroundColor: backgroundColor,
+                                                textColor: textColor,
+                                                onTap: {
+                                                    if isSelected {
+                                                        selectedTemplates.remove(template.id)
+                                                        store.deleteTaskByTemplateID(template.id)
+                                                    } else {
+                                                        selectedTemplates.insert(template.id)
+                                                        store.addTaskFromTemplate(template, kind: kind)
+                                                    }
                                                 }
-                                            }
-                                        )
+                                            )
+                                            .environmentObject(store)
+                                        } else {
+                                            CatalogueRow(
+                                                template: template,
+                                                isSelected: isSelected,
+                                                backgroundColor: backgroundColor,
+                                                textColor: textColor,
+                                                onTap: {
+                                                    if isSelected {
+                                                        selectedTemplates.remove(template.id)
+                                                        store.deleteTaskByTemplateID(template.id)
+                                                    } else {
+                                                        selectedTemplates.insert(template.id)
+                                                        store.addTaskFromTemplate(template, kind: kind)
+                                                    }
+                                                }
+                                            )
+                                        }
                                     }
                                 }
                                 .padding(.horizontal, 24)
