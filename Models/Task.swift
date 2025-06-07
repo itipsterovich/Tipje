@@ -1,8 +1,9 @@
 import Foundation
 import SwiftData
+import SwiftUI
 
 @Model
-final class Task: Identifiable {
+final class TipjeTask: Identifiable {
     @Attribute(.unique) var id: UUID = UUID()
     var kind: TaskKind
     var title: String

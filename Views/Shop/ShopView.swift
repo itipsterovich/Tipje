@@ -20,16 +20,16 @@ enum ShopModal: Identifiable {
 
 struct ShopView: View {
     @EnvironmentObject var store: Store
-    @State private var selectedTab: ShopTab = .rewards // rewards or basket
+    @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
     @State private var activeModal: ShopModal? = nil
-    @State private var pendingBasketEntry: BasketEntry? = nil
+    @State private var pendingPurchase: RewardPurchase? = nil
 
-    private var availableRewards: [Task] {
-        store.tasks.filter { $0.kind == .reward && $0.isSelected }
+    private var availableRewards: [Reward] {
+        store.rewards.filter { $0.isActive }
     }
-    private var basketEntries: [BasketEntry] {
-        store.basket
+    private var basketEntries: [RewardPurchase] {
+        store.rewardPurchases.filter { $0.status == "IN_BASKET" }
     }
 
     var body: some View {
@@ -38,20 +38,16 @@ struct ShopView: View {
             bannerHeight: 300,
             bannerContent: {
                 ZStack {
-                    // Left and right illustrations attached to edges
-              
-                    // Top center mascot (same as HomeView)
                     Image("il_shop_0")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 300)
                         .frame(maxWidth: .infinity, alignment: .top)
-                        .offset(y: -25) // Move mascot higher
-                    // Large balance display, centered and floating
+                        .offset(y: 0)
                     VStack(spacing: 0) {
                         Spacer()
                         Text("\(store.balance)")
-                            .font(.system(size: 84, weight: .bold))
+                            .font(.custom("Inter-Regular_Bold", size: 84))
                             .foregroundColor(.white)
                             .shadow(radius: 4)
                         HStack(alignment: .center, spacing: 4) {
@@ -60,14 +56,14 @@ struct ShopView: View {
                                 .frame(width: 24, height: 24)
                                 .foregroundColor(.white)
                             Text("peanuts earned")
-                                .font(.system(size: 24, weight: .medium))
+                                .font(.custom("Inter-Regular_Medium", size: 24))
                                 .foregroundColor(.white)
                                 .shadow(radius: 2)
                         }
                         .padding(.top, -8)
                         Spacer()
                     }
-                    .padding(.top, 40)
+                    .padding(.top, 80)
                 }
                 .frame(height: 300)
             },
@@ -82,34 +78,17 @@ struct ShopView: View {
                     )
                     if selectedTab == .rewards {
                         if availableRewards.isEmpty {
-                            GeometryReader { geometry in
-                                let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
-                                VStack(spacing: 24) {
-                                    Image("mascot_shoping")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(height: mascotHeight)
-                                        .padding(.top, -100)
-                                    Text("No rewards available")
-                                        .font(.custom("Inter-Medium", size: 24))
-                                        .foregroundColor(Color(hex: "#8E9293"))
-                                }
-                                .padding(.top, 32)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            EmptyShopState(image: "mascot_shoping", text: "No rewards available")
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
-                                    ForEach(Array(availableRewards.enumerated()), id: \ .element.id) { index, reward in
-                                        let color = colorForIndex(index)
-                                        RewardKidCard(task: reward, onTap: {
-                                            if store.balance >= reward.peanuts {
-                                                withAnimation(.spring()) {
-                                                    store.purchaseReward(reward)
-                                                    showConfetti = true
-                                                    SoundPlayer.shared.playSound(named: "reward.aiff")
-                                                }
+                                    ForEach(availableRewards) { reward in
+                                        let canBuy = store.balance >= reward.cost
+                                        RewardKidCard(reward: reward, canBuy: canBuy) {
+                                            if canBuy {
+                                                store.purchaseReward(reward)
+                                                showConfetti = true
+                                                SoundPlayer.shared.playSound(named: "reward.aiff")
                                                 activeModal = .addedToBasket
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                                     showConfetti = false
@@ -117,7 +96,7 @@ struct ShopView: View {
                                             } else {
                                                 activeModal = .notEnoughPeanuts
                                             }
-                                        }, backgroundColor: color)
+                                        }
                                     }
                                 }
                                 .padding(.top, 8)
@@ -125,33 +104,16 @@ struct ShopView: View {
                         }
                     } else if selectedTab == .basket {
                         if basketEntries.isEmpty {
-                            GeometryReader { geometry in
-                                let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
-                                VStack(spacing: 24) {
-                                    Image("mascot_empty")
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(height: mascotHeight)
-                                        .padding(.top, -100)
-                                    Text("No rewards in basket")
-                                        .font(.custom("Inter-Medium", size: 24))
-                                        .foregroundColor(Color(hex: "#8E9293"))
-                                }
-                                .padding(.top, 32)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            EmptyShopState(image: "mascot_empty", text: "No rewards in basket")
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
-                                    ForEach(Array(basketEntries.enumerated()), id: \ .element.id) { index, entry in
-                                        if let reward = store.tasks.first(where: { $0.id == entry.rewardID }) {
-                                            let color = colorForIndex(index)
-                                            RewardKidCard(task: reward, onTap: {
-                                                pendingBasketEntry = entry
-                                                activeModal = .confettiOverlay
-                                            }, basketMode: true, backgroundColor: color)
-                                        }
+                                    ForEach(basketEntries) { entry in
+                                        // You may want to resolve reward details from rewardRef if needed
+                                        BasketCard(purchase: entry, onConfirm: {
+                                            pendingPurchase = entry
+                                            activeModal = .confettiOverlay
+                                        })
                                     }
                                 }
                                 .padding(.top, 8)
@@ -164,9 +126,9 @@ struct ShopView: View {
             }
         )
         .sheet(item: $activeModal, onDismiss: {
-            if activeModal == .confettiOverlay, let entry = pendingBasketEntry {
-                store.basket.removeAll { $0.id == entry.id }
-                pendingBasketEntry = nil
+            if activeModal == .confettiOverlay, let entry = pendingPurchase {
+                store.confirmRewardGiven(entry)
+                pendingPurchase = nil
             }
             activeModal = nil
         }) { modal in
@@ -186,8 +148,8 @@ struct ShopView: View {
                                     .frame(height: min(UIScreen.main.bounds.height * 0.32, 340) * 1.4)
                                     .padding(.top, 0)
                                 Text("You don't have enough peanuts. Earn them by completing tasks!")
-                                    .font(.custom("Inter-Medium", size: 22))
-                                    .foregroundColor(Color(hex: "#8E9293"))
+                                    .font(.custom("Inter-Regular_Medium", size: 22))
+                                    .foregroundColor(Color(hex: "8E9293"))
                                     .multilineTextAlignment(.center)
                                     .fixedSize(horizontal: false, vertical: true)
                                 Spacer(minLength: 8)
@@ -200,7 +162,7 @@ struct ShopView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            IconRoundButton(iconName: "icon_close") { activeModal = nil }
+                            ButtonRegular(iconName: "icon_close", variant: .light) { activeModal = nil }
                                 .padding(.top, 24)
                                 .padding(.trailing, 24)
                                 .shadow(color: .clear, radius: 0)
@@ -223,8 +185,8 @@ struct ShopView: View {
                                     .frame(height: min(UIScreen.main.bounds.height * 0.32, 340) * 1.4)
                                     .padding(.top, 0)
                                 Text("You've just added a new reward to your basket.")
-                                    .font(.custom("Inter-Medium", size: 22))
-                                    .foregroundColor(Color(hex: "#8E9293"))
+                                    .font(.custom("Inter-Regular_Medium", size: 22))
+                                    .foregroundColor(Color(hex: "8E9293"))
                                     .multilineTextAlignment(.center)
                                     .fixedSize(horizontal: false, vertical: true)
                                 Spacer(minLength: 8)
@@ -237,7 +199,7 @@ struct ShopView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            IconRoundButton(iconName: "icon_close") { activeModal = nil }
+                            ButtonRegular(iconName: "icon_close", variant: .light) { activeModal = nil }
                                 .padding(.top, 24)
                                 .padding(.trailing, 24)
                                 .shadow(color: .clear, radius: 0)
@@ -261,7 +223,7 @@ struct ShopView: View {
                                     .padding(.top, 0)
                                 Text("Well deserved! Have fun enjoying your treat")
                                     .font(.custom("Inter-Medium", size: 22))
-                                    .foregroundColor(Color(hex: "#8E9293"))
+                                    .foregroundColor(Color(hex: "8E9293"))
                                     .multilineTextAlignment(.center)
                                     .fixedSize(horizontal: false, vertical: true)
                                 Spacer(minLength: 8)
@@ -274,7 +236,7 @@ struct ShopView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            IconRoundButton(iconName: "icon_close") { activeModal = nil }
+                            ButtonRegular(iconName: "icon_close", variant: .light) { activeModal = nil }
                                 .padding(.top, 24)
                                 .padding(.trailing, 24)
                                 .shadow(color: .clear, radius: 0)
@@ -284,6 +246,29 @@ struct ShopView: View {
                 }
             }
         }
+    }
+}
+
+struct EmptyShopState: View {
+    let image: String
+    let text: String
+    var body: some View {
+        GeometryReader { geometry in
+            let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
+            VStack(spacing: 24) {
+                Image(image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: mascotHeight)
+                    .padding(.top, -100)
+                Text(text)
+                    .font(.custom("Inter-Medium", size: 24))
+                    .foregroundColor(Color(hex: "#8E9293"))
+            }
+            .padding(.top, 32)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

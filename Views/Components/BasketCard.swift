@@ -1,27 +1,23 @@
 import SwiftUI
 
-struct RewardKidCard: View {
-    let reward: Reward
-    var canBuy: Bool = true
-    var onTap: (() -> Void)? = nil
-    var basketMode: Bool = false
+struct BasketCard: View {
+    let purchase: RewardPurchase
+    var reward: Reward? = nil
+    var onConfirm: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
         HStack(spacing: 0) {
-            // Left section: Text with left rounded corners
             ZStack(alignment: .leading) {
                 Color(.systemGray5)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                Text(reward.title)
+                Text(reward?.title ?? "Reward")
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
-                    .padding(.trailing, 24)
                     .padding(.vertical, 14)
                     .foregroundColor(.white)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
-            // Dashed line, always visible, inside right section
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
@@ -30,29 +26,18 @@ struct RewardKidCard: View {
             .foregroundColor(Color(.systemGray5))
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
-            // Right section: fixed width (120pt)
             ZStack {
                 Color(.systemGray5)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
-                    if basketMode {
-                        Button(action: { onTap?() }) {
-                            Image("icon_give")
-                                .resizable()
-                                .frame(width: 32, height: 32)
-                                .foregroundColor(.white)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    } else {
-                        Text("\(reward.cost)")
-                            .foregroundColor(canBuy ? .white : .gray)
-                        Spacer().frame(width: 4)
-                        Image("icon_peanut")
+                    Button(action: { onConfirm?() }) {
+                        Image("icon_give")
                             .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(canBuy ? .white : .gray)
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(.white)
                     }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
@@ -61,39 +46,23 @@ struct RewardKidCard: View {
         }
         .frame(height: 90)
         .scaleEffect(isTapped ? 0.96 : 1.0)
-        .opacity(canBuy || basketMode ? 1 : 0.5)
         .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
         .onTapGesture {
-            guard canBuy || basketMode else { return }
             isTapped = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                 isTapped = false
             }
-            onTap?()
-        }
-    }
-}
-
-extension View {
-    @ViewBuilder
-    func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
+            onConfirm?()
         }
     }
 }
 
 #if DEBUG
-struct RewardKidCard_Previews: PreviewProvider {
+import FirebaseFirestore
+struct BasketCard_Previews: PreviewProvider {
     static var previews: some View {
-        RewardKidCard(reward: .init(
-            id: UUID().uuidString,
-            title: "Extra screen time",
-            cost: 10,
-            isActive: true
-        ), canBuy: true)
+        let dummyRef = Firestore.firestore().collection("dummy").document("dummy")
+        BasketCard(purchase: RewardPurchase(id: "1", rewardRef: dummyRef, status: "IN_BASKET", purchasedAt: Date(), givenAt: nil), reward: Reward(id: "r1", title: "Ice Cream", cost: 10, isActive: true))
             .previewLayout(.sizeThatFits)
     }
 }

@@ -1,32 +1,6 @@
 import SwiftUI
 
-extension Category {
-    var defaultColor: Color {
-        switch self {
-        case .security: return Color(hex: "#EAF3EA")
-        case .respect: return Color(hex: "#FAEDDB")
-        case .fun: return Color(hex: "#E4F0F8")
-        }
-    }
-    var selectedColor: Color {
-        switch self {
-        case .security: return Color(hex: "#7FAD98")
-        case .respect: return Color(hex: "#D78C28")
-        case .fun: return Color(hex: "#7F9BAD")
-        }
-    }
-    var defaultTextColor: Color {
-        switch self {
-        case .security: return Color(hex: "#7FAD98")
-        case .respect: return Color(hex: "#D78C28")
-        case .fun: return Color(hex: "#7F9BAD")
-        }
-    }
-    var selectedTextColor: Color {
-        return .white
-    }
-}
-
+// Extension to allow Color(hex: "#RRGGBB") usage
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

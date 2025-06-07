@@ -7,7 +7,7 @@ struct BalanceChip: View {
             Image("icon_peanuts")
             Text("\(balance)")
         }
-        .font(.custom("Inter-Medium", size: 24))
+        .font(.custom("Inter-Regular_Medium", size: 24))
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
         .background(Color(.systemGray6))

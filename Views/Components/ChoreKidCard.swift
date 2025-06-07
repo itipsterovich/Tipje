@@ -1,27 +1,22 @@
 import SwiftUI
 
-struct RuleAdultCard: View {
-    let rule: Rule
-    var onArchive: (() -> Void)? = nil
-    var selected: Bool = false
-    var baseColor: Color = Color(hex: "#A2AFC1") // Example color, replace with color library
+struct ChoreKidCard: View {
+    let chore: Chore
+    var isCompleted: Bool
     var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
-        let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
-        let contentColor = selected ? Color.white : baseColor
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {
-                backgroundColor
+                Color(.systemGray5)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                Text(rule.title)
+                Text(chore.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
                     .padding(.trailing, 24)
                     .padding(.vertical, 14)
-                    .foregroundColor(contentColor)
-                    .font(.custom("Inter-Medium", size: 24))
+                    .foregroundColor(.white)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
             Path { path in
@@ -29,49 +24,49 @@ struct RuleAdultCard: View {
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
             }
             .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
-            .foregroundColor(backgroundColor)
+            .foregroundColor(Color(.systemGray5))
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
             ZStack {
-                backgroundColor
+                Color(.systemGray5)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
-                    Text("\(rule.peanutValue)")
-                        .foregroundColor(contentColor)
+                    Text("\(chore.peanutValue)")
+                        .foregroundColor(.white)
                         .font(.custom("Inter-Medium", size: 24))
-                        .frame(width: 20, alignment: .trailing)
-                    Spacer().frame(width: 4)
+                        .frame(width: 32, alignment: .trailing)
+                    Spacer().frame(width: 12)
                     Image("icon_peanut")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .foregroundColor(contentColor)
-                    Spacer().frame(width: 24)
-                    Button(action: { onArchive?() }) {
-                        Image(selected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(contentColor)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                        .foregroundColor(.white)
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
             }
-            .frame(width: 144, height: 90)
+            .frame(width: 120, height: 90)
         }
         .frame(height: 90)
-        .frame(maxWidth: .infinity)
+        .opacity(isCompleted ? 0.3 : 1)
         .scaleEffect(isTapped ? 0.96 : 1.0)
         .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
-                isTapped = true
-            }
+            guard !isCompleted else { return }
+            isTapped = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                 isTapped = false
-                onTap?()
             }
+            onTap?()
         }
     }
-} 
+}
+
+#if DEBUG
+struct ChoreKidCard_Previews: PreviewProvider {
+    static var previews: some View {
+        ChoreKidCard(chore: Chore(id: "1", title: "Clean your room", peanutValue: 5, isActive: true), isCompleted: false)
+            .previewLayout(.sizeThatFits)
+    }
+}
+#endif 

@@ -8,9 +8,12 @@ struct SubTabBar<T: Hashable>: View {
     var body: some View {
         HStack(spacing: 10) {
             ForEach(tabs, id: \.self) { tab in
-                Button(action: { selectedTab = tab }) {
+                Button(action: { 
+                    print("SubTabBar: tapped \(tab)")
+                    selectedTab = tab 
+                }) {
                     Text(title(tab))
-                        .font(.custom("Inter-Medium", size: 24))
+                        .font(.custom("Inter-Regular_Medium", size: 24))
                         .foregroundColor(selectedTab == tab ? .white : Color(hex: "#799B44"))
                         .frame(maxWidth: .infinity, minHeight: 56)
                         .background(

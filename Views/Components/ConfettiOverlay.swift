@@ -14,10 +14,10 @@ struct ConfettiOverlay: View {
                     .frame(height: min(UIScreen.main.bounds.height * 0.45, 500) * 1.75)
                     .padding(.top, -100)
                 Text("Well deserved! Have fun enjoying your treat")
-                    .font(.custom("Inter-Medium", size: 24))
+                    .font(.custom("Inter-Regular_Medium", size: 24))
                     .foregroundColor(Color(hex: "#8E9293"))
                 Button("OK") { isPresented = false }
-                    .font(.custom("Inter-Medium", size: 24))
+                    .font(.custom("Inter-Regular_Medium", size: 24))
                     .padding(.vertical, 14)
                     .padding(.horizontal, 24)
                     .background(Color(hex: "EAF3EA"))

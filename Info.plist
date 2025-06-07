@@ -2,25 +2,35 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleName</key>
-    <string>Tipje</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.Tipje</string>
-    <key>CFBundleVersion</key>
-    <string>1</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
-    <key>UILaunchScreen</key>
-    <dict/>
-    <key>UIAppFonts</key>
-    <array>
-        <string>Inter-VariableFont_opsz,wght.ttf</string>
-    </array>
+	<key>CFBundleExecutable</key>
+	<string>Tipje</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.Tipje</string>
+	<key>CFBundleName</key>
+	<string>Tipje</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>GoogleSignIn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.241802017109-3m083oncbfqe6m34733kgsgh4f19vkam</string>
+			</array>
+		</dict>
+		<dict/>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Inter-VariableFont_opsz,wght.ttf</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
 </dict>
-</plist>//
-//  Info.plist
-//  Tipje
-//
-//  Created by Ira Bykova on 30/05/2025.
-//
-
+</plist>

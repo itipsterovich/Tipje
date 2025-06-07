@@ -1,27 +1,28 @@
 import SwiftUI
 
 struct ChoreAdultCard: View {
-    @EnvironmentObject var store: Store
-    let task: Task
-    let backgroundColor: Color
-    var onTap: (() -> Void)? = nil
+    let chore: Chore
+    var onArchive: (() -> Void)? = nil
+    var selected: Bool = false
+    var baseColor: Color = Color(hex: "#C3BCA5") // Example color, replace with color library
     @State private var isTapped: Bool = false
-    @State private var isButtonTapped: Bool = false
     var body: some View {
+        let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
+        let contentColor = selected ? Color.white : baseColor
         HStack(spacing: 0) {
-            // Left section: flexible width
             ZStack(alignment: .leading) {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                Text(task.title)
+                Text(chore.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
+                    .padding(.trailing, 24)
                     .padding(.vertical, 14)
-                    .foregroundColor(.white)
+                    .foregroundColor(contentColor)
+                    .font(.custom("Inter-Medium", size: 24))
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
-            // Dashed line, always visible
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
@@ -30,25 +31,25 @@ struct ChoreAdultCard: View {
             .foregroundColor(backgroundColor)
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
-            // Right section: fixed width (144pt)
             ZStack {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
                     Spacer().frame(width: 24)
-                    Text("\(task.peanuts)")
-                        .foregroundColor(.white)
-                        .frame(width: 20)
-                    Spacer().frame(width: 4)
+                    Text("\(chore.peanutValue)")
+                        .foregroundColor(contentColor)
+                        .font(.custom("Inter-Medium", size: 24))
+                        .frame(width: 32, alignment: .trailing)
+                    Spacer().frame(width: 12)
                     Image("icon_peanut")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .foregroundColor(.white)
+                        .foregroundColor(contentColor)
                     Spacer().frame(width: 24)
-                    Image(task.isSelected ? "icon_delete" : "icon_plus")
+                    Image(selected ? "icon_delete" : "icon_plus")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .foregroundColor(.white)
+                        .foregroundColor(contentColor)
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
@@ -65,8 +66,6 @@ struct ChoreAdultCard: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                 isTapped = false
-                store.toggleSelection(for: task)
-                onTap?()
             }
         }
     }

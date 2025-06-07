@@ -19,19 +19,10 @@ struct MainTabBar: View {
     var body: some View {
         HStack(spacing: 20) {
             ForEach(MainTab.allCases) { tab in
-                Button(action: { selectedTab = tab }) {
-                    ZStack {
-                        Circle()
-                            .fill(selectedTab == tab ? Color(hex: "#799B44") : Color(hex: "#EAF3EA"))
-                            .frame(width: 56, height: 56)
-                        Image(tab.iconName)
-                            .resizable()
-                            .renderingMode(.template)
-                            .foregroundColor(selectedTab == tab ? .white : Color(hex: "#799B44"))
-                            .frame(width: 24, height: 24)
-                    }
+                ButtonRegular(iconName: tab.iconName, variant: selectedTab == tab ? .green : .light) {
+                    print("MainTabBar: tapped \(tab)")
+                    selectedTab = tab
                 }
-                .buttonStyle(PlainButtonStyle())
             }
         }
         .padding(.horizontal, 10)

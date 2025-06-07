@@ -2,3 +2,63 @@
 "app_name" = "Tipje";
 // TODO: Add all user-facing strings
 // TODO: Add NL localization 
+
+/* Settings */
+"settings_title" = "Settings";
+"settings_account" = "Account";
+"settings_security" = "Security";
+"settings_language" = "Language";
+"settings_subscription" = "Subscription";
+"settings_app_info" = "App Info";
+"settings_change_password" = "Change Password";
+"settings_change_email" = "Change Email";
+"settings_logout" = "Log Out";
+"settings_pin" = "PIN (4 digits)";
+"settings_change_pin" = "Change PIN";
+"settings_forgot_pin" = "Forgot PIN?";
+"settings_link_google" = "Link Google Account";
+"settings_unlink_google" = "Unlink Google Account";
+"settings_kids" = "Kids";
+"settings_delete_kid" = "Delete";
+"settings_delete_kid_confirm" = "Are you sure you want to delete this kid and all their data? This cannot be undone.";
+"settings_delete_kid_success" = "Kid deleted successfully.";
+"settings_delete_kid_fail" = "Failed to delete kid.";
+
+/* Onboarding */
+"onboarding_title" = "Who's in Your Tipje Family?";
+"onboarding_subtitle" = "Enter your child's name to begin. Add more kids anytime—each with custom age-appropriate set of rules and chores.";
+"onboarding_child_name" = "Child's name";
+"onboarding_child_name_2" = "Child's name 2";
+"onboarding_next" = "Next";
+
+/* PIN & Errors */
+"pin_invalid" = "Please enter a valid 4-digit PIN.";
+"pin_success" = "PIN changed successfully.";
+"pin_fail" = "Failed to change PIN: %@";
+"pin_incorrect" = "Incorrect PIN. If you forgot your PIN, please reset it.";
+"pin_correct" = "Your PIN is correct.";
+"pin_locked_out" = "Too many failed attempts. Please try again later.";
+
+/* General */
+"ok" = "OK";
+"cancel" = "Cancel";
+"yes" = "Yes";
+"no" = "No";
+
+/* Pin Setup */
+"pinsetup_title" = "Lock Your Admin Section";
+"pinsetup_subtitle" = "Create a 4-digit PIN to secure the Admin area—parents manage rules here, while kids focus on completing chores.";
+"pinsetup_save_fail" = "Failed to save PIN. Please try again.";
+
+/* Login */
+"login_title" = "Build your mindful family home with a 7-day free trial";
+"login_google" = "Sign in with Google";
+"login_or" = "OR";
+"login_email" = "Email";
+"login_password" = "Password";
+"login_repeat_password" = "Repeat Password";
+"login_signup" = "Sign Up";
+"login_signin" = "Sign In";
+"login_have_account" = "Have an account?";
+"login_no_account" = "Don't have an account?";
+"login_passwords_no_match" = "Passwords do not match"; 

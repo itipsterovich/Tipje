@@ -19,25 +19,23 @@ struct BannerPanelLayout<BannerContent: View, Content: View>: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            bannerColor
-                .frame(height: bannerHeight)
-                .edgesIgnoringSafeArea(.top)
-                .overlay(bannerContent(), alignment: .top)
-            VStack(spacing: 0) {
-                Spacer().frame(height: bannerHeight - 24)
-                // Content panel
-                ZStack(alignment: .topTrailing) {
+        VStack(spacing: 0) {
+            ZStack {
+                bannerColor
+                    .frame(height: bannerHeight)
+                    .edgesIgnoringSafeArea(.top)
+                bannerContent()
+                    .frame(height: bannerHeight)
+            }
+            // White content panel with rounded top corners
+            content()
+                .background(
                     RoundedCorner(radius: 24, corners: [.topLeft, .topRight])
                         .fill(Color.white)
-                        .frame(maxWidth: .infinity)
-                        .offset(y: -24)
-                    content()
-                        .offset(y: -24)
-                }
-                .padding(.horizontal, 0)
-            }
+                )
+                .offset(y: -24)
         }
+        .edgesIgnoringSafeArea(.top)
     }
 }
 

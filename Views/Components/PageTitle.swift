@@ -12,7 +12,7 @@ struct PageTitle<Content: View>: View {
     var body: some View {
         HStack(alignment: .center) {
             Text(text)
-                .font(.custom("Inter-Medium", size: 28))
+                .font(.custom("Inter-Regular_Medium", size: 28))
                 .foregroundColor(Color.titlePrimary)
             Spacer()
             trailing()
@@ -36,7 +36,7 @@ struct PageTitle_Previews: PreviewProvider {
             PageTitle("Add new rule") {
                 Button(action: {}) {
                     Image(systemName: "xmark")
-                        .font(.title)
+                        .font(.custom("Inter-Regular_Medium", size: 28))
                         .foregroundColor(.gray)
                 }
             }

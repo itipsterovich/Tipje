@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6212A9B92DEDE1EC00C809B7 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9B82DEDE1EC00C809B7 /* FirebaseAuth */; };
+		6212A9BB2DEDE1EC00C809B7 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9BA2DEDE1EC00C809B7 /* FirebaseCore */; };
+		6212A9BD2DEDE1EC00C809B7 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9BC2DEDE1EC00C809B7 /* FirebaseFirestore */; };
+		6212A9C22DEDF03300C809B7 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9C12DEDF03300C809B7 /* GoogleSignIn */; };
+		6212A9C42DEDF03300C809B7 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9C32DEDF03300C809B7 /* GoogleSignInSwift */; };
+		629ABF502DEE168F00362CEC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */; };
+		629ABF592DEF2A2E00362CEC /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 629ABF582DEF2A2E00362CEC /* ActivityIndicatorView */; };
+		629ABF632DF043A400362CEC /* il_clouds.png in Resources */ = {isa = PBXBuildFile; fileRef = 629ABF622DF043A400362CEC /* il_clouds.png */; };
 		62C4C52C2DDDE08A001CAB3B /* TipjeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */; };
 		62C4C5882DDDE0A2001CAB3B /* success.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C54D2DDDE0A2001CAB3B /* success.aiff */; };
 		62C4C58F2DDDE0A2001CAB3B /* reward.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C54C2DDDE0A2001CAB3B /* reward.aiff */; };
@@ -28,6 +36,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		626E81012DE9AA7700715C38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		629ABF622DF043A400362CEC /* il_clouds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = il_clouds.png; sourceTree = "<group>"; };
 		62C4C3F22DDDC962001CAB3B /* Tipje.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tipje.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipjeApp.swift; sourceTree = "<group>"; };
 		62C4C54B2DDDE0A2001CAB3B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -40,6 +51,7 @@
 		62C4C59C2DDDE0A2001CAB3B /* Exceptions for "Models" folder in "Tipje" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CatalogData.swift,
 				"Category+Color.swift",
 				Store.swift,
 				Task.swift,
@@ -61,6 +73,7 @@
 				CustomUI/mascot_like.png,
 				CustomUI/mascot_peanuts.png,
 				CustomUI/mascot_ticket.png,
+				"Inter-VariableFont_opsz,wght.ttf",
 				Localizable.strings,
 				SeedData/chores.json,
 				SeedData/rewards.json,
@@ -72,16 +85,21 @@
 		62C4C59E2DDDE0A2001CAB3B /* Exceptions for "Views" folder in "Tipje" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Admin/AddRewardModal.swift,
-				Admin/AddTaskModal.swift,
 				Admin/AdminView.swift,
-				Admin/CatalogueModal.swift,
+				Admin/CatalogChoresModal.swift,
+				Admin/CatalogRewardsModal.swift,
+				Admin/CatalogRulesModal.swift,
 				Components/BalanceChip.swift,
 				Components/BannerPanelLayout.swift,
+				Components/BasketCard.swift,
+				Components/ButtonLarge.swift,
+				Components/ButtonRegular.swift,
+				Components/ButtonText.swift,
 				Components/ChoreAdultCard.swift,
+				Components/ChoreKidCard.swift,
 				Components/ConfettiOverlay.swift,
+				Components/CustomDropdownCompact.swift,
 				Components/IconRoundButton.swift,
-				Components/MainButton.swift,
 				Components/MainTabBar.swift,
 				Components/MascotModal.swift,
 				Components/PageTitle.swift,
@@ -89,12 +107,15 @@
 				Components/RewardAdultCard.swift,
 				Components/RewardKidCard.swift,
 				Components/RuleAdultCard.swift,
+				Components/RuleKidCard.swift,
 				Components/SubTabBar.swift,
-				Components/TaskCard.swift,
 				Components/VisualEffectBlur.swift,
 				Home/HomeView.swift,
 				MainView.swift,
-				OnboardingView.swift,
+				Onboarding/KidsProfileView.swift,
+				Onboarding/LoginView.swift,
+				Onboarding/OnboardingView.swift,
+				Onboarding/PinSetupView.swift,
 				PinLockView.swift,
 				Settings/DebugView.swift,
 				Settings/SettingsView.swift,
@@ -141,6 +162,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6212A9C42DEDF03300C809B7 /* GoogleSignInSwift in Frameworks */,
+				6212A9BB2DEDE1EC00C809B7 /* FirebaseCore in Frameworks */,
+				6212A9C22DEDF03300C809B7 /* GoogleSignIn in Frameworks */,
+				6212A9B92DEDE1EC00C809B7 /* FirebaseAuth in Frameworks */,
+				629ABF592DEF2A2E00362CEC /* ActivityIndicatorView in Frameworks */,
+				6212A9BD2DEDE1EC00C809B7 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +178,10 @@
 			isa = PBXGroup;
 			children = (
 				62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */,
+				629ABF622DF043A400362CEC /* il_clouds.png */,
 				62C4C54B2DDDE0A2001CAB3B /* README.md */,
+				629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */,
+				626E81012DE9AA7700715C38 /* Info.plist */,
 				62C4C54C2DDDE0A2001CAB3B /* reward.aiff */,
 				62C4C54D2DDDE0A2001CAB3B /* success.aiff */,
 				62C4C53E2DDDE0A2001CAB3B /* Models */,
@@ -192,6 +222,12 @@
 			);
 			name = Tipje;
 			packageProductDependencies = (
+				6212A9B82DEDE1EC00C809B7 /* FirebaseAuth */,
+				6212A9BA2DEDE1EC00C809B7 /* FirebaseCore */,
+				6212A9BC2DEDE1EC00C809B7 /* FirebaseFirestore */,
+				6212A9C12DEDF03300C809B7 /* GoogleSignIn */,
+				6212A9C32DEDF03300C809B7 /* GoogleSignInSwift */,
+				629ABF582DEF2A2E00362CEC /* ActivityIndicatorView */,
 			);
 			productName = Tipje;
 			productReference = 62C4C3F22DDDC962001CAB3B /* Tipje.app */;
@@ -222,6 +258,9 @@
 			mainGroup = 62C4C3E92DDDC962001CAB3B;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				6212A9B72DEDE1EC00C809B7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				6212A9C02DEDF03300C809B7 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				629ABF572DEF2A2E00362CEC /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 62C4C3F32DDDC962001CAB3B /* Products */;
@@ -239,8 +278,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				62C4C5AE2DDDE8BA001CAB3B /* Assets.xcassets in Resources */,
+				629ABF502DEE168F00362CEC /* GoogleService-Info.plist in Resources */,
 				62C4C58F2DDDE0A2001CAB3B /* reward.aiff in Resources */,
 				62C4C5962DDDE0A2001CAB3B /* README.md in Resources */,
+				629ABF632DF043A400362CEC /* il_clouds.png in Resources */,
 				62C4C5882DDDE0A2001CAB3B /* success.aiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,7 +428,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6U498W8698;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -415,7 +457,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6U498W8698;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -456,6 +499,66 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6212A9B72DEDE1EC00C809B7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.13.0;
+			};
+		};
+		6212A9C02DEDF03300C809B7 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		629ABF572DEF2A2E00362CEC /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/ActivityIndicatorView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6212A9B82DEDE1EC00C809B7 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6212A9B72DEDE1EC00C809B7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		6212A9BA2DEDE1EC00C809B7 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6212A9B72DEDE1EC00C809B7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		6212A9BC2DEDE1EC00C809B7 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6212A9B72DEDE1EC00C809B7 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6212A9C12DEDF03300C809B7 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6212A9C02DEDF03300C809B7 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		6212A9C32DEDF03300C809B7 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6212A9C02DEDF03300C809B7 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		629ABF582DEF2A2E00362CEC /* ActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 629ABF572DEF2A2E00362CEC /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */;
+			productName = ActivityIndicatorView;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 62C4C3EA2DDDC962001CAB3B /* Project object */;
 }

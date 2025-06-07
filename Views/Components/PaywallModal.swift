@@ -3,17 +3,17 @@ import SwiftUI
 struct PaywallModal: View {
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // TODO: Add illustration
-                Text("Unlock all features")
-                    .font(.custom("Inter-Medium", size: 24))
-                // TODO: Add feature bullets
-                // TODO: Add price toggle and subscribe/restore buttons
-            }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(24)
-            .shadow(radius: 8)
+        VStack(spacing: 24) {
+            // TODO: Add illustration
+            Text("Unlock all features")
+                .font(.custom("Inter", size: 24).weight(.medium))
+            // TODO: Add feature bullets
+            // TODO: Add price toggle and subscribe/restore buttons
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(24)
+        .shadow(radius: 8)
         }
     }
 }

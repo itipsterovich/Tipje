@@ -1,11 +1,17 @@
 import SwiftUI
+import ActivityIndicatorView
 
 struct DebugView: View {
     @AppStorage("didCompleteOnboarding") var didCompleteOnboarding: Bool = false
+    @AppStorage("didLogin") var didLogin: Bool = false
     @AppStorage("didRegister") var didRegister: Bool = false
     @AppStorage("hasActiveSubscription") var hasActiveSubscription: Bool = false
     @EnvironmentObject var store: Store
     @State private var showRestartAlert = false
+    @State private var testUserId: String? = nil
+    @State private var showKidsProfile = false
+    @State private var showPinSetup = false
+    @State private var isLoadingTestUser = false
 
     var body: some View {
         ScrollView {
@@ -17,15 +23,18 @@ struct DebugView: View {
                     Text("Debug Tools")
                         .font(.custom("Inter-Medium", size: 28))
                 }
-                SettingsSection(title: "Onboarding") {
+                SettingsSection(title: "Onboarding & Login") {
                     VStack(alignment: .trailing, spacing: 16) {
                         HStack(spacing: 16) {
                             DebugButton(title: "Mark Onboarding Complete") { didCompleteOnboarding = true }
-                            DebugButton(title: "Reset Onboarding") { didCompleteOnboarding = false }
+                            DebugButton(title: "Reset Onboarding & Login") {
+                                didCompleteOnboarding = false
+                                didLogin = false
+                            }
                         }
-                        Text("Current: \(didCompleteOnboarding ? "Complete" : "Not Complete")")
+                        Text("Current: \(didCompleteOnboarding ? "Complete" : "Not Complete") | Login: \(didLogin ? "Yes" : "No")")
                             .foregroundColor(.secondary)
-                            .font(.custom("Inter-Medium", size: 20))
+                            .font(.custom("Inter-Regular_Medium", size: 20))
                     }
                 }
                 SettingsSection(title: "Registration") {
@@ -36,7 +45,7 @@ struct DebugView: View {
                         }
                         Text("Current: \(didRegister ? "Registered" : "Not Registered")")
                             .foregroundColor(.secondary)
-                            .font(.custom("Inter-Medium", size: 20))
+                            .font(.custom("Inter-Regular_Medium", size: 20))
                     }
                 }
                 SettingsSection(title: "Subscription") {
@@ -47,7 +56,7 @@ struct DebugView: View {
                         }
                         Text("Current: \(hasActiveSubscription ? "Active" : "Inactive")")
                             .foregroundColor(.secondary)
-                            .font(.custom("Inter-Medium", size: 20))
+                            .font(.custom("Inter-Regular_Medium", size: 20))
                     }
                 }
                 SettingsSection(title: "App State Shortcuts") {
@@ -55,6 +64,30 @@ struct DebugView: View {
                         DebugButton(title: "Go to Home (bypass onboarding)") {
                             didCompleteOnboarding = true
                             didRegister = true
+                        }
+                        DebugButton(title: "Skip Registration: Test Kids Profile & PIN") {
+                            isLoadingTestUser = true
+                            let newUserId = UUID().uuidString
+                            let user = User(
+                                id: newUserId,
+                                email: "test+\(Int.random(in: 1000...9999))@tipje.app",
+                                displayName: "Test User",
+                                authProvider: nil,
+                                pinHash: nil,
+                                createdAt: nil,
+                                updatedAt: nil,
+                                pinFailedAttempts: nil,
+                                pinLockoutUntil: nil
+                            )
+                            FirestoreManager.shared.createUser(user) { error in
+                                // DispatchQueue.main.async(execute: {
+                                    isLoadingTestUser = false
+                                    if error == nil {
+                                        testUserId = newUserId
+                                        showKidsProfile = true
+                                    }
+                                // })
+                            }
                         }
                         DebugButton(title: "Clear All UserDefaults") {
                             let domain = Bundle.main.bundleIdentifier!
@@ -64,6 +97,28 @@ struct DebugView: View {
                         Text("Use these tools to simulate onboarding, registration, and subscription states. Useful for testing flows in the simulator.")
                             .foregroundColor(.secondary)
                             .font(.footnote)
+                    }
+                }
+                SettingsSection(title: "Firestore Test") {
+                    DebugButton(title: "Create Test User in Firestore") {
+                        let user = User(
+                            id: "testUserId",
+                            email: "test@email.com",
+                            displayName: "Test User",
+                            authProvider: nil,
+                            pinHash: nil,
+                            createdAt: nil,
+                            updatedAt: nil,
+                            pinFailedAttempts: nil,
+                            pinLockoutUntil: nil
+                        )
+                        FirestoreManager.shared.createUser(user) { error in
+                            if let error = error {
+                                print("Error: \(error)")
+                            } else {
+                                print("User created!")
+                            }
+                        }
                     }
                 }
             }
@@ -76,6 +131,40 @@ struct DebugView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        .fullScreenCover(isPresented: $showKidsProfile, onDismiss: {
+            testUserId = nil
+        }) {
+            if let userId = testUserId {
+                KidsProfileView(userId: userId) {
+                    showKidsProfile = false
+                    showPinSetup = true
+                }
+            }
+        }
+        .fullScreenCover(isPresented: $showPinSetup) {
+            if let userId = testUserId {
+                PinSetupView(userId: userId) {
+                    showPinSetup = false
+                }
+            }
+        }
+        .overlay(
+            Group {
+                if isLoadingTestUser {
+                    ZStack {
+                        Color.white.ignoresSafeArea()
+                        VStack(spacing: 32) {
+                            ActivityIndicatorView(isVisible: .constant(true), type: .scalingDots())
+                                .frame(width: 140, height: 140)
+                                .foregroundColor(Color(hex: "#799B44"))
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.clear)
+                    }
+                    .edgesIgnoringSafeArea(.all)
+                }
+            }
+        )
     }
 }
 

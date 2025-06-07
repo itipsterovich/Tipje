@@ -1,0 +1,59 @@
+/* Settings */
+"settings_title" = "Instellingen";
+"settings_account" = "Account";
+"settings_security" = "Beveiliging";
+"settings_language" = "Taal";
+"settings_subscription" = "Abonnement";
+"settings_app_info" = "App-info";
+"settings_change_password" = "Wachtwoord wijzigen";
+"settings_change_email" = "E-mail wijzigen";
+"settings_logout" = "Uitloggen";
+"settings_pin" = "PIN (4 cijfers)";
+"settings_change_pin" = "PIN wijzigen";
+"settings_forgot_pin" = "PIN vergeten?";
+"settings_link_google" = "Google-account koppelen";
+"settings_unlink_google" = "Google-account ontkoppelen";
+"settings_kids" = "Kinderen";
+"settings_delete_kid" = "Verwijderen";
+"settings_delete_kid_confirm" = "Weet je zeker dat je dit kind en alle bijbehorende gegevens wilt verwijderen? Dit kan niet ongedaan worden gemaakt.";
+"settings_delete_kid_success" = "Kind succesvol verwijderd.";
+"settings_delete_kid_fail" = "Verwijderen van kind mislukt.";
+
+/* Onboarding */
+"onboarding_title" = "Wie zit er in jouw Tipje-familie?";
+"onboarding_subtitle" = "Vul de naam van je kind in om te beginnen. Voeg later meer kinderen toe—elk met een eigen set regels en taken.";
+"onboarding_child_name" = "Naam van het kind";
+"onboarding_child_name_2" = "Naam van het kind 2";
+"onboarding_next" = "Volgende";
+
+/* PIN & Errors */
+"pin_invalid" = "Voer een geldige 4-cijferige PIN in.";
+"pin_success" = "PIN succesvol gewijzigd.";
+"pin_fail" = "PIN wijzigen mislukt: %@";
+"pin_incorrect" = "Onjuiste PIN. Als je je PIN bent vergeten, reset deze dan.";
+"pin_correct" = "Je PIN is correct.";
+"pin_locked_out" = "Te veel mislukte pogingen. Probeer het later opnieuw.";
+
+/* General */
+"ok" = "OK";
+"cancel" = "Annuleren";
+"yes" = "Ja";
+"no" = "Nee";
+
+/* Pin Setup */
+"pinsetup_title" = "Beveilig het oudergedeelte";
+"pinsetup_subtitle" = "Maak een 4-cijferige PIN aan om het oudergedeelte te beveiligen—ouders beheren hier de regels, kinderen focussen op hun taken.";
+"pinsetup_save_fail" = "PIN opslaan mislukt. Probeer het opnieuw.";
+
+/* Login */
+"login_title" = "Bouw je mindful gezinsleven met 7 dagen gratis proef";
+"login_google" = "Inloggen met Google";
+"login_or" = "OF";
+"login_email" = "E-mail";
+"login_password" = "Wachtwoord";
+"login_repeat_password" = "Herhaal wachtwoord";
+"login_signup" = "Registreren";
+"login_signin" = "Inloggen";
+"login_have_account" = "Heb je al een account?";
+"login_no_account" = "Nog geen account?";
+"login_passwords_no_match" = "Wachtwoorden komen niet overeen"; 

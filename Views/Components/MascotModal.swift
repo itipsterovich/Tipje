@@ -10,7 +10,7 @@ struct MascotModal: View {
                     .resizable()
                     .frame(width: 160, height: 120)
                 Text(headline)
-                    .font(.custom("Inter-Medium", size: 24))
+                    .font(.custom("Inter", size: 24).weight(.medium))
                 // TODO: Add Button S to close
             }
             .padding()

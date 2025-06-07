@@ -1,25 +1,28 @@
 import SwiftUI
 
 struct RewardAdultCard: View {
-    @EnvironmentObject var store: Store
-    let task: Task
-    let backgroundColor: Color
+    let reward: Reward
+    var onArchive: (() -> Void)? = nil
     var textColor: Color = .white
-    var onTap: (() -> Void)? = nil
+    var selected: Bool = false
+    var baseColor: Color = Color(hex: "#A5ADC3") // Example color, replace with color library
     @State private var isTapped: Bool = false
-    @State private var isButtonTapped: Bool = false
     var body: some View {
+        let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
+        let contentColor = selected ? Color.white : baseColor
         HStack(spacing: 0) {
             // Left section: flexible width
             ZStack(alignment: .leading) {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                Text(task.title)
+                Text(reward.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
+                    .padding(.trailing, 24)
                     .padding(.vertical, 14)
-                    .foregroundColor(task.isSelected ? .white : textColor)
+                    .foregroundColor(contentColor)
+                    .font(.custom("Inter-Medium", size: 24))
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
             // Dash + right section: fixed width group
@@ -39,19 +42,20 @@ struct RewardAdultCard: View {
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                     HStack(spacing: 0) {
                         Spacer().frame(width: 24)
-                        Text("\(task.peanuts)")
-                            .foregroundColor(.white)
+                        Text("\(reward.cost)")
+                            .foregroundColor(contentColor)
+                            .font(.custom("Inter-Medium", size: 24))
                             .frame(width: 32, alignment: .trailing)
                         Spacer().frame(width: 12)
                         Image("icon_peanut")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .foregroundColor(.white)
+                            .foregroundColor(contentColor)
                         Spacer().frame(width: 24)
-                        Image(task.isSelected ? "icon_delete" : "icon_plus")
+                        Image(selected ? "icon_delete" : "icon_plus")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .foregroundColor(.white)
+                            .foregroundColor(contentColor)
                         Spacer().frame(width: 24)
                     }
                     .frame(height: 90)
@@ -71,8 +75,6 @@ struct RewardAdultCard: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                 isTapped = false
-                store.toggleSelection(for: task)
-                onTap?()
             }
         }
     }
