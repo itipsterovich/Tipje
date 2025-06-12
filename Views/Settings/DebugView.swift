@@ -12,6 +12,7 @@ struct DebugView: View {
     @State private var showKidsProfile = false
     @State private var showPinSetup = false
     @State private var isLoadingTestUser = false
+    @EnvironmentObject private var authManager: AuthManager
 
     var body: some View {
         ScrollView {
@@ -30,6 +31,7 @@ struct DebugView: View {
                             DebugButton(title: "Reset Onboarding & Login") {
                                 didCompleteOnboarding = false
                                 didLogin = false
+                                authManager.signOut()
                             }
                         }
                         Text("Current: \(didCompleteOnboarding ? "Complete" : "Not Complete") | Login: \(didLogin ? "Yes" : "No")")
@@ -119,6 +121,42 @@ struct DebugView: View {
                                 print("User created!")
                             }
                         }
+                    }
+                }
+                SettingsSection(title: "Reset Scores & Tickets") {
+                    VStack(alignment: .trailing, spacing: 16) {
+                        DebugButton(title: "Reset all scores and tickets (for testing)") {
+                            // Archive all active rules, chores, rewards
+                            for rule in store.rules where rule.isActive { store.archiveRule(rule) }
+                            for chore in store.chores where chore.isActive { store.archiveChore(chore) }
+                            for reward in store.rewards where reward.isActive { store.archiveReward(reward) }
+                            // Reset balance to zero for selected kid
+                            if let kid = store.selectedKid {
+                                let delta = -store.balance
+                                if delta != 0 {
+                                    let txn = Transaction(
+                                        id: UUID().uuidString,
+                                        type: "RESET_BALANCE",
+                                        refId: kid.id,
+                                        amount: delta,
+                                        timestamp: Date(),
+                                        note: "Reset balance from debug screen"
+                                    )
+                                    FirestoreManager.shared.updateBalanceAndLog(userId: store.userId, kidId: kid.id, delta: delta, txn: txn) { error in
+                                        if let error = error {
+                                            store.errorMessage = error.localizedDescription
+                                        } else {
+                                            store.fetchAllDataForSelectedKid()
+                                        }
+                                    }
+                                }
+                            }
+                            // Reset onboarding modal flag
+                            UserDefaults.standard.set(false, forKey: "adminOnboardingComplete")
+                        }
+                        Text("This will archive all rules, chores, and rewards, and allow you to see the onboarding modal again.")
+                            .foregroundColor(.secondary)
+                            .font(.footnote)
                     }
                 }
             }

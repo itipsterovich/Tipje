@@ -5,7 +5,7 @@ struct BalanceChip: View {
     var body: some View {
         HStack(spacing: 4) {
             Image("icon_peanuts")
-            Text("\(balance)")
+            Text("\(max(0, balance))")
         }
         .font(.custom("Inter-Regular_Medium", size: 24))
         .padding(.vertical, 8)

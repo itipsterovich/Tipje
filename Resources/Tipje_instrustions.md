@@ -102,3 +102,83 @@ If you update the UI or backend, update this doc to match!**
 ---
 
 # (All previous references to categories, custom input, or editing have been removed for clarity and accuracy.)
+
+## Onboarding Flow Standard (2024-06)
+
+### The onboarding flow for Tipje must follow this exact sequence:
+
+1. **OnboardingView.swift**  
+   - Shows intro slides.
+
+2. **LoginView.swift**  
+   - User logs in or registers.
+   - On success, userId is set and passed to subsequent steps.
+
+3. **KidsProfileView.swift**  
+   - User creates at least one kid profile.
+   - Cannot proceed without at least one kid.
+
+4. **PinSetupView.swift**  
+   - User sets up their PIN.
+   - Cannot proceed without setting a valid PIN.
+
+5. **AdminView.swift**  
+   - User must add at least one card to each tab (Rules, Chores, Rewards).
+   - Cannot proceed until all three have at least one item.
+
+6. **TipjeModal.swift**  
+   - Shows a congrats modal: "Admin is now locked, cards are in the home view."
+   - **Note:** This modal is only shown after the user has added at least one card to each tab in AdminView, not immediately after PIN setup. After dismissing the modal, the user remains in Admin and can leave if they want. From then on, Admin is PIN-locked (PinPadView/PinLockView) on future access.
+
+7. **Main App/Home View**  
+   - User is routed to the main app.
+   - **PinPadView/PinLockView** is only shown when accessing the admin area after onboarding is complete.
+
+**Rules:**
+- Each step is shown only once, in order.
+- No step is repeated or skipped.
+- PIN entry is never required during onboarding, only when accessing admin after onboarding.
+- The success modal is only shown after all three admin tabs have at least one card, not after PIN setup.
+- After dismissing the success modal, the user remains in Admin and Admin is PIN-locked on future access.
+- All state and navigation for onboarding is managed in `OnboardingView.swift` as a state machine.
+- `TipjeApp.swift` only checks `didCompleteOnboarding` to decide whether to show onboarding or the main app.
+
+**If you update the onboarding flow, update this section to match!**
+
+## 6. **Kids Profile Editing & Profile Switch (2024-06)**
+
+- **Kids can be edited after onboarding:**
+  - In Settings, the "Edit" button in the kids section opens a full-screen modal (identical to onboarding) for editing kids' names, removing, or adding up to 2 kids.
+  - Existing kid names are prefilled in the input fields. Editing a name updates it everywhere (including the main tab bar/profile switch).
+  - Removing a kid automatically selects the remaining kid as active.
+  - The button remains "Next" for both onboarding and editing.
+
+- **Profile switch in main tab bar:**
+  - If there are 2 kids, a round profile button appears on the right of the main tab bar.
+  - The button uses Template1 for the first kid and Template2 for the second, based on their order in the kids array.
+  - Tapping the button switches the active kid, updates the UI, and shows a modal: "You've switched to [Kid's Name]" with the correct template image.
+  - The profile button matches the style and spacing of other tab bar buttons (same padding, size, and background).
+  - If a kid is deleted, the profile button and selection update immediately.
+
+- **PIN protection:**
+  - The PIN is global for the parent and works for both profiles.
+  - Switching kids does not affect PIN logic; admin access is always protected by the same PIN.
+
+### Update (2024-06):
+- The white background panel/safe area has been **removed** from all main content views (Home, Shop, Settings, Debug, etc.) for a unified look. The only backgrounds are banners and cards. The MainTabBar now always floats above the content, never pushed by it.
+
+---
+
+# Device-Specific Layout Policy (2024-06)
+
+**All onboarding and layout changes (such as mascot offset, font size, scaling, and similar visual tweaks) must be applied conditionally:**
+
+- **iPhone (compact size class):**
+  - Apply adaptive changes (e.g., mascot offset, font scaling, padding adjustments) to improve usability and fit.
+- **iPad (regular size class):**
+  - Always retain the original layout, sizing, and visual design as specified in the initial iPad implementation.
+  - No mascot offset, font size, or spacing changes should affect iPad views unless explicitly approved for both platforms.
+
+**This rule is mandatory for all onboarding, admin, settings, and main app views.**
+
+If you update any layout or visual logic, you must ensure iPad and iPhone are handled separately and update this doc to match.

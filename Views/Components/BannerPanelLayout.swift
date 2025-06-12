@@ -36,6 +36,7 @@ struct BannerPanelLayout<BannerContent: View, Content: View>: View {
                 .offset(y: -24)
         }
         .edgesIgnoringSafeArea(.top)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 

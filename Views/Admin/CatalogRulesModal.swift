@@ -27,10 +27,11 @@ struct CatalogRulesModal: View {
             content: {
                 VStack(spacing: 0) {
                     // Fixed header
-                    PageTitle("Select Rules that fit your family’s values") {
+                    PageTitle("Select Rules") {
                         ButtonRegular(iconName: "icon_close", variant: .light) {
                             saveAndClose()
                         }
+                        .accessibilityIdentifier("saveRulesButton")
                     }
                     .padding(.top, 8)
                     .padding(.bottom, 8)
@@ -51,6 +52,7 @@ struct CatalogRulesModal: View {
                                         }
                                     }
                                 )
+                                .accessibilityIdentifier("ruleCell_\(item.id)")
                             }
                         }
                         .padding(.horizontal, 24)
@@ -62,7 +64,6 @@ struct CatalogRulesModal: View {
         )
     }
     private func saveAndClose() {
-        print("[DEBUG] CatalogRulesModal saveAndClose called with selected: \(selected)")
         onSave(Array(selected))
         dismiss()
     }

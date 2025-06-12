@@ -14,6 +14,8 @@ struct User: Identifiable, Codable {
     // PIN lockout fields
     var pinFailedAttempts: Int?
     var pinLockoutUntil: Date?
+    // Onboarding completion
+    var adminOnboardingComplete: Bool?
     
     func toDict() -> [String: Any] {
         return [
@@ -24,7 +26,8 @@ struct User: Identifiable, Codable {
             "createdAt": createdAt ?? FieldValue.serverTimestamp(),
             "updatedAt": updatedAt ?? FieldValue.serverTimestamp(),
             "pinFailedAttempts": pinFailedAttempts as Any,
-            "pinLockoutUntil": pinLockoutUntil as Any
+            "pinLockoutUntil": pinLockoutUntil as Any,
+            "adminOnboardingComplete": adminOnboardingComplete as Any
         ]
     }
     
@@ -37,7 +40,8 @@ struct User: Identifiable, Codable {
         let updatedAt = (dict["updatedAt"] as? Timestamp)?.dateValue()
         let pinFailedAttempts = dict["pinFailedAttempts"] as? Int
         let pinLockoutUntil = (dict["pinLockoutUntil"] as? Timestamp)?.dateValue()
-        return User(id: id, email: email, displayName: displayName, authProvider: authProvider, pinHash: pinHash, createdAt: createdAt, updatedAt: updatedAt, pinFailedAttempts: pinFailedAttempts, pinLockoutUntil: pinLockoutUntil)
+        let adminOnboardingComplete = dict["adminOnboardingComplete"] as? Bool
+        return User(id: id, email: email, displayName: displayName, authProvider: authProvider, pinHash: pinHash, createdAt: createdAt, updatedAt: updatedAt, pinFailedAttempts: pinFailedAttempts, pinLockoutUntil: pinLockoutUntil, adminOnboardingComplete: adminOnboardingComplete)
     }
 }
 
@@ -147,13 +151,15 @@ struct RewardPurchase: Identifiable, Codable {
     var status: String // "IN_BASKET" | "GIVEN"
     var purchasedAt: Date
     var givenAt: Date?
+    var quantity: Int
     
     func toDict() -> [String: Any] {
         return [
             "rewardRef": rewardRef,
             "status": status,
             "purchasedAt": purchasedAt,
-            "givenAt": givenAt as Any
+            "givenAt": givenAt as Any,
+            "quantity": quantity
         ]
     }
     
@@ -162,7 +168,8 @@ struct RewardPurchase: Identifiable, Codable {
               let status = dict["status"] as? String,
               let purchasedAt = (dict["purchasedAt"] as? Timestamp)?.dateValue() else { return nil }
         let givenAt = (dict["givenAt"] as? Timestamp)?.dateValue()
-        return RewardPurchase(id: id, rewardRef: rewardRef, status: status, purchasedAt: purchasedAt, givenAt: givenAt)
+        let quantity = dict["quantity"] as? Int ?? 1
+        return RewardPurchase(id: id, rewardRef: rewardRef, status: status, purchasedAt: purchasedAt, givenAt: givenAt, quantity: quantity)
     }
 }
 
@@ -258,7 +265,6 @@ class FirestoreManager {
     // MARK: - Rule
     func addRule(userId: String, kidId: String, rule: Rule, completion: @escaping (Error?) -> Void) {
         db.collection("users").document(userId).collection("kids").document(kidId).collection("rules").document(rule.id).setData(rule.toDict(), merge: true) { error in
-            print("[DEBUG] Firestore addRule completed for \(rule.id), error: \(String(describing: error))")
             completion(error)
         }
     }
@@ -268,13 +274,13 @@ class FirestoreManager {
             let rules = snapshot?.documents.compactMap { doc in
                 Rule.fromDict(id: doc.documentID, dict: doc.data())
             } ?? []
-            print("[DEBUG] Firestore fetchRules fetched: " + rules.map { "id=\($0.id), isActive=\($0.isActive)" }.joined(separator: ", "))
             completion(rules)
         }
     }
 
     // MARK: - Chore
     func addChore(userId: String, kidId: String, chore: Chore, completion: @escaping (Error?) -> Void) {
+        let path = "/users/\(userId)/kids/\(kidId)/chores/\(chore.id)"
         db.collection("users").document(userId).collection("kids").document(kidId).collection("chores").document(chore.id).setData(chore.toDict(), merge: true) { error in
             completion(error)
         }
@@ -282,8 +288,8 @@ class FirestoreManager {
 
     func fetchChores(userId: String, kidId: String, completion: @escaping ([Chore]) -> Void) {
         db.collection("users").document(userId).collection("kids").document(kidId).collection("chores").getDocuments { snapshot, error in
-            let chores = snapshot?.documents.compactMap { doc in
-                Chore.fromDict(id: doc.documentID, dict: doc.data())
+            let chores = snapshot?.documents.compactMap { doc -> Chore? in
+                return Chore.fromDict(id: doc.documentID, dict: doc.data())
             } ?? []
             completion(chores)
         }
@@ -521,6 +527,15 @@ class FirestoreManager {
         }
         group.notify(queue: .main) {
             completion(firstError)
+        }
+    }
+
+    // MARK: - Admin Onboarding Completion
+    /// Sets the adminOnboardingComplete flag in Firestore for the user
+    func setAdminOnboardingComplete(userId: String, completion: @escaping (Error?) -> Void) {
+        let userRef = db.collection("users").document(userId)
+        userRef.setData(["adminOnboardingComplete": true], merge: true) { error in
+            completion(error)
         }
     }
 } 

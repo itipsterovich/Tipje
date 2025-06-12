@@ -5,9 +5,14 @@ struct MainView: View {
     @State private var selectedTab: MainTab = .home
     @StateObject private var store = Store()
     @AppStorage("shouldShowAdminAfterOnboarding") var shouldShowAdminAfterOnboarding: Bool = false
+    @AppStorage("adminOnboardingComplete") var adminOnboardingComplete: Bool = false
+    @AppStorage("skipPinAfterSetup") var skipPinAfterSetup: Bool = false
+    @State private var isAdminUnlocked: Bool = false
+    @State private var showProfileSwitchModal: Bool = false
+    @State private var switchedKid: Kid? = nil
 
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack(alignment: .bottom) {
             Group {
                 switch selectedTab {
                 case .home:
@@ -15,19 +20,80 @@ struct MainView: View {
                 case .shop:
                     ShopView().environmentObject(store)
                 case .admin:
-                    AdminView().environmentObject(store)
+                    if !adminOnboardingComplete || skipPinAfterSetup {
+                        AdminView()
+                            .environmentObject(store)
+                            .onAppear {
+                                if skipPinAfterSetup {
+                                    skipPinAfterSetup = false
+                                }
+                            }
+                    } else if isAdminUnlocked {
+                        AdminView().environmentObject(store)
+                    } else {
+                        PinLockView(userId: store.userId) {
+                            isAdminUnlocked = true
+                        }
+                    }
                 case .settings:
                     SettingsView().environmentObject(store)
                 case .debug:
                     DebugView().environmentObject(store)
                 }
             }
-            
-            Spacer(minLength: 0)
-            MainTabBar(selectedTab: $selectedTab)
+            .edgesIgnoringSafeArea(.all)
+            // Overlay the tab bar at the bottom
+            VStack {
+                Spacer()
+                MainTabBar(selectedTab: $selectedTab,
+                           kids: store.kids,
+                           selectedKid: store.selectedKid,
+                           onProfileSwitch: {
+                    if store.kids.count == 2, let current = store.selectedKid {
+                        let other = store.kids.first { $0.id != current.id }
+                        if let other = other {
+                            store.selectKid(other)
+                            switchedKid = other
+                            showProfileSwitchModal = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                showProfileSwitchModal = false
+                            }
+                        }
+                    }
+                })
                 .padding(.bottom, 16)
+            }
+            .edgesIgnoringSafeArea(.bottom)
+            // Overlay for profile switch modal
+            .overlay(
+                Group {
+                    if showProfileSwitchModal, let kid = switchedKid {
+                        VStack(spacing: 16) {
+                            let isFirst = store.kids.first?.id == kid.id
+                            let imageName = isFirst ? "Template1" : "Template2"
+                            Image(imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 80, height: 80)
+                                .clipShape(Circle())
+                                .shadow(radius: 8)
+                            Text("You've switched to \(kid.name)")
+                                .font(.title2)
+                                .foregroundColor(Color(hex: "#799B44"))
+                                .padding(.top, 8)
+                        }
+                        .padding(32)
+                        .background(
+                            RoundedRectangle(cornerRadius: 24)
+                                .fill(Color.white)
+                                .shadow(radius: 16)
+                        )
+                        .frame(maxWidth: 320)
+                        .transition(.scale)
+                    }
+                }
+            )
         }
-        .edgesIgnoringSafeArea(.bottom)
         .onAppear {
             if shouldShowAdminAfterOnboarding {
                 selectedTab = .admin
@@ -35,6 +101,11 @@ struct MainView: View {
             }
             if let uid = Auth.auth().currentUser?.uid, store.userId.isEmpty {
                 store.setUser(userId: uid)
+            }
+        }
+        .onChange(of: selectedTab) { newTab in
+            if newTab != .admin {
+                isAdminUnlocked = false
             }
         }
     }

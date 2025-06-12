@@ -5,6 +5,7 @@ struct ChoreAdultCard: View {
     var onArchive: (() -> Void)? = nil
     var selected: Bool = false
     var baseColor: Color = Color(hex: "#C3BCA5") // Example color, replace with color library
+    var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
         let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
@@ -39,17 +40,20 @@ struct ChoreAdultCard: View {
                     Text("\(chore.peanutValue)")
                         .foregroundColor(contentColor)
                         .font(.custom("Inter-Medium", size: 24))
-                        .frame(width: 32, alignment: .trailing)
-                    Spacer().frame(width: 12)
+                        .frame(width: 20, alignment: .trailing)
+                    Spacer().frame(width: 4)
                     Image("icon_peanut")
                         .resizable()
                         .frame(width: 24, height: 24)
                         .foregroundColor(contentColor)
                     Spacer().frame(width: 24)
-                    Image(selected ? "icon_delete" : "icon_plus")
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .foregroundColor(contentColor)
+                    Button(action: { onArchive?() }) {
+                        Image(selected ? "icon_delete" : "icon_plus")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(contentColor)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
@@ -66,6 +70,7 @@ struct ChoreAdultCard: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                 isTapped = false
+                onTap?()
             }
         }
     }

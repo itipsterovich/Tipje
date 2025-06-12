@@ -2,12 +2,24 @@ import SwiftUI
 import Foundation
 
 struct KidsProfileView: View {
-    @State private var kidNames: [String] = [""]
+    @State private var kidNames: [String]
     @State private var isNextActive: Bool = false
     @State private var isLoading: Bool = false
     @State private var errorMessage: String? = nil
     let userId: String
     var onNext: (() -> Void)? = nil
+    var initialKids: [Kid]? = nil
+
+    init(userId: String, onNext: (() -> Void)? = nil, initialKids: [Kid]? = nil) {
+        self.userId = userId
+        self.onNext = onNext
+        self.initialKids = initialKids
+        if let initialKids = initialKids {
+            _kidNames = State(initialValue: initialKids.map { $0.name })
+        } else {
+            _kidNames = State(initialValue: [""])
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -46,9 +58,14 @@ struct KidsProfileView: View {
                     ForEach(Array(kidNames.enumerated()), id: \.offset) { index, _ in
                         KidInputRow(
                             text: $kidNames[index],
-                            showDelete: kidNames.count == 2 && index == 1,
-                            onDelete: { kidNames.remove(at: 1) },
-                            placeholder: index == 0 ? String(localized: "onboarding_child_name") : String(localized: "onboarding_child_name_2")
+                            showDelete: kidNames.count == 2,
+                            onDelete: {
+                                if kidNames.indices.contains(index) {
+                                    kidNames.remove(at: index)
+                                }
+                            },
+                            placeholder: index == 0 ? String(localized: "onboarding_child_name") : String(localized: "onboarding_child_name_2"),
+                            index: index
                         )
                         .id(index)
                     }
@@ -71,6 +88,7 @@ struct KidsProfileView: View {
                     ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#ADA57F")) {
                         saveKids()
                     }
+                    .accessibilityIdentifier("kidsProfileNextButton")
                     .disabled(!isNextActive || isLoading)
                     .padding(.top, 16)
                 }
@@ -110,13 +128,52 @@ struct KidsProfileView: View {
         let kidsToSave = kidNames.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
         let group = DispatchGroup()
         var errors: [Error] = []
-        for name in kidsToSave.prefix(2) { // enforce max 2
-            group.enter()
-            let kidId = UUID().uuidString
-            let kid = Kid(id: kidId, name: name, createdAt: nil, balance: 0)
-            FirestoreManager.shared.createKid(userId: userId, kid: kid) { error in
-                if let error = error { errors.append(error) }
-                group.leave()
+        // If editing, update existing kids or add new
+        if let initialKids = initialKids {
+            for (index, name) in kidsToSave.prefix(2).enumerated() {
+                group.enter()
+                if index < initialKids.count {
+                    // Update existing kid if name changed
+                    var kid = initialKids[index]
+                    if kid.name != name {
+                        kid.name = name
+                        FirestoreManager.shared.createKid(userId: userId, kid: kid) { error in
+                            if let error = error { errors.append(error) }
+                            group.leave()
+                        }
+                    } else {
+                        group.leave()
+                    }
+                } else {
+                    // Add new kid
+                    let kidId = UUID().uuidString
+                    let kid = Kid(id: kidId, name: name, createdAt: nil, balance: 0)
+                    FirestoreManager.shared.createKid(userId: userId, kid: kid) { error in
+                        if let error = error { errors.append(error) }
+                        group.leave()
+                    }
+                }
+            }
+            // Remove kid if deleted
+            if kidsToSave.count < initialKids.count {
+                for kid in initialKids[kidsToSave.count...] {
+                    group.enter()
+                    FirestoreManager.shared.cascadeDeleteKid(userId: userId, kidId: kid.id) { error in
+                        if let error = error { errors.append(error) }
+                        group.leave()
+                    }
+                }
+            }
+        } else {
+            // Onboarding: just add new kids
+            for name in kidsToSave.prefix(2) {
+                group.enter()
+                let kidId = UUID().uuidString
+                let kid = Kid(id: kidId, name: name, createdAt: nil, balance: 0)
+                FirestoreManager.shared.createKid(userId: userId, kid: kid) { error in
+                    if let error = error { errors.append(error) }
+                    group.leave()
+                }
             }
         }
         group.notify(queue: .main) {
@@ -144,19 +201,18 @@ struct KidInputRow: View {
     var showDelete: Bool
     var onDelete: () -> Void
     var placeholder: String
+    var index: Int
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 24) {
             Spacer()
-            ZStack(alignment: .trailing) {
-                OnboardingInputField(
-                    text: $text,
-                    placeholder: placeholder
-                )
-                .frame(width: 240, height: 56)
-                if showDelete {
-                    ButtonRegular(iconName: "icon_delete", variant: .light, action: onDelete)
-                        .padding(.trailing, -56)
-                }
+            OnboardingInputField(
+                text: $text,
+                placeholder: placeholder,
+                index: index
+            )
+            .frame(width: 240, height: 56)
+            if showDelete {
+                IconRoundButton(iconName: "icon_delete", iconColor: Color(hex: "#ADA57F"), action: onDelete)
             }
             Spacer()
         }
@@ -167,6 +223,7 @@ struct KidInputRow: View {
 struct OnboardingInputField: View {
     @Binding var text: String
     var placeholder: String
+    var index: Int? = nil
     @FocusState private var isFocused: Bool
     var body: some View {
         ZStack(alignment: .leading) {
@@ -183,6 +240,7 @@ struct OnboardingInputField: View {
                 .keyboardType(.default)
                 .textContentType(.name)
                 .submitLabel(.done)
+                .accessibilityIdentifier(index != nil ? "kidNameField_\(index!)" : "kidNameField")
             if text.isEmpty {
                 Text(placeholder)
                     .font(.custom("Inter", size: 24))
@@ -200,5 +258,6 @@ struct OnboardingInputField: View {
         .onTapGesture {
             isFocused = true
         }
+        .accessibilityIdentifier(index != nil ? "kidNameField_\(index!)" : "kidNameField")
     }
 } 

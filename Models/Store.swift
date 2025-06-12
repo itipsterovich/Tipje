@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 class Store: ObservableObject {
@@ -14,6 +15,7 @@ class Store: ObservableObject {
     @Published var balance: Int = 0
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
+    @AppStorage("activeKidId") var activeKidId: String?
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -25,9 +27,17 @@ class Store: ObservableObject {
     }
 
     func selectKid(_ kid: Kid) {
-        print("[DEBUG] selectKid: Selecting kid with id=\(kid.id), name=\(kid.name)")
         self.selectedKid = kid
+        self.activeKidId = kid.id
         fetchAllDataForSelectedKid()
+    }
+
+    func selectFirstKidIfAvailable() {
+        if let activeId = activeKidId, let found = kids.first(where: { $0.id == activeId }) {
+            selectKid(found)
+        } else if let firstKid = kids.first {
+            selectKid(firstKid)
+        }
     }
 
     func fetchKids() {
@@ -37,19 +47,13 @@ class Store: ObservableObject {
             Task { @MainActor in
                 self?.kids = kids
                 self?.isLoading = false
-                if let firstKid = kids.first {
-                    self?.selectKid(firstKid)
-                }
+                self?.selectFirstKidIfAvailable()
             }
         }
     }
 
     func fetchAllDataForSelectedKid() {
-        guard let kid = selectedKid else {
-            print("[DEBUG] fetchAllDataForSelectedKid: No kid selected!")
-            return
-        }
-        print("[DEBUG] fetchAllDataForSelectedKid: Loading data for kid id=\(kid.id), name=\(kid.name)")
+        guard let kid = selectedKid else { return }
         isLoading = true
         let group = DispatchGroup()
         var rules: [Rule] = []
@@ -96,26 +100,19 @@ class Store: ObservableObject {
             self?.transactions = txns
             self?.balance = balance
             self?.isLoading = false
-            print("[DEBUG] fetchAllDataForSelectedKid: Finished loading for kid id=\(kid.id), rules count=\(rules.count)")
         }
     }
 
     // MARK: - CRUD for Rules
     func addRule(_ rule: Rule) {
-        guard let kid = selectedKid else {
-            print("[DEBUG] addRule: No kid selected! Rule id=\(rule.id)")
-            return
-        }
-        print("[DEBUG] addRule: Adding rule id=\(rule.id), title=\(rule.title) for kid id=\(kid.id), name=\(kid.name)")
+        guard let kid = selectedKid else { return }
         isLoading = true
         FirestoreManager.shared.addRule(userId: userId, kidId: kid.id, rule: rule) { [weak self] error in
             Task { @MainActor in
                 self?.isLoading = false
                 if let error = error {
                     self?.errorMessage = error.localizedDescription
-                    print("[DEBUG] addRule: Error adding rule id=\(rule.id): \(error.localizedDescription)")
                 } else {
-                    print("[DEBUG] addRule: Successfully added rule id=\(rule.id) for kid id=\(kid.id)")
                     self?.fetchAllDataForSelectedKid()
                 }
             }
@@ -226,21 +223,38 @@ class Store: ObservableObject {
     // MARK: - Purchase Reward
     func purchaseReward(_ reward: Reward) {
         guard let kid = selectedKid, balance >= reward.cost else { return }
-        let purchaseId = UUID().uuidString
-        let rewardRef = FirestoreManager.shared.rewardRef(userId: userId, kidId: kid.id, rewardId: reward.id)
-        let purchase = RewardPurchase(id: purchaseId, rewardRef: rewardRef, status: "IN_BASKET", purchasedAt: Date(), givenAt: nil)
-        let txn = Transaction(id: UUID().uuidString, type: "SPEND_REWARD", refId: purchaseId, amount: -reward.cost, timestamp: Date(), note: "Purchased reward: \(reward.title)")
-        FirestoreManager.shared.updateBalanceAndLog(userId: userId, kidId: kid.id, delta: -reward.cost, txn: txn) { [weak self] error in
-            if error == nil {
-                FirestoreManager.shared.addRewardPurchase(userId: self?.userId ?? "", kidId: kid.id, purchase: purchase) { err in
-                    if err == nil {
-                        self?.fetchAllDataForSelectedKid()
-                    } else {
-                        self?.errorMessage = err?.localizedDescription
-                    }
+        // Check if reward is already in basket
+        if let existing = rewardPurchases.first(where: { $0.status == "IN_BASKET" && $0.rewardRef.documentID == reward.id }) {
+            // Increment quantity atomically
+            var updated = existing
+            updated.quantity += 1
+            FirestoreManager.shared.addRewardPurchase(userId: userId, kidId: kid.id, purchase: updated) { [weak self] err in
+                if err == nil {
+                    self?.fetchAllDataForSelectedKid()
+                } else {
+                    self?.errorMessage = err?.localizedDescription
                 }
-            } else {
-                self?.errorMessage = error?.localizedDescription
+            }
+            // Deduct peanuts and log transaction
+            let txn = Transaction(id: UUID().uuidString, type: "SPEND_REWARD", refId: existing.id, amount: -reward.cost, timestamp: Date(), note: "Purchased reward: \(reward.title)")
+            FirestoreManager.shared.updateBalanceAndLog(userId: userId, kidId: kid.id, delta: -reward.cost, txn: txn) { _ in }
+        } else {
+            let purchaseId = UUID().uuidString
+            let rewardRef = FirestoreManager.shared.rewardRef(userId: userId, kidId: kid.id, rewardId: reward.id)
+            let purchase = RewardPurchase(id: purchaseId, rewardRef: rewardRef, status: "IN_BASKET", purchasedAt: Date(), givenAt: nil, quantity: 1)
+            let txn = Transaction(id: UUID().uuidString, type: "SPEND_REWARD", refId: purchaseId, amount: -reward.cost, timestamp: Date(), note: "Purchased reward: \(reward.title)")
+            FirestoreManager.shared.updateBalanceAndLog(userId: userId, kidId: kid.id, delta: -reward.cost, txn: txn) { [weak self] error in
+                if error == nil {
+                    FirestoreManager.shared.addRewardPurchase(userId: self?.userId ?? "", kidId: kid.id, purchase: purchase) { err in
+                        if err == nil {
+                            self?.fetchAllDataForSelectedKid()
+                        } else {
+                            self?.errorMessage = err?.localizedDescription
+                        }
+                    }
+                } else {
+                    self?.errorMessage = error?.localizedDescription
+                }
             }
         }
     }
@@ -260,35 +274,57 @@ class Store: ObservableObject {
     }
     // MARK: - Delete Kid (Cascade)
     func deleteKid(_ kid: Kid, completion: @escaping (Bool) -> Void) {
-        FirestoreManager.shared.cascadeDeleteKid(userId: userId, kidId: kid.id) { error in
-            if error == nil {
-                // Remove from local state
-                Task { @MainActor in
-                    self.kids.removeAll { $0.id == kid.id }
-                    if self.selectedKid?.id == kid.id {
-                        self.selectedKid = self.kids.first
-                        self.fetchAllDataForSelectedKid()
+        guard !userId.isEmpty else { completion(false); return }
+        FirestoreManager.shared.cascadeDeleteKid(userId: userId, kidId: kid.id) { [weak self] error in
+            Task { @MainActor in
+                if let error = error {
+                    completion(false)
+                } else {
+                    self?.fetchKids()
+                    // If the deleted kid was selected, select the remaining kid (if any)
+                    if self?.selectedKid?.id == kid.id {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            self?.selectFirstKidIfAvailable()
+                        }
                     }
                     completion(true)
                 }
-            } else {
-                completion(false)
             }
         }
     }
     // MARK: - Firestore Cleanup for Catalog Consistency
-    func cleanupNonCatalogItemsForSelectedKid() {
-        guard let kid = selectedKid else { print("[DEBUG] No kid selected for cleanup"); return }
-        // Define the current catalog IDs (should match AdminView)
-        let rulesCatalogIds = ["rule1", "rule2", "rule3", "rule4", "rule5"]
-        let choresCatalogIds = ["chore1", "chore2", "chore3", "chore4", "chore5"]
-        let rewardsCatalogIds = ["reward1", "reward2", "reward3", "reward4", "reward5"]
-        FirestoreManager.shared.cleanupNonCatalogItems(userId: userId, kidId: kid.id, validRuleIds: rulesCatalogIds, validChoreIds: choresCatalogIds, validRewardIds: rewardsCatalogIds) { error in
+    func cleanupChoresToCatalog() {
+        guard let kid = selectedKid else { return }
+        let choresCatalogIds = choresCatalog.map { $0.id }
+        FirestoreManager.shared.cleanupNonCatalogItems(userId: userId, kidId: kid.id, validRuleIds: [], validChoreIds: choresCatalogIds, validRewardIds: []) { error in
             if let error = error {
-                print("[DEBUG] Firestore cleanup error: \(error.localizedDescription)")
             } else {
-                print("[DEBUG] Firestore cleanup completed successfully.")
                 self.fetchAllDataForSelectedKid()
+            }
+        }
+    }
+    func decrementOrRemovePurchase(purchase: RewardPurchase) {
+        guard let kid = selectedKid else { return }
+        if purchase.quantity > 1 {
+            var updated = purchase
+            updated.quantity -= 1
+            FirestoreManager.shared.addRewardPurchase(userId: userId, kidId: kid.id, purchase: updated) { [weak self] err in
+                if err == nil {
+                    self?.fetchAllDataForSelectedKid()
+                } else {
+                    self?.errorMessage = err?.localizedDescription
+                }
+            }
+        } else {
+            var updated = purchase
+            updated.status = "GIVEN"
+            updated.givenAt = Date()
+            FirestoreManager.shared.addRewardPurchase(userId: userId, kidId: kid.id, purchase: updated) { [weak self] err in
+                if err == nil {
+                    self?.fetchAllDataForSelectedKid()
+                } else {
+                    self?.errorMessage = err?.localizedDescription
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ struct ButtonText: View {
     var title: String
     var variant: ButtonTextVariant = .primary
     var action: () -> Void
+    var fontSize: CGFloat = 24
     
     var fillColor: Color {
         switch variant {
@@ -25,7 +26,7 @@ struct ButtonText: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.custom("Inter-Medium", size: 24))
+                .font(.custom("Inter-Medium", size: fontSize))
                 .foregroundColor(textColor)
                 .frame(maxWidth: .infinity, minHeight: 56)
                 .background(

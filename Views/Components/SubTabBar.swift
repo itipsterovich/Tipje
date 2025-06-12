@@ -9,7 +9,6 @@ struct SubTabBar<T: Hashable>: View {
         HStack(spacing: 10) {
             ForEach(tabs, id: \.self) { tab in
                 Button(action: { 
-                    print("SubTabBar: tapped \(tab)")
                     selectedTab = tab 
                 }) {
                     Text(title(tab))

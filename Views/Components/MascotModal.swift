@@ -2,11 +2,12 @@ import SwiftUI
 
 struct MascotModal: View {
     var headline: String
+    var imageName: String = "mascot_happy"
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // TODO: Add mascot image/animation
-                Image("mascot_happy")
+                // Mascot image/animation
+                Image(imageName)
                     .resizable()
                     .frame(width: 160, height: 120)
                 Text(headline)

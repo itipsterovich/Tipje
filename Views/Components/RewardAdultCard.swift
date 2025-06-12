@@ -3,15 +3,14 @@ import SwiftUI
 struct RewardAdultCard: View {
     let reward: Reward
     var onArchive: (() -> Void)? = nil
-    var textColor: Color = .white
     var selected: Bool = false
-    var baseColor: Color = Color(hex: "#A5ADC3") // Example color, replace with color library
+    var baseColor: Color = Color(hex: "#A5ADC3")
+    var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
         let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
         let contentColor = selected ? Color.white : baseColor
         HStack(spacing: 0) {
-            // Left section: flexible width
             ZStack(alignment: .leading) {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -25,46 +24,42 @@ struct RewardAdultCard: View {
                     .font(.custom("Inter-Medium", size: 24))
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
-            // Dash + right section: fixed width group
-            HStack(spacing: 0) {
-                // Dash
-                Path { path in
-                    path.move(to: CGPoint(x: 0.75, y: 0))
-                    path.addLine(to: CGPoint(x: 0.75, y: 60))
-                }
-                .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
-                .foregroundColor(backgroundColor)
-                .frame(width: 1.5, height: 60)
-                .padding(.vertical, 15)
-                // Right section
-                ZStack {
-                    backgroundColor
-                        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                    HStack(spacing: 0) {
-                        Spacer().frame(width: 24)
-                        Text("\(reward.cost)")
-                            .foregroundColor(contentColor)
-                            .font(.custom("Inter-Medium", size: 24))
-                            .frame(width: 32, alignment: .trailing)
-                        Spacer().frame(width: 12)
-                        Image("icon_peanut")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(contentColor)
-                        Spacer().frame(width: 24)
+            Path { path in
+                path.move(to: CGPoint(x: 0.75, y: 0))
+                path.addLine(to: CGPoint(x: 0.75, y: 60))
+            }
+            .stroke(style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
+            .foregroundColor(backgroundColor)
+            .frame(width: 1.5, height: 60)
+            .padding(.vertical, 15)
+            ZStack {
+                backgroundColor
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                HStack(spacing: 0) {
+                    Spacer().frame(width: 20)
+                    Text("\(reward.cost)")
+                        .foregroundColor(contentColor)
+                        .font(.custom("Inter-Medium", size: 24))
+                        .frame(width: 32, alignment: .trailing)
+                    Spacer().frame(width: 4)
+                    Image("icon_peanut")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(contentColor)
+                    Spacer().frame(width: 16)
+                    Button(action: { onArchive?() }) {
                         Image(selected ? "icon_delete" : "icon_plus")
                             .resizable()
                             .frame(width: 24, height: 24)
                             .foregroundColor(contentColor)
-                        Spacer().frame(width: 24)
                     }
-                    .frame(height: 90)
+                    .buttonStyle(PlainButtonStyle())
+                    Spacer().frame(width: 24)
                 }
-                .frame(width: 168, height: 90)
+                .frame(height: 90)
             }
-            .fixedSize() // Ensures dash + right section never shrink
+            .frame(width: 144, height: 90)
         }
-        .font(.custom("Inter-Medium", size: 24))
         .frame(height: 90)
         .frame(maxWidth: .infinity)
         .scaleEffect(isTapped ? 0.96 : 1.0)
@@ -75,6 +70,7 @@ struct RewardAdultCard: View {
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
                 isTapped = false
+                onTap?()
             }
         }
     }

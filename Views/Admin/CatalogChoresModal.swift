@@ -2,50 +2,52 @@ import SwiftUI
 
 struct CatalogChoresModal: View {
     var onSave: ([String]) -> Void
+    var initiallySelected: [String]
     @Environment(\.dismiss) private var dismiss
-    @State private var selected: Set<String> = []
+    @State private var selected: Set<String>
     let catalog = choresCatalog
+    init(onSave: @escaping ([String]) -> Void, initiallySelected: [String]) {
+        self.onSave = onSave
+        self.initiallySelected = initiallySelected
+        _selected = State(initialValue: Set(initiallySelected))
+    }
     var body: some View {
-        BannerPanelLayout(
+        return BannerPanelLayout(
             bannerColor: Color(hex: "#C3BCA5"),
             bannerHeight: 100,
             content: {
-                ScrollView {
-                    VStack(spacing: 24) {
-                        PageTitle("Add chores") {
-                            ButtonRegular(iconName: "icon_close", variant: .light) { dismiss() }
-                        }
-                        .padding(.top, 24)
-                        .padding(.horizontal, 24)
-                        ForEach(catalog, id: \.id) { item in
-                            ChoreAdultCard(
-                                chore: Chore(id: item.id, title: item.title, peanutValue: item.peanuts, isActive: true),
-                                selected: selected.contains(item.id),
-                                baseColor: item.color
-                            )
-                            .onTapGesture {
-                                if selected.contains(item.id) {
-                                    selected.remove(item.id)
-                                } else {
-                                    selected.insert(item.id)
-                                }
+                VStack(spacing: 0) {
+                    // Fixed header
+                    PageTitle("Select Chores") {
+                        ButtonRegular(iconName: "icon_close", variant: .light) { save() }
+                        .accessibilityIdentifier("saveChoresButton")
+                    }
+                    .padding(.top, 8)
+                    .padding(.bottom, 8)
+                    .padding(.horizontal, 24)
+                    // Scrollable list
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            ForEach(catalog, id: \.id) { item in
+                                ChoreAdultCard(
+                                    chore: Chore(id: item.id, title: item.title, peanutValue: item.peanuts, isActive: true),
+                                    selected: selected.contains(item.id),
+                                    baseColor: item.color,
+                                    onTap: {
+                                        if selected.contains(item.id) {
+                                            selected.remove(item.id)
+                                        } else {
+                                            selected.insert(item.id)
+                                        }
+                                    }
+                                )
+                                .accessibilityIdentifier("choreCell_\(item.id)")
                             }
                         }
-                        Button(action: { save() }) {
-                            Text("Save")
-                                .font(.custom("Inter-Medium", size: 24))
-                                .foregroundColor(Color(hex: "#799B44"))
-                                .padding(.vertical, 14)
-                                .padding(.horizontal, 24)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                                        .fill(Color(hex: "#EAF3EA"))
-                                )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .disabled(selected.isEmpty)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 24)
+                        .padding(.bottom, 24)
                     }
-                    .padding(24)
                 }
             }
         )

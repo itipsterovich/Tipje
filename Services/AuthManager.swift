@@ -11,6 +11,11 @@ class AuthManager: ObservableObject {
 
     init() {
         self.firebaseUser = Auth.auth().currentUser
+        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            DispatchQueue.main.async {
+                self?.firebaseUser = user
+            }
+        }
     }
 
     func signUp(email: String, password: String, completion: @escaping (Bool, String?) -> Void) {

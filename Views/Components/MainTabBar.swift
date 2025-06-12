@@ -16,13 +16,28 @@ enum MainTab: Int, CaseIterable, Identifiable {
 
 struct MainTabBar: View {
     @Binding var selectedTab: MainTab
+    var kids: [Kid] = []
+    var selectedKid: Kid? = nil
+    var onProfileSwitch: (() -> Void)? = nil
     var body: some View {
         HStack(spacing: 20) {
             ForEach(MainTab.allCases) { tab in
                 ButtonRegular(iconName: tab.iconName, variant: selectedTab == tab ? .green : .light) {
-                    print("MainTabBar: tapped \(tab)")
                     selectedTab = tab
                 }
+            }
+            if kids.count == 2, let selectedKid = selectedKid {
+                let isFirst = kids.first?.id == selectedKid.id
+                let imageName = isFirst ? "Template1" : "Template2"
+                Button(action: { onProfileSwitch?() }) {
+                    Image(imageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 56, height: 56)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(PlainButtonStyle())
+                .accessibilityIdentifier("profileSwitchButton")
             }
         }
         .padding(.horizontal, 10)

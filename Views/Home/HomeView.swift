@@ -6,20 +6,13 @@ let choresCatalogIds = choresCatalog.map { $0.id }
 struct HomeView: View {
     @EnvironmentObject var store: Store
     @State private var selectedTab: TaskKind = .rule // .rule or .chore
+    @State private var showUsedModal: Bool = false
 
     private var filteredRules: [Rule] {
         store.rules.filter { $0.isActive }
     }
     private var filteredChores: [Chore] {
         store.chores.filter { $0.isActive }
-    }
-
-    private func debugPrints() {
-        print("Current balance: \(store.balance)")
-        for rule in store.rules.filter({ $0.isActive && rulesCatalogIds.contains($0.id) }) {
-            let completedToday = rule.completions.contains { Calendar.current.isDateInToday($0) }
-            print("Rule \(rule.title) completions: \(rule.completions), completedToday: \(completedToday)")
-        }
     }
 
     var body: some View {
@@ -61,7 +54,7 @@ struct HomeView: View {
             },
             content: {
                 VStack(spacing: 16) {
-                    PageTitle("\(kidName)'s \(weekday)")
+                    PageTitle("\(kidName)'s Mindful \(weekday)")
                         .padding(.top, 24)
                     SubTabBar(
                         tabs: [TaskKind.rule, TaskKind.chore],
@@ -70,7 +63,10 @@ struct HomeView: View {
                     )
                     if selectedTab == .rule {
                         if filteredRules.isEmpty {
-                            EmptyHomeState(image: "mascot_empty", text: "You don't have family rules yet")
+                            TipjeEmptyState(
+                                imageName: "mascot_ticket",
+                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜"
+                            )
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
@@ -83,7 +79,11 @@ struct HomeView: View {
                                                 if !completedToday {
                                                     store.completeRule(rule)
                                                 } else {
-                                                    store.uncompleteRule(rule)
+                                                    if store.balance < rule.peanutValue {
+                                                        showUsedModal = true
+                                                    } else {
+                                                        store.uncompleteRule(rule)
+                                                    }
                                                 }
                                             }
                                         )
@@ -94,7 +94,10 @@ struct HomeView: View {
                         }
                     } else {
                         if filteredChores.isEmpty {
-                            EmptyHomeState(image: "mascot_ticket", text: "You don't have chores yet")
+                            TipjeEmptyState(
+                                imageName: "mascot_ticket",
+                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜"
+                            )
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
@@ -107,8 +110,11 @@ struct HomeView: View {
                                                 if !completedToday {
                                                     store.completeChore(chore)
                                                 } else {
-                                                    // Double-tap logic to mark as incomplete and update balance, but never negative
-                                                    // Implement as needed
+                                                    if store.balance < chore.peanutValue {
+                                                        showUsedModal = true
+                                                    } else {
+                                                        store.uncompleteChore(chore)
+                                                    }
                                                 }
                                             }
                                         )
@@ -121,14 +127,15 @@ struct HomeView: View {
                 }
                 .padding(.horizontal, 24)
                 .font(.custom("Inter-Medium", size: 24))
-                .background(
-                    RoundedCorner(radius: 24, corners: [.topLeft, .topRight])
-                        .fill(Color.white)
-                )
             }
         )
-        .onAppear {
-            debugPrints()
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .sheet(isPresented: $showUsedModal) {
+            TipjeModal(
+                imageName: "il_used",
+                message: "You've done this today and got your peanuts!\nLet's make sure it's really done. 💪",
+                onClose: { showUsedModal = false }
+            )
         }
     }
 }

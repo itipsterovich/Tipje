@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct PinSetupView: View {
+    @AppStorage("skipPinAfterSetup") var skipPinAfterSetup: Bool = false
     @State private var pin: [String] = ["", "", "", ""]
     @FocusState private var focusedIndex: Int?
     @State private var isNextActive: Bool = false
@@ -25,7 +26,7 @@ struct PinSetupView: View {
                 .ignoresSafeArea()
                 .zIndex(0)
             VStack(spacing: 0) {
-                Spacer().frame(height: 100)
+                Spacer().frame(height: 400)
                 Text("pinsetup_title")
                     .font(.custom("Inter-Regular_SemiBold", size: 40))
                     .foregroundColor(.white)
@@ -41,27 +42,9 @@ struct PinSetupView: View {
                     .frame(maxWidth: 500)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer().frame(height: 40)
-                HStack(spacing: 16) {
-                    ForEach(0..<4) { i in
-                        TextField("", text: $pin[i])
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.center)
-                            .frame(width: 80, height: 80)
-                            .background(Color.white)
-                            .cornerRadius(16)
-                            .font(.system(size: 36, weight: .bold, design: .monospaced))
-                            .focused($focusedIndex, equals: i)
-                            .onChange(of: pin[i]) { newValue in
-                                if newValue.count > 1 {
-                                    pin[i] = String(newValue.prefix(1))
-                                }
-                                if !newValue.isEmpty && i < 3 {
-                                    focusedIndex = i + 1
-                                }
-                                checkPin()
-                            }
-                    }
-                }
+                PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: true)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("pinInputFields")
                 if let errorMessage = errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
@@ -77,18 +60,22 @@ struct PinSetupView: View {
                         if let error = error {
                             errorMessage = String(localized: "pinsetup_save_fail")
                         } else {
+                            skipPinAfterSetup = true
                             onPinSet()
                         }
                     }
                 }
+                .accessibilityIdentifier("pinSetupNextButton")
                 .disabled(!isNextActive || isLoading)
                 .opacity(isNextActive && !isLoading ? 1 : 0.5)
                 .padding(.bottom, 40)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .zIndex(1)
+            .padding()
         }
         .onAppear { focusedIndex = 0 }
+        .onChange(of: pin) { _ in checkPin() }
     }
 
     func checkPin() {

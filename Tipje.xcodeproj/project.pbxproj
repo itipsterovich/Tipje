@@ -12,6 +12,8 @@
 		6212A9BD2DEDE1EC00C809B7 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9BC2DEDE1EC00C809B7 /* FirebaseFirestore */; };
 		6212A9C22DEDF03300C809B7 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9C12DEDF03300C809B7 /* GoogleSignIn */; };
 		6212A9C42DEDF03300C809B7 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9C32DEDF03300C809B7 /* GoogleSignInSwift */; };
+		622BF0E62DF4EA470003532F /* File.txt in Resources */ = {isa = PBXBuildFile; fileRef = 622BF0E52DF4EA470003532F /* File.txt */; };
+		622BF0E82DF4EC240003532F /* Stickers.xcstickers in Resources */ = {isa = PBXBuildFile; fileRef = 622BF0E72DF4EC240003532F /* Stickers.xcstickers */; };
 		629ABF502DEE168F00362CEC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */; };
 		629ABF592DEF2A2E00362CEC /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 629ABF582DEF2A2E00362CEC /* ActivityIndicatorView */; };
 		629ABF632DF043A400362CEC /* il_clouds.png in Resources */ = {isa = PBXBuildFile; fileRef = 629ABF622DF043A400362CEC /* il_clouds.png */; };
@@ -21,6 +23,16 @@
 		62C4C5962DDDE0A2001CAB3B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C54B2DDDE0A2001CAB3B /* README.md */; };
 		62C4C5AE2DDDE8BA001CAB3B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		622BF0F92DF603360003532F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 62C4C3EA2DDDC962001CAB3B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 62C4C3F12DDDC962001CAB3B;
+			remoteInfo = Tipje;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		62C4C5C52DE09E74001CAB3B /* Embed Frameworks */ = {
@@ -36,6 +48,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		622BF0E52DF4EA470003532F /* File.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = File.txt; sourceTree = "<group>"; };
+		622BF0E72DF4EC240003532F /* Stickers.xcstickers */ = {isa = PBXFileReference; lastKnownFileType = folder.stickers; path = Stickers.xcstickers; sourceTree = "<group>"; };
+		622BF0F32DF603360003532F /* TipjeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TipjeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		626E81012DE9AA7700715C38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		629ABF622DF043A400362CEC /* il_clouds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = il_clouds.png; sourceTree = "<group>"; };
@@ -99,21 +114,27 @@
 				Components/ChoreKidCard.swift,
 				Components/ConfettiOverlay.swift,
 				Components/CustomDropdownCompact.swift,
+				Components/DropdownRegular.swift,
+				Components/IconButton.swift,
 				Components/IconRoundButton.swift,
 				Components/MainTabBar.swift,
 				Components/MascotModal.swift,
 				Components/PageTitle.swift,
 				Components/PaywallModal.swift,
+				Components/PinPadView.swift,
 				Components/RewardAdultCard.swift,
 				Components/RewardKidCard.swift,
 				Components/RuleAdultCard.swift,
 				Components/RuleKidCard.swift,
 				Components/SubTabBar.swift,
+				Components/TipjeEmptyState.swift,
+				Components/TipjeModal.swift,
 				Components/VisualEffectBlur.swift,
 				Home/HomeView.swift,
 				MainView.swift,
 				Onboarding/KidsProfileView.swift,
 				Onboarding/LoginView.swift,
+				Onboarding/OnboardingStateManager.swift,
 				Onboarding/OnboardingView.swift,
 				Onboarding/PinSetupView.swift,
 				PinLockView.swift,
@@ -126,6 +147,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		622BF0F42DF603360003532F /* TipjeUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TipjeUITests;
+			sourceTree = "<group>";
+		};
 		62C4C53E2DDDE0A2001CAB3B /* Models */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -158,6 +184,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		622BF0F02DF603360003532F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		62C4C3EF2DDDC962001CAB3B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -178,6 +211,8 @@
 			isa = PBXGroup;
 			children = (
 				62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */,
+				622BF0E72DF4EC240003532F /* Stickers.xcstickers */,
+				622BF0E52DF4EA470003532F /* File.txt */,
 				629ABF622DF043A400362CEC /* il_clouds.png */,
 				62C4C54B2DDDE0A2001CAB3B /* README.md */,
 				629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */,
@@ -189,6 +224,7 @@
 				62C4C5592DDDE0A2001CAB3B /* Services */,
 				62C4C5702DDDE0A2001CAB3B /* Views */,
 				62C4C50E2DDDE08A001CAB3B /* TipjeApp.swift */,
+				622BF0F42DF603360003532F /* TipjeUITests */,
 				62C4C3F32DDDC962001CAB3B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -197,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				62C4C3F22DDDC962001CAB3B /* Tipje.app */,
+				622BF0F32DF603360003532F /* TipjeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -204,6 +241,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		622BF0F22DF603360003532F /* TipjeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 622BF0FB2DF603360003532F /* Build configuration list for PBXNativeTarget "TipjeUITests" */;
+			buildPhases = (
+				622BF0EF2DF603360003532F /* Sources */,
+				622BF0F02DF603360003532F /* Frameworks */,
+				622BF0F12DF603360003532F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				622BF0FA2DF603360003532F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				622BF0F42DF603360003532F /* TipjeUITests */,
+			);
+			name = TipjeUITests;
+			packageProductDependencies = (
+			);
+			productName = TipjeUITests;
+			productReference = 622BF0F32DF603360003532F /* TipjeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		62C4C3F12DDDC962001CAB3B /* Tipje */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 62C4C3FD2DDDC963001CAB3B /* Build configuration list for PBXNativeTarget "Tipje" */;
@@ -240,9 +300,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
+					622BF0F22DF603360003532F = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 62C4C3F12DDDC962001CAB3B;
+					};
 					62C4C3F12DDDC962001CAB3B = {
 						CreatedOnToolsVersion = 16.3;
 					};
@@ -268,11 +332,19 @@
 			projectRoot = "";
 			targets = (
 				62C4C3F12DDDC962001CAB3B /* Tipje */,
+				622BF0F22DF603360003532F /* TipjeUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		622BF0F12DF603360003532F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		62C4C3F02DDDC962001CAB3B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -281,6 +353,8 @@
 				629ABF502DEE168F00362CEC /* GoogleService-Info.plist in Resources */,
 				62C4C58F2DDDE0A2001CAB3B /* reward.aiff in Resources */,
 				62C4C5962DDDE0A2001CAB3B /* README.md in Resources */,
+				622BF0E62DF4EA470003532F /* File.txt in Resources */,
+				622BF0E82DF4EC240003532F /* Stickers.xcstickers in Resources */,
 				629ABF632DF043A400362CEC /* il_clouds.png in Resources */,
 				62C4C5882DDDE0A2001CAB3B /* success.aiff in Resources */,
 			);
@@ -289,6 +363,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		622BF0EF2DF603360003532F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		62C4C3EE2DDDC962001CAB3B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -299,7 +380,49 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		622BF0FA2DF603360003532F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 62C4C3F12DDDC962001CAB3B /* Tipje */;
+			targetProxy = 622BF0F92DF603360003532F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		622BF0FC2DF603360003532F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TipjeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Tipje;
+			};
+			name = Debug;
+		};
+		622BF0FD2DF603360003532F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.TipjeUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Tipje;
+			};
+			name = Release;
+		};
 		62C4C3FB2DDDC963001CAB3B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -424,6 +547,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6U498W8698;
@@ -453,6 +577,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6U498W8698;
@@ -480,6 +605,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		622BF0FB2DF603360003532F /* Build configuration list for PBXNativeTarget "TipjeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				622BF0FC2DF603360003532F /* Debug */,
+				622BF0FD2DF603360003532F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		62C4C3ED2DDDC962001CAB3B /* Build configuration list for PBXProject "Tipje" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

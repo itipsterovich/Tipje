@@ -7,11 +7,13 @@ enum ShopTab: String, CaseIterable {
 
 enum ShopModal: Identifiable {
     case notEnoughPeanuts
+    case notEnoughPeanutsForReward
     case addedToBasket
     case confettiOverlay
     var id: Int {
         switch self {
         case .notEnoughPeanuts: return 1
+        case .notEnoughPeanutsForReward: return 4
         case .addedToBasket: return 2
         case .confettiOverlay: return 3
         }
@@ -69,7 +71,7 @@ struct ShopView: View {
             },
             content: {
                 VStack(spacing: 16) {
-                    PageTitle("Reward shop")
+                    PageTitle("Reward Shop")
                         .padding(.top, 24)
                     SubTabBar(
                         tabs: ShopTab.allCases,
@@ -78,7 +80,10 @@ struct ShopView: View {
                     )
                     if selectedTab == .rewards {
                         if availableRewards.isEmpty {
-                            EmptyShopState(image: "mascot_shoping", text: "No rewards available")
+                            TipjeEmptyState(
+                                imageName: "mascot_empty",
+                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn."
+                            )
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
@@ -94,7 +99,7 @@ struct ShopView: View {
                                                     showConfetti = false
                                                 }
                                             } else {
-                                                activeModal = .notEnoughPeanuts
+                                                activeModal = .notEnoughPeanutsForReward
                                             }
                                         }
                                     }
@@ -104,13 +109,17 @@ struct ShopView: View {
                         }
                     } else if selectedTab == .basket {
                         if basketEntries.isEmpty {
-                            EmptyShopState(image: "mascot_empty", text: "No rewards in basket")
+                            TipjeEmptyState(
+                                imageName: "mascot_empty",
+                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!"
+                            )
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
                                     ForEach(basketEntries) { entry in
                                         // You may want to resolve reward details from rewardRef if needed
                                         BasketCard(purchase: entry, onConfirm: {
+                                            store.decrementOrRemovePurchase(purchase: entry)
                                             pendingPurchase = entry
                                             activeModal = .confettiOverlay
                                         })
@@ -134,118 +143,33 @@ struct ShopView: View {
         }) { modal in
             switch modal {
             case .notEnoughPeanuts:
-                ZStack {
-                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-                        .edgesIgnoringSafeArea(.all)
-                    VStack {
-                        Spacer()
-                        ZStack {
-                            VStack(spacing: 24) {
-                                Spacer().frame(height: 8)
-                                Image("mascot_no")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(height: min(UIScreen.main.bounds.height * 0.32, 340) * 1.4)
-                                    .padding(.top, 0)
-                                Text("You don't have enough peanuts. Earn them by completing tasks!")
-                                    .font(.custom("Inter-Regular_Medium", size: 22))
-                                    .foregroundColor(Color(hex: "8E9293"))
-                                    .multilineTextAlignment(.center)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                Spacer(minLength: 8)
-                            }
-                            .padding(16)
-                            .frame(maxWidth: 340)
-                        }
-                        Spacer()
-                    }
-                    VStack {
-                        HStack {
-                            Spacer()
-                            ButtonRegular(iconName: "icon_close", variant: .light) { activeModal = nil }
-                                .padding(.top, 24)
-                                .padding(.trailing, 24)
-                                .shadow(color: .clear, radius: 0)
-                        }
-                        Spacer()
-                    }
-                }
+                TipjeModal(
+                    imageName: "mascot_no",
+                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    onClose: { activeModal = nil }
+                )
+            case .notEnoughPeanutsForReward:
+                TipjeModal(
+                    imageName: "mascot_no",
+                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    onClose: { activeModal = nil }
+                )
             case .addedToBasket:
-                ZStack {
-                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-                        .edgesIgnoringSafeArea(.all)
-                    VStack {
-                        Spacer()
-                        ZStack {
-                            VStack(spacing: 24) {
-                                Spacer().frame(height: 8)
-                                Image("mascot_atb")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(height: min(UIScreen.main.bounds.height * 0.32, 340) * 1.4)
-                                    .padding(.top, 0)
-                                Text("You've just added a new reward to your basket.")
-                                    .font(.custom("Inter-Regular_Medium", size: 22))
-                                    .foregroundColor(Color(hex: "8E9293"))
-                                    .multilineTextAlignment(.center)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                Spacer(minLength: 8)
-                            }
-                            .padding(16)
-                            .frame(maxWidth: 340)
-                        }
-                        Spacer()
-                    }
-                    VStack {
-                        HStack {
-                            Spacer()
-                            ButtonRegular(iconName: "icon_close", variant: .light) { activeModal = nil }
-                                .padding(.top, 24)
-                                .padding(.trailing, 24)
-                                .shadow(color: .clear, radius: 0)
-                        }
-                        Spacer()
-                    }
-                }
+                TipjeModal(
+                    imageName: "mascot_atb",
+                    message: "Nice pick! 🎁\nYour reward is in the basket, waiting for you.",
+                    onClose: { activeModal = nil }
+                )
             case .confettiOverlay:
-                ZStack {
-                    VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
-                        .edgesIgnoringSafeArea(.all)
-                    VStack {
-                        Spacer()
-                        ZStack {
-                            VStack(spacing: 24) {
-                                Spacer().frame(height: 8)
-                                Image("mascot_yam")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(height: min(UIScreen.main.bounds.height * 0.32, 340) * 1.4)
-                                    .padding(.top, 0)
-                                Text("Well deserved! Have fun enjoying your treat")
-                                    .font(.custom("Inter-Medium", size: 22))
-                                    .foregroundColor(Color(hex: "8E9293"))
-                                    .multilineTextAlignment(.center)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                Spacer(minLength: 8)
-                            }
-                            .padding(16)
-                            .frame(maxWidth: 340)
-                        }
-                        Spacer()
-                    }
-                    VStack {
-                        HStack {
-                            Spacer()
-                            ButtonRegular(iconName: "icon_close", variant: .light) { activeModal = nil }
-                                .padding(.top, 24)
-                                .padding(.trailing, 24)
-                                .shadow(color: .clear, radius: 0)
-                        }
-                        Spacer()
-                    }
-                }
+                TipjeModal(
+                    imageName: "mascot_yam",
+                    message: "Woohoo! You earned it! 🍦\nEnjoy your treat—you deserve it!",
+                    onClose: { activeModal = nil },
+                    font: .custom("Inter-Medium", size: 22)
+                )
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 

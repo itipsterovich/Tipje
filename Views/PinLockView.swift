@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct PinLockView: View {
-    @State private var pin: [String] = []
+    @State private var pin: [String] = ["", "", "", ""]
+    @FocusState private var focusedIndex: Int?
     @State private var errorMessage: String? = nil
     @State private var isLoading: Bool = false
     let pinLength = 4
@@ -20,45 +21,31 @@ struct PinLockView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
                 .zIndex(0)
-            VStack(spacing: 0) {
-                Spacer().frame(height: 140)
-                HStack(spacing: 16) {
-                    ForEach(0..<pinLength, id: \.self) { i in
-                        Circle()
-                            .stroke(errorMessage == nil ? Color.white : Color.red, lineWidth: 2)
-                            .frame(width: 80, height: 80)
-                            .background(
-                                Circle()
-                                    .fill(pin.count > i ? (errorMessage == nil ? Color.white : Color.red) : Color.clear)
-                                    .frame(width: 80, height: 80)
-                            )
-                    }
-                }
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .font(.caption)
-                        .padding(.top, 12)
-                }
-                Spacer().frame(height: 40)
-                VStack(spacing: 16) {
-                    ForEach([["1","2","3"],["4","5","6"],["7","8","9"]], id: \.self) { row in
-                        HStack(spacing: 24) {
-                            ForEach(row, id: \.self) { num in
-                                PinPadButton(label: num) {
-                                    appendDigit(num)
-                                }
-                            }
-                        }
-                    }
-                    HStack(spacing: 24) {
-                        Spacer().frame(width: 64)
-                        PinPadButton(label: "0") {
-                            appendDigit("0")
-                        }
-                        PinPadButton(label: "⌫") {
-                            deleteDigit()
-                        }
+            VStack {
+                Spacer()
+                VStack(spacing: 0) {
+                    Text("Enter PIN")
+                        .font(.custom("Inter-Regular_SemiBold", size: 40))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                    Spacer().frame(height: 16)
+                    Text("Enter your 4-digit PIN to unlock Admin")
+                        .font(.custom("Inter-Regular_Medium", size: 20))
+                        .foregroundColor(.white)
+                        .opacity(0.8)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .frame(maxWidth: 500)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer().frame(height: 40)
+                    PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: false)
+                        .frame(maxWidth: .infinity)
+                    if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                            .padding(.top, 12)
                     }
                 }
                 Spacer()
@@ -68,49 +55,70 @@ struct PinLockView: View {
         }
         .padding(.horizontal, 24)
         .font(.custom("Inter-Regular_Medium", size: 24))
-    }
-
-    private func appendDigit(_ digit: String) {
-        guard pin.count < pinLength else { return }
-        pin.append(digit)
-        errorMessage = nil
-        if pin.count == pinLength {
-            isLoading = true
-            let pinCode = pin.joined()
-            FirestoreManager.shared.verifyUserPin(userId: userId, pinCode: pinCode) { success in
-                isLoading = false
-                if success {
-                    onUnlock()
-                } else {
-                    errorMessage = "Incorrect PIN. Please try again."
-                    pin.removeAll()
-                }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .onAppear { focusedIndex = 0 }
+        .onChange(of: pin) { _ in
+            if pin.allSatisfy({ $0.count == 1 }) {
+                verifyPin()
             }
         }
     }
 
-    private func deleteDigit() {
-        guard !pin.isEmpty else { return }
-        pin.removeLast()
+    private func verifyPin() {
+        guard pin.allSatisfy({ $0.count == 1 }) else { return }
+        let pinCode = pin.joined()
+        isLoading = true
         errorMessage = nil
+        FirestoreManager.shared.verifyUserPin(userId: userId, pinCode: pinCode) { success in
+            isLoading = false
+            if success {
+                onUnlock()
+            } else {
+                errorMessage = "Incorrect PIN. Please try again."
+                pin = ["", "", "", ""]
+                focusedIndex = 0
+            }
+        }
     }
 }
 
-struct PinPadButton: View {
-    let label: String
-    let action: () -> Void
+struct PinInputFields: View {
+    @Binding var pin: [String]
+    @FocusState var focusedIndex: Int?
+    var error: Bool = false
+    var showNumbers: Bool = false
+
     var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(Color.white.opacity(0.15))
-                    .frame(width: 64, height: 64)
-                Text(label)
-                    .font(.custom("Inter-Regular_SemiBold", size: 28))
-                    .foregroundColor(.white)
+        HStack(spacing: 16) {
+            ForEach(0..<4) { i in
+                Group {
+                    if showNumbers {
+                        TextField("", text: $pin[i])
+                            .keyboardType(.numberPad)
+                    } else {
+                        SecureField("", text: $pin[i])
+                            .keyboardType(.numberPad)
+                    }
+                }
+                .multilineTextAlignment(.center)
+                .frame(width: 80, height: 80)
+                .background(Color.white)
+                .cornerRadius(16)
+                .font(.system(size: 36, weight: .bold, design: .monospaced))
+                .focused($focusedIndex, equals: i)
+                .onChange(of: pin[i]) { newValue in
+                    if newValue.count > 1 {
+                        pin[i] = String(newValue.prefix(1))
+                    }
+                    if !newValue.isEmpty && i < 3 {
+                        focusedIndex = i + 1
+                    }
+                    if newValue.isEmpty && i > 0 {
+                        focusedIndex = i - 1
+                    }
+                }
             }
         }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 
