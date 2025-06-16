@@ -41,7 +41,15 @@ struct MainView: View {
                     DebugView().environmentObject(store)
                 }
             }
-            .edgesIgnoringSafeArea(.all)
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear {
+                            print("[DEBUG] MainView geometry: \(geo.size)")
+                        }
+                }
+            )
+            .edgesIgnoringSafeArea(.top)
             // Overlay the tab bar at the bottom
             VStack {
                 Spacer()
@@ -61,6 +69,7 @@ struct MainView: View {
                         }
                     }
                 })
+                .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .phone ? 14 : 24)
                 .padding(.bottom, 16)
             }
             .edgesIgnoringSafeArea(.bottom)
@@ -95,11 +104,13 @@ struct MainView: View {
             )
         }
         .onAppear {
+            print("[MainView] onAppear. store.userId=\(store.userId), Auth.auth().currentUser?.uid=\(Auth.auth().currentUser?.uid ?? "nil")")
             if shouldShowAdminAfterOnboarding {
                 selectedTab = .admin
                 shouldShowAdminAfterOnboarding = false
             }
             if let uid = Auth.auth().currentUser?.uid, store.userId.isEmpty {
+                print("[MainView] Setting store.userId from Auth: \(uid)")
                 store.setUser(userId: uid)
             }
         }

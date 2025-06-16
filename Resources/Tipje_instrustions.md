@@ -103,47 +103,60 @@ If you update the UI or backend, update this doc to match!**
 
 # (All previous references to categories, custom input, or editing have been removed for clarity and accuracy.)
 
-## Onboarding Flow Standard (2024-06)
+## Onboarding Flow (2024-06, Updated)
 
-### The onboarding flow for Tipje must follow this exact sequence:
+### **Stage 1: Intro & Account Creation**
+- **Purpose:** For new users only. Shows intro slides and login/register screen.
+- **When to show:**
+  - Only if the user is not authenticated **and** has no Firestore user profile.
+  - If the user is authenticated and a Firestore user profile exists, **never show Stage 1 again**.
+- **Completion:**
+  - Stage 1 is complete as soon as the user is authenticated and a Firestore user profile is created.
+  - After this, the user never sees Stage 1 again, even if they log out and back in.
 
-1. **OnboardingView.swift**  
-   - Shows intro slides.
+---
 
-2. **LoginView.swift**  
-   - User logs in or registers.
-   - On success, userId is set and passed to subsequent steps.
+### **Stage 2: Sequential Onboarding Checks (After Login)**
+After successful authentication and Firestore user profile creation, the app must perform the following checks in order. The user is always routed to the first incomplete step:
 
-3. **KidsProfileView.swift**  
-   - User creates at least one kid profile.
-   - Cannot proceed without at least one kid.
+1. **Check for Kids:**
+   - **Call:** `FirestoreManager.fetchKids(userId: uid)`
+   - **If none:** Show KidsProfileView to create at least one kid.
+   - **If at least one exists:** Continue.
 
-4. **PinSetupView.swift**  
-   - User sets up their PIN.
-   - Cannot proceed without setting a valid PIN.
+2. **Check for PIN Code:**
+   - **Check:** `user.pinHash != nil`
+   - **If not set:** Show PinSetupView to set a PIN.
+   - **If set:** Continue.
 
-5. **AdminView.swift**  
-   - User must add at least one card to each tab (Rules, Chores, Rewards).
-   - Cannot proceed until all three have at least one item.
+3. **Check for Cards (Rules, Chores, Rewards):**
+   - **Call:** 
+     - `FirestoreManager.fetchRules(userId: uid)` (active only)
+     - `FirestoreManager.fetchChores(userId: uid)` (active only)
+     - `FirestoreManager.fetchRewards(userId: uid)` (active only)
+   - **If any tab is empty:** Show the admin view and prompt the user to add at least one card in each tab.
+   - **If all have at least one:** Continue.
 
-6. **TipjeModal.swift**  
-   - Shows a congrats modal: "Admin is now locked, cards are in the home view."
-   - **Note:** This modal is only shown after the user has added at least one card to each tab in AdminView, not immediately after PIN setup. After dismissing the modal, the user remains in Admin and can leave if they want. From then on, Admin is PIN-locked (PinPadView/PinLockView) on future access.
+4. **Success Modal and Admin Lock:**
+   - **When:** After at least one card is present in each tab.
+   - **Action:** Show the success modal.
+   - **After:** Lock the admin page with the PIN.
 
-7. **Main App/Home View**  
-   - User is routed to the main app.
-   - **PinPadView/PinLockView** is only shown when accessing the admin area after onboarding is complete.
+5. **Navigating the User:**
+   - **If all steps are complete:** User goes directly to the main home view on future launches.
+   - **If any step is missing:** User resumes onboarding at the last incomplete step.
 
-**Rules:**
-- Each step is shown only once, in order.
-- No step is repeated or skipped.
-- PIN entry is never required during onboarding, only when accessing admin after onboarding.
-- The success modal is only shown after all three admin tabs have at least one card, not after PIN setup.
-- After dismissing the success modal, the user remains in Admin and Admin is PIN-locked on future access.
-- All state and navigation for onboarding is managed in `OnboardingView.swift` as a state machine.
-- `TipjeApp.swift` only checks `didCompleteOnboarding` to decide whether to show onboarding or the main app.
+---
 
-**If you update the onboarding flow, update this section to match!**
+### **Best Practice**
+- The app must never show the KidsProfileView if at least one kid profile exists.
+- The app must never skip onboarding if the user, kid, PIN, or cards are missing.
+- All onboarding state and navigation is managed by the onboarding state machine.
+- After all onboarding is complete, the user always goes straight to the main app.
+
+---
+
+**If you update onboarding logic, update this section to match!**
 
 ## 6. **Kids Profile Editing & Profile Switch (2024-06)**
 
@@ -182,3 +195,123 @@ If you update the UI or backend, update this doc to match!**
 **This rule is mandatory for all onboarding, admin, settings, and main app views.**
 
 If you update any layout or visual logic, you must ensure iPad and iPhone are handled separately and update this doc to match.
+
+## Handling Missing User Profile (2024-06)
+
+- On app launch, if `Auth.auth().currentUser` is set but the Firestore user profile does not exist (e.g., the account was deleted from Firebase console or backend), the app must:
+    - Reset onboarding state (set `didCompleteOnboarding` to false and onboarding step to `.slides` or first step).
+    - Route the user to the beginning of onboarding (intro slides).
+    - This ensures users who are signed in but have no profile are not stuck and can re-onboard cleanly.
+- This logic should be implemented in the onboarding state check (see `OnboardingStateManager.swift`).
+- If the user is not logged in (`Auth.auth().currentUser` is nil), show the login screen as usual.
+
+## User and Kid Profile Definitions & Onboarding Logic (2024-06)
+
+### Definitions
+
+- **User Profile (Parent):**
+  - The main account, authenticated via email/password or Google.
+  - Stored in Firestore at `/users/{userId}`.
+  - Contains parent info (email, displayName, etc.).
+
+- **Kid Profile (Sub-user):**
+  - Each kid is a sub-document: `/users/{userId}/kids/{kidId}`.
+  - Contains the kid's name and other kid-specific data.
+  - A parent can have up to 2 kid profiles.
+
+### Onboarding and App Entry Logic
+
+1. **On App Launch:**
+    - If not logged in, show the login screen.
+    - If logged in, check if the user profile exists in Firestore:
+        - If not, start onboarding from the beginning (intro slides).
+    - If user profile exists, check for kid profiles:
+        - If none, show KidsProfileView to create a kid profile.
+        - If at least one exists, proceed to the main app (Home/Admin).
+
+2. **After Google Auth or Email Registration:**
+    - If the user is new, create the user profile and start onboarding.
+    - After login, always check for kid profiles:
+        - If none, show KidsProfileView.
+        - If at least one exists, skip KidsProfileView and go to the main app.
+
+3. **If User Profile is Deleted or Missing:**
+    - If the user is logged in but their Firestore user profile is missing, reset onboarding and start from the beginning.
+
+### Best Practice
+
+- The app must never show the KidsProfileView (profile page) if at least one kid profile exists.
+- The app must never skip onboarding if the user or kid profile is missing.
+- All onboarding state and navigation is managed by the onboarding state machine.
+
+## 7. **Error State UI Standard (2024-06)**
+
+### ErrorStateView Component
+- All error states in the app must use the reusable `ErrorStateView` SwiftUI component for consistency.
+- **Parameters:**
+  - `headline` (String): Main message, e.g., "Welcome back!"
+  - `bodyText` (String): Supporting message, e.g., "It looks like you were logged out. Please log in again to continue your journey with Tipje."
+  - `buttonTitle` (String): Button label, e.g., "Log In"
+  - `onButtonTap` (closure): Action to perform when the button is tapped (e.g., trigger login or onboarding flow)
+  - `imageName` (String?): Optional asset name for an illustration (e.g., "mascot_empty_chores")
+- **Styling:**
+  - **Background:** Always white (`Color.white.ignoresSafeArea()`)
+  - **Headline:** Inter-Regular_SemiBold, 32pt, #494646, center-aligned
+  - **Body:** Inter-Regular_Medium, 20pt, #494646 at 0.5 opacity, center-aligned
+  - **Button:** Uses `ButtonText` with primary variant, 24pt
+  - **Image:** If provided, shown above the text, 180pt height, scaled to fit
+- **Device-Specific Layout:**
+  - iPhone (compact): All spacing, font sizes, and mascot scaling as above
+  - iPad (regular): Use the same layout, font sizes, and mascot scaling as iPhone for error states (no iPad-specific overrides unless specified)
+- **Usage Policy:**
+  - Use `ErrorStateView` for all error, empty, or missing state screens (e.g., missing user, missing kid profile, network errors, etc.)
+  - Never use ad-hoc or inline error UI; always use the shared component for consistency
+  - Always provide a clear action for the user to recover (e.g., log in, retry, go to onboarding)
+
+# Device-Specific View Struct Policy (2024-06)
+
+**New Mandatory Policy:**
+
+All main app views (including but not limited to `AdminView`, `ShopView`, `HomeView`, `MainView`, etc.) must have **separate SwiftUI view structs for iPhone (compact size class) and iPad (regular size class)**. This is already the standard in the Onboarding flow and must be followed everywhere else in the app.
+
+- Each file must contain two clearly named view structs, e.g.:
+  - `AdminViewiPhone` and `AdminViewiPad`
+  - `ShopViewiPhone` and `ShopViewiPad`
+  - `HomeViewiPhone` and `HomeViewiPad`
+  - `MainViewiPhone` and `MainViewiPad`
+- The main entry point (e.g., `AdminView`) should switch between these based on `horizontalSizeClass` or device type.
+- **Add comments** at the top of each struct indicating "// iPhone layout" or "// iPad layout".
+- All device-specific layout, font, spacing, and visual logic must be handled in the appropriate struct, not with inline `if horizontalSizeClass == .compact` checks.
+- This policy is **mandatory** for all new and refactored code.
+- Failing to follow this policy can break the app's layout and user experience, especially as device requirements diverge.
+
+**Example:**
+```swift
+struct ShopView: View {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    var body: some View {
+        if horizontalSizeClass == .compact {
+            ShopViewiPhone()
+        } else {
+            ShopViewiPad()
+        }
+    }
+}
+
+// iPhone layout
+struct ShopViewiPhone: View { ... }
+
+// iPad layout
+struct ShopViewiPad: View { ... }
+```
+
+**This rule applies to:**
+- AdminView
+- ShopView
+- HomeView
+- MainView
+- Any other main app view
+
+**Onboarding already follows this pattern. All other areas must be updated to match.**
+
+---

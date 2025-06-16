@@ -21,6 +21,180 @@ enum ShopModal: Identifiable {
 }
 
 struct ShopView: View {
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    var body: some View {
+        if horizontalSizeClass == .compact {
+            ShopViewiPhone()
+        } else {
+            ShopViewiPad()
+        }
+    }
+}
+
+// =======================
+// iPhone layout
+// =======================
+struct ShopViewiPhone: View {
+    @EnvironmentObject var store: Store
+    @State private var selectedTab: ShopTab = .rewards
+    @State private var showConfetti = false
+    @State private var activeModal: ShopModal? = nil
+    @State private var pendingPurchase: RewardPurchase? = nil
+
+    private var availableRewards: [Reward] {
+        store.rewards.filter { $0.isActive }
+    }
+    private var basketEntries: [RewardPurchase] {
+        store.rewardPurchases.filter { $0.status == "IN_BASKET" }
+    }
+
+    var body: some View {
+        BannerPanelLayout(
+            bannerColor: Color(hex: "#C2A3A4"),
+            bannerHeight: 300,
+            bannerContent: {
+                ZStack {
+                    Image("il_shop_0")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 300)
+                        .frame(maxWidth: .infinity, alignment: .top)
+                        .offset(y: 0)
+                    VStack(spacing: 0) {
+                        Spacer()
+                        Text("\(store.balance)")
+                            .font(.custom("Inter-Regular_Bold", size: 64))
+                            .foregroundColor(.white)
+                            .shadow(radius: 4)
+                        HStack(alignment: .center, spacing: 4) {
+                            Image("icon_peanut")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(.white)
+                            Text("peanuts earned")
+                                .font(.custom("Inter-Regular_Medium", size: 22))
+                                .foregroundColor(.white)
+                                .shadow(radius: 2)
+                        }
+                        .padding(.top, -8)
+                        Spacer()
+                    }
+                    .padding(.top, 36)
+                }
+                .frame(height: 300)
+            },
+            content: {
+                VStack(spacing: 16) {
+                    PageTitle("Reward Shop")
+                        .padding(.top, 14)
+                    SubTabBar(
+                        tabs: ShopTab.allCases,
+                        selectedTab: $selectedTab,
+                        title: { $0.rawValue }
+                    )
+                    if selectedTab == .rewards {
+                        if availableRewards.isEmpty {
+                            TipjeEmptyState(
+                                imageName: "mascot_empty",
+                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn."
+                            )
+                        } else {
+                            ScrollView {
+                                VStack(spacing: 8) {
+                                    ForEach(availableRewards) { reward in
+                                        let canBuy = store.balance >= reward.cost
+                                        RewardKidCard(reward: reward, canBuy: canBuy) {
+                                            if canBuy {
+                                                store.purchaseReward(reward)
+                                                showConfetti = true
+                                                SoundPlayer.shared.playSound(named: "reward.aiff")
+                                                activeModal = .addedToBasket
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                                    showConfetti = false
+                                                }
+                                            } else {
+                                                activeModal = .notEnoughPeanutsForReward
+                                            }
+                                        }
+                                        .frame(maxWidth: .infinity)
+                                    }
+                                }
+                                .padding(.top, 8)
+                            }
+                        }
+                    } else if selectedTab == .basket {
+                        if basketEntries.isEmpty {
+                            TipjeEmptyState(
+                                imageName: "mascot_empty",
+                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!"
+                            )
+                        } else {
+                            ScrollView {
+                                VStack(spacing: 8) {
+                                    ForEach(basketEntries) { entry in
+                                        BasketCard(purchase: entry, onConfirm: {
+                                            store.decrementOrRemovePurchase(purchase: entry)
+                                            pendingPurchase = entry
+                                            activeModal = .confettiOverlay
+                                        })
+                                        .frame(maxWidth: .infinity)
+                                    }
+                                }
+                                .padding(.top, 8)
+                            }
+                        }
+                    }
+                }
+                .font(.custom("Inter-Medium", size: 17))
+            }
+        )
+        .sheet(item: $activeModal, onDismiss: {
+            if activeModal == .confettiOverlay, let entry = pendingPurchase {
+                store.confirmRewardGiven(entry)
+                pendingPurchase = nil
+            }
+            activeModal = nil
+        }) { modal in
+            switch modal {
+            case .notEnoughPeanuts:
+                TipjeModal(
+                    imageName: "mascot_no",
+                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    onClose: { activeModal = nil }
+                )
+            case .notEnoughPeanutsForReward:
+                TipjeModal(
+                    imageName: "mascot_no",
+                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    onClose: { activeModal = nil }
+                )
+            case .addedToBasket:
+                TipjeModal(
+                    imageName: "mascot_atb",
+                    message: "Nice pick! 🎁\nYour reward is in the basket, waiting for you.",
+                    onClose: { activeModal = nil }
+                )
+            case .confettiOverlay:
+                TipjeModal(
+                    imageName: "mascot_yam",
+                    message: "Woohoo! You earned it! 🍦\nEnjoy your treat—you deserve it!",
+                    onClose: { activeModal = nil },
+                    font: .custom("Inter-Medium", size: 22)
+                )
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .onAppear {
+            print("[ShopViewiPhone] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
+    }
+}
+
+// =======================
+// iPad layout
+// =======================
+struct ShopViewiPad: View {
     @EnvironmentObject var store: Store
     @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
@@ -70,9 +244,8 @@ struct ShopView: View {
                 .frame(height: 300)
             },
             content: {
-                VStack(spacing: 16) {
+                VStack(spacing: 24) {
                     PageTitle("Reward Shop")
-                        .padding(.top, 24)
                     SubTabBar(
                         tabs: ShopTab.allCases,
                         selectedTab: $selectedTab,
@@ -102,9 +275,10 @@ struct ShopView: View {
                                                 activeModal = .notEnoughPeanutsForReward
                                             }
                                         }
+                                        .frame(maxWidth: .infinity)
                                     }
                                 }
-                                .padding(.top, 8)
+                                .padding(.top, 14)
                             }
                         }
                     } else if selectedTab == .basket {
@@ -117,20 +291,19 @@ struct ShopView: View {
                             ScrollView {
                                 VStack(spacing: 14) {
                                     ForEach(basketEntries) { entry in
-                                        // You may want to resolve reward details from rewardRef if needed
                                         BasketCard(purchase: entry, onConfirm: {
                                             store.decrementOrRemovePurchase(purchase: entry)
                                             pendingPurchase = entry
                                             activeModal = .confettiOverlay
                                         })
+                                        .frame(maxWidth: .infinity)
                                     }
                                 }
-                                .padding(.top, 8)
+                                .padding(.top, 14)
                             }
                         }
                     }
                 }
-                .padding(.horizontal, 24)
                 .font(.custom("Inter-Medium", size: 24))
             }
         )
@@ -170,6 +343,10 @@ struct ShopView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .onAppear {
+            print("[ShopViewiPad] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
+        }
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 

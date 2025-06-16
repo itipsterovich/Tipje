@@ -13,6 +13,7 @@ struct CatalogRulesModal: View {
     var onSave: ([String]) -> Void
     var initiallySelected: [String]
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selected: Set<String>
     let catalog = rulesCatalog
     init(onSave: @escaping ([String]) -> Void, initiallySelected: [String]) {
@@ -33,12 +34,12 @@ struct CatalogRulesModal: View {
                         }
                         .accessibilityIdentifier("saveRulesButton")
                     }
-                    .padding(.top, 8)
+                    .padding(.top, 14)
                     .padding(.bottom, 8)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, horizontalSizeClass == .compact ? 4 : 24)
                     // Scrollable list
                     ScrollView {
-                        VStack(spacing: 24) {
+                        VStack(spacing: 14) {
                             ForEach(catalog, id: \ .id) { item in
                                 RuleAdultCard(
                                     rule: Rule(id: item.id, title: item.title, peanutValue: item.peanuts, isActive: true),
@@ -55,13 +56,14 @@ struct CatalogRulesModal: View {
                                 .accessibilityIdentifier("ruleCell_\(item.id)")
                             }
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 24)
-                        .padding(.bottom, 24)
+                        .padding(.horizontal, horizontalSizeClass == .compact ? 4 : 24)
+                        .padding(.top, horizontalSizeClass == .compact ? 0 : 8)
+                        .padding(.bottom, horizontalSizeClass == .compact ? 0 : 24)
                     }
                 }
             }
         )
+        .ignoresSafeArea(.container, edges: .bottom)
     }
     private func saveAndClose() {
         onSave(Array(selected))

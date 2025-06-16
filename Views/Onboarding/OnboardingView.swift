@@ -7,37 +7,63 @@ struct OnboardingView: View {
     @State private var userId: String = ""
     @EnvironmentObject var store: Store
     @EnvironmentObject var authManager: AuthManager
+    var isStage1: Bool // True for intro/login, False for kids/PIN setup
+
+    init(isStage1: Bool = true) {
+        self.isStage1 = isStage1
+    }
 
     var body: some View {
-        switch onboardingState.onboardingStep {
-        case .slides:
-            OnboardingSlidesView(onNext: { onboardingState.onboardingStep = .login })
-        case .login:
-            LoginView(onLogin: { uid in
-                userId = uid
-                store.setUser(userId: uid)
-                onboardingState.userId = uid
-                onboardingState.checkOnboardingState(userId: uid)
-            })
-        case .kidsProfile:
-            KidsProfileView(userId: onboardingState.userId, onNext: {
-                onboardingState.onboardingStep = .pinSetup
-            })
-        case .pinSetup:
-            PinSetupView(userId: onboardingState.userId, onPinSet: {
-                shouldShowAdminAfterOnboarding = true
-                didCompleteOnboarding = true
-                onboardingState.completeOnboarding(userId: onboardingState.userId)
-                onboardingState.onboardingStep = .done
-            })
-        case .done:
-            EmptyView() // Onboarding is done, TipjeApp/MainView will take over
+        if isStage1 {
+            // Stage 1: Intro slides and login
+            OnboardingSlidesView(
+                onLoginSuccess: { uid in
+                    print("[OnboardingView] onLoginSuccess, uid=\(uid)")
+                    userId = uid
+                    print("[OnboardingView] Setting userId in Store and OnboardingStateManager: \(uid)")
+                    store.setUser(userId: uid)
+                    onboardingState.userId = uid
+                    onboardingState.checkOnboardingState(userId: uid)
+                }
+            )
+        } else {
+            // Stage 2: Kids profile, PIN setup, admin cards based on onboardingStep
+            Group {
+                switch onboardingState.onboardingStep {
+                case .kidsProfile:
+                    KidsProfileView(userId: onboardingState.userId) {
+                        onboardingState.onboardingStep = .pinSetup
+                    } onLoginRequest: {
+                        // Handle case where user was logged out
+                        authManager.signOut()
+                    }
+                case .pinSetup:
+                    PinSetupView(userId: onboardingState.userId) {
+                        onboardingState.onboardingStep = .adminCards
+                    }
+                case .adminCards:
+                    AdminView(onComplete: {
+                        onboardingState.onboardingStep = .done
+                        onboardingState.completeOnboarding(userId: onboardingState.userId)
+                    })
+                    .environmentObject(store)
+                case .done:
+                    // This should transition to MainView via TipjeApp
+                    EmptyView()
+                default:
+                    // Fallback for any other state
+                    EmptyView()
+                }
+            }
+            .onChange(of: onboardingState.onboardingStep) { newStep in
+                print("[OnboardingView] onboardingStep changed: \(newStep), userId=\(onboardingState.userId)")
+            }
         }
     }
 }
 
 struct OnboardingSlidesView: View {
-    var onNext: () -> Void
+    var onLoginSuccess: (String) -> Void
     @State private var currentPage = 0
     @AppStorage("selectedLanguage") var selectedLanguage: String = "en"
     let colors: [Color] = [
@@ -56,6 +82,7 @@ struct OnboardingSlidesView: View {
         }
     }
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @State private var hasTriggeredAutoAdvance = false
     var body: some View {
         GeometryReader { geometry in
             let isPortrait = geometry.size.height > geometry.size.width
@@ -69,50 +96,44 @@ struct OnboardingSlidesView: View {
                         endPoint: .bottom
                     ).ignoresSafeArea()
                     if horizontalSizeClass == .compact {
-                        // iPhone Portrait: Logo 1.3x, mascot offset y:70
-                        VStack(spacing: 24) {
+                        VStack {
+                            Spacer(minLength: 48)
                             Image("Tipje_logo")
                                 .resizable()
                                 .scaledToFit()
-                                .scaleEffect(1.3)
                                 .frame(height: 72)
-                                .padding(.top, 24)
+                            Spacer(minLength: 0)
                             Image("on_2")
                                 .resizable()
                                 .scaledToFit()
-                                .scaleEffect(1.7)
-                                .frame(height: 180)
-                                .offset(y: 30)
-                            Spacer()
-                            VStack(spacing: 24) {
-                                Text("Raise confident kids, connect as a family")
-                                    .font(.custom("Inter-Regular_SemiBold", size: 32))
-                                    .foregroundColor(.white)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 24)
-                                Text("Tipje helps you build habits, stay connected, and enjoy parenting more.")
-                                    .font(.custom("Inter-Regular_Medium", size: 20))
-                                    .foregroundColor(.white)
-                                    .opacity(0.8)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 32)
-                                    .frame(maxWidth: 500)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            .padding(.bottom, 14)
+                                .frame(height: 300)
+                                .padding(.bottom, 0)
+                            Text("Raise confident kids, connect as a family")
+                                .font(.custom("Inter-Regular_SemiBold", size: 32))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 24)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .lineLimit(nil)
+                                .padding(.bottom, 16)
+                            Text("Tipje helps you build habits, stay connected, and enjoy parenting.")
+                                .font(.custom("Inter-Regular_Medium", size: 20))
+                                .foregroundColor(.white)
+                                .opacity(0.8)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 32)
+                                .frame(maxWidth: 500)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .lineLimit(nil)
+                            Spacer(minLength: 24)
                             CustomDropdownCompact(
                                 selection: $selectedLanguage,
                                 options: languageOptions,
                                 display: languageDisplay
                             )
-                            .padding(.bottom, 16)
-                            ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#D78C28"), action: {
-                                withAnimation { currentPage = 1 }
-                            })
-                            .accessibilityIdentifier("onboardingNextButton1")
-                            .padding(.bottom, 48)
+                            Spacer(minLength: 32)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         // iPad Portrait: as is
                         ZStack(alignment: .top) {
@@ -135,13 +156,14 @@ struct OnboardingSlidesView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .scaleEffect(1.6)
-                                    .frame(height: 260)
+                                    .frame(height: 300)
+                                    .padding(.bottom, 16)
                                     .allowsHitTesting(false)
                                 Spacer().frame(height: 100)
                                 VStack(spacing: 16) {
                                     Text("Raise confident kids, connect as a family")
                                         .font(.custom("Inter-Regular_SemiBold", size: 40))
-                                        .frame(maxWidth: 700)
+                                        .frame(maxWidth: 600)
                                         .foregroundColor(.white)
                                         .multilineTextAlignment(.center)
                                         .padding(.horizontal, 24)
@@ -155,6 +177,7 @@ struct OnboardingSlidesView: View {
                                         .padding(.horizontal, 32)
                                         .frame(maxWidth: 500)
                                         .fixedSize(horizontal: false, vertical: true)
+                                        .lineLimit(nil)
                                 }
                                 .padding(.bottom, 24)
                                 CustomDropdownCompact(
@@ -162,12 +185,12 @@ struct OnboardingSlidesView: View {
                                     options: languageOptions,
                                     display: languageDisplay
                                 )
-                                .padding(.bottom, 40)
+                                .padding(.bottom, 24)
                                 ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#D78C28"), action: {
                                     withAnimation { currentPage = 1 }
                                 })
                                 .accessibilityIdentifier("onboardingNextButton1")
-                                .padding(.bottom, 64)
+                                .padding(.bottom, 100)
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                         }
@@ -189,13 +212,14 @@ struct OnboardingSlidesView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .scaleEffect(1.0)
-                                .frame(height: 400)
+                                .frame(height: 450)
                                 .frame(maxWidth: .infinity)
                                 .clipped()
                                 .padding(.bottom, 20)
                                 .allowsHitTesting(false)
                                 .padding(.top, 0)
                             Text("Fun Tasks & Real Rewards")
+                                .frame(maxWidth: 700)
                                 .font(.custom("Inter-Regular_SemiBold", size: 32))
                                 .foregroundColor(.white)
                                 .multilineTextAlignment(.center)
@@ -211,20 +235,17 @@ struct OnboardingSlidesView: View {
                                 .padding(.horizontal)
                                 .frame(maxWidth: 500)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .lineLimit(nil)
                             Spacer()
-                            ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#7F9BAD"), action: {
-                                withAnimation { currentPage = 2 }
-                            })
-                            .accessibilityIdentifier("onboardingNextButton2")
-                            .padding(.bottom, 64)
                         }
                     } else {
+                        // --- iPad layout start ---
                         VStack {
                             Spacer().frame(height: 72)
                             Image("mascot_reward")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 641)
+                                .frame(height: 650)
                                 .frame(maxWidth: .infinity)
                                 .clipped()
                                 .padding(.bottom, 32)
@@ -246,6 +267,7 @@ struct OnboardingSlidesView: View {
                                 .padding(.horizontal)
                                 .frame(maxWidth: 500)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .lineLimit(nil)
                             Spacer()
                             ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#7F9BAD"), action: {
                                 withAnimation { currentPage = 2 }
@@ -253,6 +275,7 @@ struct OnboardingSlidesView: View {
                             .accessibilityIdentifier("onboardingNextButton2")
                             .padding(.bottom, 64)
                         }
+                        // --- iPad layout end ---
                     }
                 }
                 .tag(1)
@@ -279,20 +302,23 @@ struct OnboardingSlidesView: View {
                                 Image("on_3b")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 400)
-                                    .offset(x: 140, y: 50)
+                                    .frame(width: 250)
+                                    .offset(x: 0, y: 50)
                                     .opacity(1.0)
                                     .ignoresSafeArea(edges: .bottom)
                                     .alignmentGuide(.bottom) { d in d[.bottom] }
                             }
                             VStack(spacing: 0) {
+                                Spacer().frame(height: 300)
                                 Text("Set Rules That Match Your Family's Values")
-                                    .font(.custom("Inter-Regular_SemiBold", size: 40))
+                                    .font(.custom("Inter-Regular_SemiBold", size: 32))
                                     .frame(maxWidth: 700)
                                     .foregroundColor(.white)
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 24)
-                                Spacer().frame(height: 16)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .lineLimit(nil)
+                                    .padding(.bottom, 16)
                                 Text("Choose from a curated collection of mindful rules—designed to guide your family with clarity and kindness.")
                                     .font(.custom("Inter-Regular_Medium", size: 20))
                                     .foregroundColor(.white)
@@ -301,12 +327,8 @@ struct OnboardingSlidesView: View {
                                     .padding(.horizontal, 32)
                                     .frame(maxWidth: 500)
                                     .fixedSize(horizontal: false, vertical: true)
+                                    .lineLimit(nil)
                                 Spacer()
-                                ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#7FAD98"), action: {
-                                    onNext()
-                                })
-                                .accessibilityIdentifier("onboardingNextButton3")
-                                .padding(.bottom, 64)
                             }
                         }
                     } else {
@@ -318,12 +340,13 @@ struct OnboardingSlidesView: View {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ).ignoresSafeArea()
+                            // Background illustrations
                             VStack(spacing: 0) {
                                 Image("on_3a")
                                     .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 500)
                                     .frame(maxWidth: .infinity)
+                                    .scaledToFill()
+                                    .frame(height: 400)
                                     .opacity(1.0)
                                     .ignoresSafeArea(edges: .top)
                                     .allowsHitTesting(false)
@@ -331,20 +354,24 @@ struct OnboardingSlidesView: View {
                                 Image("on_3b")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(height: 500)
-                                    .offset(x: 250, y: 0)
+                                    .frame(height: 800)
+                                    .offset(x: 300, y: 24)
                                     .opacity(1.0)
                                     .ignoresSafeArea(edges: .bottom)
                                     .alignmentGuide(.bottom) { d in d[.bottom] }
                             }
+                            // Foreground: text and button
                             VStack(spacing: 0) {
+                                Spacer().frame(height: 500)
                                 Text("Set Rules That Match Your Family's Values")
                                     .font(.custom("Inter-Regular_SemiBold", size: 40))
                                     .frame(maxWidth: 700)
                                     .foregroundColor(.white)
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 24)
-                                Spacer().frame(height: 16)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .lineLimit(nil)
+                                    .padding(.bottom, 16)
                                 Text("Choose from a curated collection of mindful rules—designed to guide your family with clarity and kindness.")
                                     .font(.custom("Inter-Regular_Medium", size: 20))
                                     .foregroundColor(.white)
@@ -353,21 +380,38 @@ struct OnboardingSlidesView: View {
                                     .padding(.horizontal, 32)
                                     .frame(maxWidth: 500)
                                     .fixedSize(horizontal: false, vertical: true)
+                                    .lineLimit(nil)
                                 Spacer()
                                 ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#7FAD98"), action: {
-                                    onNext()
+                                    withAnimation { currentPage = 3 }
                                 })
                                 .accessibilityIdentifier("onboardingNextButton3")
-                                .padding(.bottom, 64)
+                                .padding(.bottom, 100)
                             }
                         }
                     }
                 }
                 .tag(2)
+                // Screen 4: Login
+                ZStack {
+                    Color(hex: "#91A9B9").ignoresSafeArea()
+                    LinearGradient(
+                        gradient: Gradient(colors: [.white.opacity(0.0), .white.opacity(0.2)]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ).ignoresSafeArea()
+                    LoginView(onLogin: { uid in
+                        onLoginSuccess(uid)
+                    })
+                }
+                .tag(3)
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
             .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
             .ignoresSafeArea()
+            .onChange(of: horizontalSizeClass) { _ in
+                hasTriggeredAutoAdvance = false
+            }
         }
     }
 }

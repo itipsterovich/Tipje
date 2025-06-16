@@ -22,11 +22,13 @@ class Store: ObservableObject {
     init() {}
 
     func setUser(userId: String) {
+        print("[Store] setUser called with userId: \(userId)")
         self.userId = userId
         fetchKids()
     }
 
     func selectKid(_ kid: Kid) {
+        print("[Store] selectKid called with kid: \(kid)")
         self.selectedKid = kid
         self.activeKidId = kid.id
         fetchAllDataForSelectedKid()
@@ -41,10 +43,12 @@ class Store: ObservableObject {
     }
 
     func fetchKids() {
+        print("[Store] fetchKids called with userId: \(userId)")
         guard !userId.isEmpty else { return }
         isLoading = true
         FirestoreManager.shared.fetchKids(userId: userId) { [weak self] kids in
             Task { @MainActor in
+                print("[Store] fetchKids Firestore returned: \(kids.map { $0.name })")
                 self?.kids = kids
                 self?.isLoading = false
                 self?.selectFirstKidIfAvailable()
@@ -54,6 +58,7 @@ class Store: ObservableObject {
 
     func fetchAllDataForSelectedKid() {
         guard let kid = selectedKid else { return }
+        print("[Store] fetchAllDataForSelectedKid for userId: \(userId), kidId: \(kid.id), kidName: \(kid.name)")
         isLoading = true
         let group = DispatchGroup()
         var rules: [Rule] = []
@@ -64,16 +69,19 @@ class Store: ObservableObject {
         var balance: Int = 0
         group.enter()
         FirestoreManager.shared.fetchRules(userId: userId, kidId: kid.id) { fetched in
+            print("[Store] fetchRules returned: \(fetched.map { $0.title }) for kidId: \(kid.id)")
             rules = fetched
             group.leave()
         }
         group.enter()
         FirestoreManager.shared.fetchChores(userId: userId, kidId: kid.id) { fetched in
+            print("[Store] fetchChores returned: \(fetched.map { $0.title }) for kidId: \(kid.id)")
             chores = fetched
             group.leave()
         }
         group.enter()
         FirestoreManager.shared.fetchRewards(userId: userId, kidId: kid.id) { fetched in
+            print("[Store] fetchRewards returned: \(fetched.map { $0.title }) for kidId: \(kid.id)")
             rewards = fetched
             group.leave()
         }
@@ -93,6 +101,7 @@ class Store: ObservableObject {
             group.leave()
         }
         group.notify(queue: .main) { [weak self] in
+            print("[Store] fetchAllDataForSelectedKid complete. Rules: \(rules.map { $0.title }), Chores: \(chores.map { $0.title }), Rewards: \(rewards.map { $0.title })")
             self?.rules = rules
             self?.chores = chores
             self?.rewards = rewards
@@ -106,13 +115,16 @@ class Store: ObservableObject {
     // MARK: - CRUD for Rules
     func addRule(_ rule: Rule) {
         guard let kid = selectedKid else { return }
+        print("[Store] addRule: \(rule) for userId: \(userId), kidId: \(kid.id)")
         isLoading = true
         FirestoreManager.shared.addRule(userId: userId, kidId: kid.id, rule: rule) { [weak self] error in
             Task { @MainActor in
                 self?.isLoading = false
                 if let error = error {
+                    print("[Store] addRule error: \(error)")
                     self?.errorMessage = error.localizedDescription
                 } else {
+                    print("[Store] addRule success for rule: \(rule.title)")
                     self?.fetchAllDataForSelectedKid()
                 }
             }
@@ -126,13 +138,16 @@ class Store: ObservableObject {
     // MARK: - CRUD for Chores
     func addChore(_ chore: Chore) {
         guard let kid = selectedKid else { return }
+        print("[Store] addChore: \(chore) for userId: \(userId), kidId: \(kid.id)")
         isLoading = true
         FirestoreManager.shared.addChore(userId: userId, kidId: kid.id, chore: chore) { [weak self] error in
             Task { @MainActor in
                 self?.isLoading = false
                 if let error = error {
+                    print("[Store] addChore error: \(error)")
                     self?.errorMessage = error.localizedDescription
                 } else {
+                    print("[Store] addChore success for chore: \(chore.title)")
                     self?.fetchAllDataForSelectedKid()
                 }
             }
@@ -146,13 +161,16 @@ class Store: ObservableObject {
     // MARK: - CRUD for Rewards
     func addReward(_ reward: Reward) {
         guard let kid = selectedKid else { return }
+        print("[Store] addReward: \(reward) for userId: \(userId), kidId: \(kid.id)")
         isLoading = true
         FirestoreManager.shared.addReward(userId: userId, kidId: kid.id, reward: reward) { [weak self] error in
             Task { @MainActor in
                 self?.isLoading = false
                 if let error = error {
+                    print("[Store] addReward error: \(error)")
                     self?.errorMessage = error.localizedDescription
                 } else {
+                    print("[Store] addReward success for reward: \(reward.title)")
                     self?.fetchAllDataForSelectedKid()
                 }
             }

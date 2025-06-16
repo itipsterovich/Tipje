@@ -16,29 +16,34 @@ struct PinLockView: View {
                 startPoint: .top,
                 endPoint: .bottom
             ).ignoresSafeArea()
-            Image("il_clouds")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-                .zIndex(0)
-            VStack {
+            VStack(spacing: 0) {
                 Spacer()
+                Image("il_clouds")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 440)
+                    .opacity(0.85)
+                    .ignoresSafeArea(edges: .bottom)
+            }
+            VStack {
+                Spacer(minLength: 0)
                 VStack(spacing: 0) {
                     Text("Enter PIN")
-                        .font(.custom("Inter-Regular_SemiBold", size: 40))
+                        .font(.custom("Inter-Regular_SemiBold", size: 28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
-                    Spacer().frame(height: 16)
+                    Spacer().frame(height: 12)
                     Text("Enter your 4-digit PIN to unlock Admin")
-                        .font(.custom("Inter-Regular_Medium", size: 20))
+                        .font(.custom("Inter-Regular_Medium", size: 16))
                         .foregroundColor(.white)
                         .opacity(0.8)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
-                        .frame(maxWidth: 500)
+                        .padding(.horizontal, 24)
+                        .frame(maxWidth: 350)
                         .fixedSize(horizontal: false, vertical: true)
-                    Spacer().frame(height: 40)
+                    Spacer().frame(height: 32)
                     PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: false)
                         .frame(maxWidth: .infinity)
                     if let errorMessage = errorMessage {
@@ -48,14 +53,14 @@ struct PinLockView: View {
                             .padding(.top, 12)
                     }
                 }
-                Spacer()
+                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .zIndex(1)
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 0)
         .font(.custom("Inter-Regular_Medium", size: 24))
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .onAppear { focusedIndex = 0 }
         .onChange(of: pin) { _ in
             if pin.allSatisfy({ $0.count == 1 }) {

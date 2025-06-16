@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum ButtonRegularVariant {
-    case green, light
+    case green, light, rose
 }
 
 struct ButtonRegular: View {
@@ -13,12 +13,14 @@ struct ButtonRegular: View {
         switch variant {
         case .green: return Color(hex: "#799B44")
         case .light: return Color(hex: "#EAF3EA")
+        case .rose: return Color(hex: "#C48A8A")
         }
     }
     var iconColor: Color {
         switch variant {
         case .green: return .white
         case .light: return Color(hex: "#799B44")
+        case .rose: return .white
         }
     }
     

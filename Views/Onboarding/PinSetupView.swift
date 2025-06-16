@@ -9,6 +9,7 @@ struct PinSetupView: View {
     @State private var errorMessage: String? = nil
     var userId: String
     var onPinSet: () -> Void
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     var body: some View {
         ZStack {
@@ -25,57 +26,116 @@ struct PinSetupView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
                 .zIndex(0)
-            VStack(spacing: 0) {
-                Spacer().frame(height: 400)
-                Text("pinsetup_title")
-                    .font(.custom("Inter-Regular_SemiBold", size: 40))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                Spacer().frame(height: 16)
-                Text("pinsetup_subtitle")
-                    .font(.custom("Inter-Regular_Medium", size: 20))
-                    .foregroundColor(.white)
-                    .opacity(0.8)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-                    .frame(maxWidth: 500)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer().frame(height: 40)
-                PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: true)
-                    .frame(maxWidth: .infinity)
-                    .accessibilityIdentifier("pinInputFields")
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .font(.caption)
+            Group {
+                if horizontalSizeClass == .compact {
+                    pinSetupiPhone
+                } else {
+                    pinSetupiPad
                 }
-                Spacer()
-                ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#91A9B9")) {
-                    let pinCode = pin.joined()
-                    isLoading = true
-                    errorMessage = nil
-                    FirestoreManager.shared.setUserPin(userId: userId, pinCode: pinCode) { error in
-                        isLoading = false
-                        if let error = error {
-                            errorMessage = String(localized: "pinsetup_save_fail")
-                        } else {
-                            skipPinAfterSetup = true
-                            onPinSet()
-                        }
-                    }
-                }
-                .accessibilityIdentifier("pinSetupNextButton")
-                .disabled(!isNextActive || isLoading)
-                .opacity(isNextActive && !isLoading ? 1 : 0.5)
-                .padding(.bottom, 40)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .zIndex(1)
             .padding()
         }
         .onAppear { focusedIndex = 0 }
         .onChange(of: pin) { _ in checkPin() }
+    }
+
+    private var pinSetupiPhone: some View {
+        VStack(spacing: 0) {
+            Spacer().frame(height: 120)
+            Text("pinsetup_title")
+                .font(.custom("Inter-Regular_SemiBold", size: 28))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+            Spacer().frame(height: 12)
+            Text("pinsetup_subtitle")
+                .font(.custom("Inter-Regular_Medium", size: 16))
+                .foregroundColor(.white)
+                .opacity(0.8)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+                .frame(maxWidth: 350)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer().frame(height: 32)
+            PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: true)
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("pinInputFields")
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+            Spacer()
+            ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#91A9B9")) {
+                let pinCode = pin.joined()
+                isLoading = true
+                errorMessage = nil
+                FirestoreManager.shared.setUserPin(userId: userId, pinCode: pinCode) { error in
+                    isLoading = false
+                    if let error = error {
+                        errorMessage = String(localized: "pinsetup_save_fail")
+                    } else {
+                        skipPinAfterSetup = true
+                        onPinSet()
+                    }
+                }
+            }
+            .accessibilityIdentifier("pinSetupNextButton")
+            .disabled(!isNextActive || isLoading)
+            .opacity(isNextActive && !isLoading ? 1 : 0.5)
+            .padding(.bottom, 32)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    }
+
+    private var pinSetupiPad: some View {
+        VStack(spacing: 0) {
+            Spacer().frame(height: 400)
+            Text("pinsetup_title")
+                .font(.custom("Inter-Regular_SemiBold", size: 40))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+            Spacer().frame(height: 16)
+            Text("pinsetup_subtitle")
+                .font(.custom("Inter-Regular_Medium", size: 20))
+                .foregroundColor(.white)
+                .opacity(0.8)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+                .frame(maxWidth: 500)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer().frame(height: 40)
+            PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: true)
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("pinInputFields")
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+            Spacer()
+            ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#91A9B9")) {
+                let pinCode = pin.joined()
+                isLoading = true
+                errorMessage = nil
+                FirestoreManager.shared.setUserPin(userId: userId, pinCode: pinCode) { error in
+                    isLoading = false
+                    if let error = error {
+                        errorMessage = String(localized: "pinsetup_save_fail")
+                    } else {
+                        skipPinAfterSetup = true
+                        onPinSet()
+                    }
+                }
+            }
+            .accessibilityIdentifier("pinSetupNextButton")
+            .disabled(!isNextActive || isLoading)
+            .opacity(isNextActive && !isLoading ? 1 : 0.5)
+            .padding(.bottom, 40)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 
     func checkPin() {

@@ -40,8 +40,17 @@ class AuthManager: ObservableObject {
                     FirestoreManager.shared.createUser(user) { error in
                         if let error = error {
                             print("Firestore user creation error: \(error)")
+                            completion(false, error.localizedDescription)
+                        } else {
+                            // Confirm user is now readable
+                            FirestoreManager.shared.fetchUser(userId: user.id) { confirmedUser in
+                                if confirmedUser != nil {
+                                    completion(true, nil)
+                                } else {
+                                    completion(false, "User profile not readable after creation.")
+                                }
+                            }
                         }
-                        completion(true, nil)
                     }
                 }
             // })
@@ -72,8 +81,17 @@ class AuthManager: ObservableObject {
                             FirestoreManager.shared.createUser(newUser) { error in
                                 if let error = error {
                                     print("Firestore user creation error: \(error)")
+                                    completion(false, error.localizedDescription)
+                                } else {
+                                    // Confirm user is now readable
+                                    FirestoreManager.shared.fetchUser(userId: newUser.id) { confirmedUser in
+                                        if confirmedUser != nil {
+                                            completion(true, nil)
+                                        } else {
+                                            completion(false, "User profile not readable after creation.")
+                                        }
+                                    }
                                 }
-                                completion(true, nil)
                             }
                         } else {
                             completion(true, nil)
@@ -124,8 +142,17 @@ class AuthManager: ObservableObject {
                                 FirestoreManager.shared.createUser(newUser) { error in
                                     if let error = error {
                                         print("Firestore user creation error: \(error)")
+                                        completion(false, error.localizedDescription)
+                                        return
                                     }
-                                    completion(true, nil)
+                                    // Confirm user is now readable
+                                    FirestoreManager.shared.fetchUser(userId: newUser.id) { confirmedUser in
+                                        if confirmedUser != nil {
+                                            completion(true, nil)
+                                        } else {
+                                            completion(false, "User profile not readable after creation.")
+                                        }
+                                    }
                                 }
                             } else {
                                 completion(true, nil)
