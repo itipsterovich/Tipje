@@ -538,4 +538,30 @@ class FirestoreManager {
             completion(error)
         }
     }
+
+    /// Cascade delete all subcollections for a user, then delete the user document
+    func cascadeDeleteUser(userId: String, completion: @escaping (Error?) -> Void) {
+        let userRef = db.collection("users").document(userId)
+        // First, delete all kids and their subcollections
+        userRef.collection("kids").getDocuments { snapshot, error in
+            if let error = error { completion(error); return }
+            let kids = snapshot?.documents ?? []
+            let group = DispatchGroup()
+            var firstError: Error? = nil
+            for kidDoc in kids {
+                group.enter()
+                self.cascadeDeleteKid(userId: userId, kidId: kidDoc.documentID) { error in
+                    if let error = error, firstError == nil { firstError = error }
+                    group.leave()
+                }
+            }
+            group.notify(queue: .main) {
+                if let error = firstError { completion(error); return }
+                // Delete the user document itself
+                userRef.delete { error in
+                    completion(error)
+                }
+            }
+        }
+    }
 } 

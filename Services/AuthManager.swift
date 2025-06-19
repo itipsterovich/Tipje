@@ -271,4 +271,20 @@ class AuthManager: ObservableObject {
             }
         }
     }
+
+    /// Deletes the current Firebase Auth user
+    func deleteCurrentUser(completion: @escaping (Bool, String?) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(false, "No user signed in")
+            return
+        }
+        user.delete { error in
+            if let error = error {
+                completion(false, error.localizedDescription)
+            } else {
+                self.firebaseUser = nil
+                completion(true, nil)
+            }
+        }
+    }
 }

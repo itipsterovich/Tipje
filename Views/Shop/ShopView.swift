@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(iOS)
+import UIKit
+#endif
 
 enum ShopTab: String, CaseIterable {
     case rewards = "Rewards"
@@ -96,7 +99,8 @@ struct ShopViewiPhone: View {
                         if availableRewards.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn."
+                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn.",
+                                imageHeight: 250
                             )
                         } else {
                             ScrollView {
@@ -120,13 +124,15 @@ struct ShopViewiPhone: View {
                                     }
                                 }
                                 .padding(.top, 8)
+                                .padding(.bottom, 80)
                             }
                         }
                     } else if selectedTab == .basket {
                         if basketEntries.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!"
+                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!",
+                                imageHeight: 250
                             )
                         } else {
                             ScrollView {
@@ -141,11 +147,13 @@ struct ShopViewiPhone: View {
                                     }
                                 }
                                 .padding(.top, 8)
+                                .padding(.bottom, 80)
                             }
                         }
                     }
                 }
                 .font(.custom("Inter-Medium", size: 17))
+                .ignoresSafeArea(.container, edges: .horizontal)
             }
         )
         .sheet(item: $activeModal, onDismiss: {
@@ -196,6 +204,7 @@ struct ShopViewiPhone: View {
 // =======================
 struct ShopViewiPad: View {
     @EnvironmentObject var store: Store
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
     @State private var activeModal: ShopModal? = nil
@@ -244,8 +253,9 @@ struct ShopViewiPad: View {
                 .frame(height: 300)
             },
             content: {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     PageTitle("Reward Shop")
+                        .padding(.top, 24)
                     SubTabBar(
                         tabs: ShopTab.allCases,
                         selectedTab: $selectedTab,
@@ -255,7 +265,8 @@ struct ShopViewiPad: View {
                         if availableRewards.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn."
+                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn.",
+                                imageHeight: 450
                             )
                         } else {
                             ScrollView {
@@ -278,14 +289,15 @@ struct ShopViewiPad: View {
                                         .frame(maxWidth: .infinity)
                                     }
                                 }
-                                .padding(.top, 14)
+                                .padding(.top, 8)
                             }
                         }
                     } else if selectedTab == .basket {
                         if basketEntries.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!"
+                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!",
+                                imageHeight: 450
                             )
                         } else {
                             ScrollView {
@@ -299,12 +311,14 @@ struct ShopViewiPad: View {
                                         .frame(maxWidth: .infinity)
                                     }
                                 }
-                                .padding(.top, 14)
+                                .padding(.top, 8)
                             }
                         }
                     }
                 }
                 .font(.custom("Inter-Medium", size: 24))
+                .padding(.horizontal, 24)
+                .ignoresSafeArea(.container, edges: .horizontal)
             }
         )
         .sheet(item: $activeModal, onDismiss: {
@@ -346,7 +360,6 @@ struct ShopViewiPad: View {
         .onAppear {
             print("[ShopViewiPad] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
         }
-        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 
@@ -355,7 +368,7 @@ struct EmptyShopState: View {
     let text: String
     var body: some View {
         GeometryReader { geometry in
-            let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
+            let mascotHeight: CGFloat = 500
             VStack(spacing: 24) {
                 Image(image)
                     .resizable()

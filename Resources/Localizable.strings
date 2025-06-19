@@ -61,4 +61,10 @@
 "login_signin" = "Sign In";
 "login_have_account" = "Have an account?";
 "login_no_account" = "Don't have an account?";
-"login_passwords_no_match" = "Passwords do not match"; 
+"login_passwords_no_match" = "Passwords do not match";
+
+/* Language Settings */
+"language_change_title" = "Language Changed";
+"language_change_message" = "Please restart the app to apply the new language.";
+"restart_now" = "Restart Now";
+"restart_later" = "Later"; 

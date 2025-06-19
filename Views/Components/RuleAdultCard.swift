@@ -69,13 +69,10 @@ struct RuleAdultCardiPhone: View {
                         .frame(width: 20, height: 20)
                         .foregroundColor(contentColor)
                     Spacer().frame(width: 12)
-                    Button(action: { onArchive?() }) {
-                        Image(selected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(contentColor)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    Image(selected ? "icon_delete" : "icon_plus")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(contentColor)
                     Spacer().frame(width: 14)
                 }
                 .frame(height: 70)
@@ -84,15 +81,20 @@ struct RuleAdultCardiPhone: View {
         }
         .frame(height: 70)
         .frame(maxWidth: .infinity)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
-                onTap?()
+                if let onArchive = onArchive {
+                    onArchive()
+                } else {
+                    onTap?()
+                }
             }
         }
         .background(
@@ -158,13 +160,10 @@ struct RuleAdultCardiPad: View {
                         .frame(width: 24, height: 24)
                         .foregroundColor(contentColor)
                     Spacer().frame(width: 24)
-                    Button(action: { onArchive?() }) {
-                        Image(selected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(contentColor)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    Image(selected ? "icon_delete" : "icon_plus")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(contentColor)
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
@@ -173,15 +172,20 @@ struct RuleAdultCardiPad: View {
         }
         .frame(height: 90)
         .frame(maxWidth: .infinity)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
-                onTap?()
+                if let onArchive = onArchive {
+                    onArchive()
+                } else {
+                    onTap?()
+                }
             }
         }
         .background(

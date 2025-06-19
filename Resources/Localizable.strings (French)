@@ -1,0 +1,59 @@
+/* Settings */
+"settings_title" = "Paramètres";
+"settings_account" = "Compte";
+"settings_security" = "Sécurité";
+"settings_language" = "Langue";
+"settings_subscription" = "Abonnement";
+"settings_app_info" = "Informations sur l'application";
+"settings_change_password" = "Changer le mot de passe";
+"settings_change_email" = "Changer l'email";
+"settings_logout" = "Se déconnecter";
+"settings_pin" = "PIN (4 chiffres)";
+"settings_change_pin" = "Changer le PIN";
+"settings_forgot_pin" = "PIN oublié ?";
+"settings_link_google" = "Lier le compte Google";
+"settings_unlink_google" = "Délier le compte Google";
+"settings_kids" = "Enfants";
+"settings_delete_kid" = "Supprimer";
+"settings_delete_kid_confirm" = "Êtes-vous sûr de vouloir supprimer cet enfant et toutes ses données ? Cette action ne peut pas être annulée.";
+"settings_delete_kid_success" = "Enfant supprimé avec succès.";
+"settings_delete_kid_fail" = "Échec de la suppression de l'enfant.";
+
+/* Onboarding */
+"onboarding_title" = "Qui fait partie de votre famille Tipje ?";
+"onboarding_subtitle" = "Entrez le nom de votre enfant pour commencer. Ajoutez d'autres enfants à tout moment—chacun avec son propre ensemble de règles et de tâches.";
+"onboarding_child_name" = "Nom de l'enfant";
+"onboarding_child_name_2" = "Nom de l'enfant 2";
+"onboarding_next" = "Suivant";
+
+/* PIN & Errors */
+"pin_invalid" = "Veuillez entrer un PIN à 4 chiffres valide.";
+"pin_success" = "PIN modifié avec succès.";
+"pin_fail" = "Échec de la modification du PIN : %@";
+"pin_incorrect" = "PIN incorrect. Si vous avez oublié votre PIN, veuillez le réinitialiser.";
+"pin_correct" = "Votre PIN est correct.";
+"pin_locked_out" = "Trop de tentatives échouées. Veuillez réessayer plus tard.";
+
+/* General */
+"ok" = "OK";
+"cancel" = "Annuler";
+"yes" = "Oui";
+"no" = "Non";
+
+/* Pin Setup */
+"pinsetup_title" = "Verrouillez votre section Admin";
+"pinsetup_subtitle" = "Créez un PIN à 4 chiffres pour sécuriser la zone Admin—les parents gèrent les règles ici, tandis que les enfants se concentrent sur leurs tâches.";
+"pinsetup_save_fail" = "Échec de l'enregistrement du PIN. Veuillez réessayer.";
+
+/* Login */
+"login_title" = "Construisez votre maison familiale mindful avec un essai gratuit de 7 jours";
+"login_google" = "Se connecter avec Google";
+"login_or" = "OU";
+"login_email" = "Email";
+"login_password" = "Mot de passe";
+"login_repeat_password" = "Répéter le mot de passe";
+"login_signup" = "S'inscrire";
+"login_signin" = "Se connecter";
+"login_have_account" = "Vous avez déjà un compte ?";
+"login_no_account" = "Vous n'avez pas de compte ?";
+"login_passwords_no_match" = "Les mots de passe ne correspondent pas"; 

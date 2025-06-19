@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum MainTab: Int, CaseIterable, Identifiable {
-    case home, shop, admin, settings, debug
+    case home, shop, admin, settings
     var id: Int { rawValue }
     var iconName: String {
         switch self {
@@ -9,7 +9,6 @@ enum MainTab: Int, CaseIterable, Identifiable {
         case .shop: return "icon_shop"
         case .admin: return "icon_admin"
         case .settings: return "icon_settings"
-        case .debug: return "icon_debug"
         }
     }
 }
@@ -64,18 +63,9 @@ struct MainTabBariPhone: View {
         .background(
             RoundedRectangle(cornerRadius: 40, style: .continuous)
                 .fill(Color.white.opacity(0.85))
-                .background(.ultraThinMaterial)
                 .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
         )
         .padding(.horizontal, 24)
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear {
-                        print("[DEBUG] MainTabBariPhone size: \(geo.size)")
-                    }
-            }
-        )
     }
 }
 
@@ -113,18 +103,9 @@ struct MainTabBariPad: View {
         .background(
             RoundedRectangle(cornerRadius: 48, style: .continuous)
                 .fill(Color.white.opacity(0.85))
-                .background(.ultraThinMaterial)
                 .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 6)
         )
         .padding(.horizontal, 48)
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear {
-                        print("[DEBUG] MainTabBariPad size: \(geo.size)")
-                    }
-            }
-        )
     }
 }
 

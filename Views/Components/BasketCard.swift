@@ -62,14 +62,14 @@ struct BasketCardiPhone: View {
             }
         }
         .frame(height: 90)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .opacity(1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
             }
             onConfirm?()
@@ -132,14 +132,14 @@ struct BasketCardiPad: View {
             }
         }
         .frame(height: 90)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .opacity(1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
             }
             onConfirm?()

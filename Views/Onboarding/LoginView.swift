@@ -63,7 +63,7 @@ struct LoginView: View {
                 ZStack {
                     VStack(spacing: 0) {
                         VStack(spacing: 24) {
-                            Text("Start Your Free Trial")
+                            Text("Get Started")
                                 .font(.custom("Inter-Regular_SemiBold", size: 32))
                                 .foregroundColor(Color(hex: "#494646"))
                                 .multilineTextAlignment(.center)
@@ -124,59 +124,108 @@ struct LoginView: View {
                                     .frame(height: 1)
                                     .foregroundColor(Color(hex: "#D4D7E3"))
                             }
-                            CustomInputField(placeholder: String(localized: "login_email"), text: $email)
-                            CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
-                            CustomInputField(placeholder: String(localized: "login_repeat_password"), text: $repeatPassword, isSecure: true)
-                            if let error = localErrorMessage ?? authManager.errorMessage {
-                                Text(error)
-                                    .foregroundColor(.red)
-                                    .font(.caption)
-                            }
-                            Button {
-                                print("[LoginView] Email sign up button tapped")
-                                guard password == repeatPassword else {
-                                    print("[LoginView] Passwords do not match")
-                                    localErrorMessage = String(localized: "login_passwords_no_match")
-                                    return
+                            if isSignUp {
+                                CustomInputField(placeholder: String(localized: "login_email"), text: $email)
+                                CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
+                                CustomInputField(placeholder: String(localized: "login_repeat_password"), text: $repeatPassword, isSecure: true)
+                                if let error = localErrorMessage ?? authManager.errorMessage {
+                                    Text(error)
+                                        .foregroundColor(.red)
+                                        .font(.caption)
                                 }
-                                localErrorMessage = nil
-                                print("[LoginView] Starting email signUp...")
-                                authManager.signUp(email: email, password: password) { success, err in
-                                    print("[LoginView] Email signUp completion: success=\(success), error=\(String(describing: err))")
-                                    if success {
-                                        didLogin = true
-                                        if let uid = Auth.auth().currentUser?.uid {
-                                            print("[LoginView] Email sign up successful, uid=\(uid)")
-                                            onLogin?(uid)
+                                Button {
+                                    print("[LoginView] Email sign up button tapped")
+                                    guard password == repeatPassword else {
+                                        print("[LoginView] Passwords do not match")
+                                        localErrorMessage = String(localized: "login_passwords_no_match")
+                                        return
+                                    }
+                                    localErrorMessage = nil
+                                    print("[LoginView] Starting email signUp...")
+                                    authManager.signUp(email: email, password: password) { success, err in
+                                        print("[LoginView] Email signUp completion: success=\(success), error=\(String(describing: err))")
+                                        if success {
+                                            didLogin = true
+                                            if let uid = Auth.auth().currentUser?.uid {
+                                                print("[LoginView] Email sign up successful, uid=\(uid)")
+                                                onLogin?(uid)
+                                            } else {
+                                                print("[LoginView] Email sign up success but no uid found!")
+                                            }
                                         } else {
-                                            print("[LoginView] Email sign up success but no uid found!")
+                                            print("[LoginView] Email sign up failed: \(String(describing: err))")
+                                            localErrorMessage = err
                                         }
-                                    } else {
-                                        print("[LoginView] Email sign up failed: \(String(describing: err))")
-                                        localErrorMessage = err
+                                    }
+                                } label: {
+                                    Text("login_signup")
+                                        .font(.custom("Inter-Medium", size: 24))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, minHeight: 56)
+                                        .background(Color(hex: "#799B44"))
+                                        .cornerRadius(28)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                HStack(spacing: 4) {
+                                    Text("login_have_account")
+                                        .foregroundColor(Color(hex: "#8897AD"))
+                                    Button {
+                                        isSignUp = false
+                                    } label: {
+                                        Text("login_signin")
+                                            .foregroundColor(Color(hex: "#799B44"))
+                                            .underline()
                                     }
                                 }
-                            } label: {
-                                Text("login_signup")
-                                    .font(.custom("Inter-Medium", size: 24))
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, minHeight: 56)
-                                    .background(Color(hex: "#799B44"))
-                                    .cornerRadius(28)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            HStack(spacing: 4) {
-                                Text("login_have_account")
-                                    .foregroundColor(Color(hex: "#8897AD"))
+                                .font(.custom("Inter-Regular", size: 18))
+                            } else {
+                                CustomInputField(placeholder: String(localized: "login_email"), text: $email)
+                                CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
+                                if let error = localErrorMessage ?? authManager.errorMessage {
+                                    Text(error)
+                                        .foregroundColor(.red)
+                                        .font(.caption)
+                                }
                                 Button {
-                                    isSignUp = false
+                                    print("[LoginView] Email sign in button tapped")
+                                    localErrorMessage = nil
+                                    authManager.signIn(email: email, password: password) { success, err in
+                                        print("[LoginView] Email sign in completion: success=\(success), error=\(String(describing: err))")
+                                        if success {
+                                            didLogin = true
+                                            if let uid = Auth.auth().currentUser?.uid {
+                                                print("[LoginView] Email sign in successful, uid=\(uid)")
+                                                onLogin?(uid)
+                                            } else {
+                                                print("[LoginView] Email sign in success but no uid found!")
+                                            }
+                                        } else {
+                                            print("[LoginView] Email sign in failed: \(String(describing: err))")
+                                            localErrorMessage = err
+                                        }
+                                    }
                                 } label: {
                                     Text("login_signin")
-                                        .foregroundColor(Color(hex: "#799B44"))
-                                        .underline()
+                                        .font(.custom("Inter-Medium", size: 24))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, minHeight: 56)
+                                        .background(Color(hex: "#799B44"))
+                                        .cornerRadius(28)
                                 }
+                                .buttonStyle(PlainButtonStyle())
+                                HStack(spacing: 4) {
+                                    Text("login_no_account")
+                                        .foregroundColor(Color(hex: "#8897AD"))
+                                    Button {
+                                        isSignUp = true
+                                    } label: {
+                                        Text("login_signup")
+                                            .foregroundColor(Color(hex: "#799B44"))
+                                            .underline()
+                                    }
+                                }
+                                .font(.custom("Inter-Regular", size: 18))
                             }
-                            .font(.custom("Inter-Regular", size: 18))
                         }
                         .padding(.horizontal, 24)
                         .padding(.vertical, 24)
@@ -193,16 +242,15 @@ struct LoginView: View {
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 96)
+                        .frame(height: 140)
                         .padding(.top, 100)
                         .foregroundColor(.white)
                     Spacer()
-                    VStack(spacing: 24) {
-                        Text("Start Your Free Trial")
+                    VStack(spacing: 14) {
+                        Text("Get Started")
                             .font(.custom("Inter-Regular_SemiBold", size: 34))
                             .foregroundColor(Color(hex: "#494646"))
                             .multilineTextAlignment(.center)
-                            .padding(.vertical, 8)
                             .frame(maxWidth: .infinity)
                         Text("Enjoy 7 days of Tipje with no commitment—see how peaceful parenting can feel.")
                             .font(.custom("Inter-Regular", size: 20))
@@ -261,59 +309,108 @@ struct LoginView: View {
                                 .frame(height: 1)
                                 .foregroundColor(Color(hex: "#D4D7E3"))
                         }
-                        CustomInputField(placeholder: String(localized: "login_email"), text: $email)
-                        CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
-                        CustomInputField(placeholder: String(localized: "login_repeat_password"), text: $repeatPassword, isSecure: true)
-                        if let error = localErrorMessage ?? authManager.errorMessage {
-                            Text(error)
-                                .foregroundColor(.red)
-                                .font(.caption)
-                        }
-                        Button {
-                            print("[LoginView] Email sign up button tapped")
-                            guard password == repeatPassword else {
-                                print("[LoginView] Passwords do not match")
-                                localErrorMessage = String(localized: "login_passwords_no_match")
-                                return
+                        if isSignUp {
+                            CustomInputField(placeholder: String(localized: "login_email"), text: $email)
+                            CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
+                            CustomInputField(placeholder: String(localized: "login_repeat_password"), text: $repeatPassword, isSecure: true)
+                            if let error = localErrorMessage ?? authManager.errorMessage {
+                                Text(error)
+                                    .foregroundColor(.red)
+                                    .font(.caption)
                             }
-                            localErrorMessage = nil
-                            print("[LoginView] Starting email signUp...")
-                            authManager.signUp(email: email, password: password) { success, err in
-                                print("[LoginView] Email signUp completion: success=\(success), error=\(String(describing: err))")
-                                if success {
-                                    didLogin = true
-                                    if let uid = Auth.auth().currentUser?.uid {
-                                        print("[LoginView] Email sign up successful, uid=\(uid)")
-                                        onLogin?(uid)
+                            Button {
+                                print("[LoginView] Email sign up button tapped")
+                                guard password == repeatPassword else {
+                                    print("[LoginView] Passwords do not match")
+                                    localErrorMessage = String(localized: "login_passwords_no_match")
+                                    return
+                                }
+                                localErrorMessage = nil
+                                print("[LoginView] Starting email signUp...")
+                                authManager.signUp(email: email, password: password) { success, err in
+                                    print("[LoginView] Email signUp completion: success=\(success), error=\(String(describing: err))")
+                                    if success {
+                                        didLogin = true
+                                        if let uid = Auth.auth().currentUser?.uid {
+                                            print("[LoginView] Email sign up successful, uid=\(uid)")
+                                            onLogin?(uid)
+                                        } else {
+                                            print("[LoginView] Email sign up success but no uid found!")
+                                        }
                                     } else {
-                                        print("[LoginView] Email sign up success but no uid found!")
+                                        print("[LoginView] Email sign up failed: \(String(describing: err))")
+                                        localErrorMessage = err
                                     }
-                                } else {
-                                    print("[LoginView] Email sign up failed: \(String(describing: err))")
-                                    localErrorMessage = err
+                                }
+                            } label: {
+                                Text("login_signup")
+                                    .font(.custom("Inter-Medium", size: 24))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity, minHeight: 56)
+                                    .background(Color(hex: "#799B44"))
+                                    .cornerRadius(28)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            HStack(spacing: 4) {
+                                Text("login_have_account")
+                                    .foregroundColor(Color(hex: "#8897AD"))
+                                Button {
+                                    isSignUp = false
+                                } label: {
+                                    Text("login_signin")
+                                        .foregroundColor(Color(hex: "#799B44"))
+                                        .underline()
                                 }
                             }
-                        } label: {
-                            Text("login_signup")
-                                .font(.custom("Inter-Medium", size: 24))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity, minHeight: 56)
-                                .background(Color(hex: "#799B44"))
-                                .cornerRadius(28)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        HStack(spacing: 4) {
-                            Text("login_have_account")
-                                .foregroundColor(Color(hex: "#8897AD"))
+                            .font(.custom("Inter-Regular", size: 18))
+                        } else {
+                            CustomInputField(placeholder: String(localized: "login_email"), text: $email)
+                            CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
+                            if let error = localErrorMessage ?? authManager.errorMessage {
+                                Text(error)
+                                    .foregroundColor(.red)
+                                    .font(.caption)
+                            }
                             Button {
-                                isSignUp = false
+                                print("[LoginView] Email sign in button tapped")
+                                localErrorMessage = nil
+                                authManager.signIn(email: email, password: password) { success, err in
+                                    print("[LoginView] Email sign in completion: success=\(success), error=\(String(describing: err))")
+                                    if success {
+                                        didLogin = true
+                                        if let uid = Auth.auth().currentUser?.uid {
+                                            print("[LoginView] Email sign in successful, uid=\(uid)")
+                                            onLogin?(uid)
+                                        } else {
+                                            print("[LoginView] Email sign in success but no uid found!")
+                                        }
+                                    } else {
+                                        print("[LoginView] Email sign in failed: \(String(describing: err))")
+                                        localErrorMessage = err
+                                    }
+                                }
                             } label: {
                                 Text("login_signin")
-                                    .foregroundColor(Color(hex: "#799B44"))
-                                    .underline()
+                                    .font(.custom("Inter-Medium", size: 24))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity, minHeight: 56)
+                                    .background(Color(hex: "#799B44"))
+                                    .cornerRadius(28)
                             }
+                            .buttonStyle(PlainButtonStyle())
+                            HStack(spacing: 4) {
+                                Text("login_no_account")
+                                    .foregroundColor(Color(hex: "#8897AD"))
+                                Button {
+                                    isSignUp = true
+                                } label: {
+                                    Text("login_signup")
+                                        .foregroundColor(Color(hex: "#799B44"))
+                                        .underline()
+                                }
+                            }
+                            .font(.custom("Inter-Regular", size: 18))
                         }
-                        .font(.custom("Inter-Regular", size: 18))
                     }
                     .padding(.horizontal, 40)
                     .padding(.vertical, 40)

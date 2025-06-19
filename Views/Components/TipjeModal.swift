@@ -12,6 +12,8 @@ struct TipjeModal: View {
     var closeVariant: ButtonRegularVariant = .light
 
     var body: some View {
+        ZStack {
+            Color.white.ignoresSafeArea()
         VStack(spacing: 0) {
             HStack {
                 Spacer()
@@ -35,6 +37,10 @@ struct TipjeModal: View {
         }
         .padding(.horizontal, 32)
         .frame(maxWidth: maxWidth)
+            .background(Color.white)
+            .cornerRadius(32)
+            .shadow(color: Color.black.opacity(0.08), radius: 24, x: 0, y: 8)
+        }
     }
 }
 

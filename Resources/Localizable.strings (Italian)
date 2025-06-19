@@ -1,0 +1,65 @@
+/* Settings */
+"settings_title" = "Impostazioni";
+"settings_account" = "Account";
+"settings_security" = "Sicurezza";
+"settings_language" = "Lingua";
+"settings_subscription" = "Abbonamento";
+"settings_app_info" = "Info app";
+"settings_change_password" = "Cambia password";
+"settings_change_email" = "Cambia email";
+"settings_logout" = "Esci";
+"settings_pin" = "PIN (4 cifre)";
+"settings_change_pin" = "Cambia PIN";
+"settings_forgot_pin" = "PIN dimenticato?";
+"settings_link_google" = "Collega account Google";
+"settings_unlink_google" = "Scollega account Google";
+"settings_kids" = "Bambini";
+"settings_delete_kid" = "Elimina";
+"settings_delete_kid_confirm" = "Sei sicuro di voler eliminare questo bambino e tutti i suoi dati? Questa azione non può essere annullata.";
+"settings_delete_kid_success" = "Bambino eliminato con successo.";
+"settings_delete_kid_fail" = "Impossibile eliminare il bambino.";
+
+/* Onboarding */
+"onboarding_title" = "Chi c'è nella tua famiglia Tipje?";
+"onboarding_subtitle" = "Inserisci il nome di tuo figlio per iniziare. Aggiungi altri bambini in qualsiasi momento—ognuno con le proprie regole e compiti.";
+"onboarding_child_name" = "Nome del bambino";
+"onboarding_child_name_2" = "Nome del bambino 2";
+"onboarding_next" = "Avanti";
+
+/* PIN & Errors */
+"pin_invalid" = "Inserisci un PIN valido di 4 cifre.";
+"pin_success" = "PIN modificato con successo.";
+"pin_fail" = "Impossibile modificare il PIN: %@";
+"pin_incorrect" = "PIN errato. Se hai dimenticato il PIN, reimpostalo.";
+"pin_correct" = "Il tuo PIN è corretto.";
+"pin_locked_out" = "Troppi tentativi falliti. Riprova più tardi.";
+
+/* General */
+"ok" = "OK";
+"cancel" = "Annulla";
+"yes" = "Sì";
+"no" = "No";
+
+/* Pin Setup */
+"pinsetup_title" = "Proteggi la sezione Admin";
+"pinsetup_subtitle" = "Crea un PIN di 4 cifre per proteggere l'area Admin—i genitori gestiscono le regole qui, mentre i bambini si concentrano sui compiti.";
+"pinsetup_save_fail" = "Impossibile salvare il PIN. Riprova.";
+
+/* Login */
+"login_title" = "Costruisci la tua casa familiare consapevole con 7 giorni di prova gratuita";
+"login_google" = "Accedi con Google";
+"login_or" = "OPPURE";
+"login_email" = "Email";
+"login_password" = "Password";
+"login_repeat_password" = "Ripeti password";
+"login_signup" = "Registrati";
+"login_signin" = "Accedi";
+"login_have_account" = "Hai già un account?";
+"login_no_account" = "Non hai un account?";
+"login_passwords_no_match" = "Le password non coincidono";
+
+/* Language Settings */
+"language_change_title" = "Lingua modificata";
+"language_change_message" = "Riavvia l'app per applicare la nuova lingua.";
+"restart_now" = "Riavvia ora";
+"restart_later" = "Più tardi"; 

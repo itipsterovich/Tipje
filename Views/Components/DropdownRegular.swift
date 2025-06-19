@@ -21,7 +21,7 @@ struct DropdownRegular<T: Hashable>: View {
             }
             .padding(.horizontal, 20)
             .frame(height: 56)
-            .frame(width: UIScreen.main.bounds.width * 0.6 - 48)
+            .frame(maxWidth: .infinity)
             .background(Color.white)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)

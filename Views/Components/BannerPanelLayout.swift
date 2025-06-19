@@ -6,11 +6,13 @@ struct BannerPanelLayout<BannerContent: View, Content: View>: View {
     let bannerHeight: CGFloat
     let bannerContent: () -> BannerContent
     let content: () -> Content
+    let containerOffsetY: CGFloat
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     init(
         bannerColor: Color,
         bannerHeight: CGFloat,
+        containerOffsetY: CGFloat = -60,
         @ViewBuilder bannerContent: @escaping () -> BannerContent = { EmptyView() },
         @ViewBuilder content: @escaping () -> Content
     ) {
@@ -18,11 +20,12 @@ struct BannerPanelLayout<BannerContent: View, Content: View>: View {
         self.bannerHeight = bannerHeight
         self.bannerContent = bannerContent
         self.content = content
+        self.containerOffsetY = containerOffsetY
     }
 
     var body: some View {
         if horizontalSizeClass == .compact {
-            BannerPanelLayoutiPhone(bannerColor: bannerColor, bannerHeight: bannerHeight, bannerContent: bannerContent, content: content)
+            BannerPanelLayoutiPhone(bannerColor: bannerColor, bannerHeight: bannerHeight, bannerContent: bannerContent, content: content, containerOffsetY: containerOffsetY)
         } else {
             BannerPanelLayoutiPad(bannerColor: bannerColor, bannerHeight: bannerHeight, bannerContent: bannerContent, content: content)
         }
@@ -37,6 +40,7 @@ struct BannerPanelLayoutiPhone<BannerContent: View, Content: View>: View {
     let bannerHeight: CGFloat
     let bannerContent: () -> BannerContent
     let content: () -> Content
+    let containerOffsetY: CGFloat
 
     var body: some View {
         GeometryReader { outerGeo in
@@ -56,19 +60,11 @@ struct BannerPanelLayoutiPhone<BannerContent: View, Content: View>: View {
                         RoundedCorner(radius: 24, corners: [.topLeft, .topRight])
                             .fill(Color.white)
                     )
-                    .offset(y: -60)
+                    .offset(y: containerOffsetY)
                     .frame(maxWidth: min(outerGeo.size.width, UIScreen.main.bounds.width))
             }
             .edgesIgnoringSafeArea(.top)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(
-                GeometryReader { geo in
-                    Color.clear
-                        .onAppear {
-                            print("[DEBUG] BannerPanelLayoutiPhone size: \(geo.size)")
-                        }
-                }
-            )
         }
     }
 }
@@ -83,6 +79,8 @@ struct BannerPanelLayoutiPad<BannerContent: View, Content: View>: View {
     let content: () -> Content
 
     var body: some View {
+        ZStack {
+            Color.white.ignoresSafeArea()
         VStack(spacing: 0) {
             ZStack {
                 bannerColor
@@ -100,14 +98,7 @@ struct BannerPanelLayoutiPad<BannerContent: View, Content: View>: View {
         }
         .edgesIgnoringSafeArea(.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear {
-                        print("[DEBUG] BannerPanelLayoutiPad size: \(geo.size)")
-                    }
-            }
-        )
+        }
     }
 }
 

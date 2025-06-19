@@ -1,0 +1,65 @@
+/* Settings */
+"settings_title" = "Ajustes";
+"settings_account" = "Cuenta";
+"settings_security" = "Seguridad";
+"settings_language" = "Idioma";
+"settings_subscription" = "Suscripción";
+"settings_app_info" = "Información de la app";
+"settings_change_password" = "Cambiar contraseña";
+"settings_change_email" = "Cambiar correo";
+"settings_logout" = "Cerrar sesión";
+"settings_pin" = "PIN (4 dígitos)";
+"settings_change_pin" = "Cambiar PIN";
+"settings_forgot_pin" = "¿Olvidaste el PIN?";
+"settings_link_google" = "Vincular cuenta de Google";
+"settings_unlink_google" = "Desvincular cuenta de Google";
+"settings_kids" = "Niños";
+"settings_delete_kid" = "Eliminar";
+"settings_delete_kid_confirm" = "¿Estás seguro de que quieres eliminar este niño y todos sus datos? Esta acción no se puede deshacer.";
+"settings_delete_kid_success" = "Niño eliminado con éxito.";
+"settings_delete_kid_fail" = "Error al eliminar el niño.";
+
+/* Onboarding */
+"onboarding_title" = "¿Quién está en tu familia Tipje?";
+"onboarding_subtitle" = "Ingresa el nombre de tu hijo para comenzar. Agrega más niños en cualquier momento—cada uno con su propio conjunto de reglas y tareas.";
+"onboarding_child_name" = "Nombre del niño";
+"onboarding_child_name_2" = "Nombre del niño 2";
+"onboarding_next" = "Siguiente";
+
+/* PIN & Errors */
+"pin_invalid" = "Por favor, ingresa un PIN válido de 4 dígitos.";
+"pin_success" = "PIN cambiado con éxito.";
+"pin_fail" = "Error al cambiar el PIN: %@";
+"pin_incorrect" = "PIN incorrecto. Si olvidaste tu PIN, por favor restablécelo.";
+"pin_correct" = "Tu PIN es correcto.";
+"pin_locked_out" = "Demasiados intentos fallidos. Por favor, inténtalo más tarde.";
+
+/* General */
+"ok" = "OK";
+"cancel" = "Cancelar";
+"yes" = "Sí";
+"no" = "No";
+
+/* Pin Setup */
+"pinsetup_title" = "Asegura tu sección de Administrador";
+"pinsetup_subtitle" = "Crea un PIN de 4 dígitos para asegurar el área de Administrador—los padres gestionan las reglas aquí, mientras los niños se concentran en completar tareas.";
+"pinsetup_save_fail" = "Error al guardar el PIN. Por favor, inténtalo de nuevo.";
+
+/* Login */
+"login_title" = "Construye tu hogar familiar consciente con una prueba gratuita de 7 días";
+"login_google" = "Iniciar sesión con Google";
+"login_or" = "O";
+"login_email" = "Correo electrónico";
+"login_password" = "Contraseña";
+"login_repeat_password" = "Repetir contraseña";
+"login_signup" = "Registrarse";
+"login_signin" = "Iniciar sesión";
+"login_have_account" = "¿Ya tienes una cuenta?";
+"login_no_account" = "¿No tienes una cuenta?";
+"login_passwords_no_match" = "Las contraseñas no coinciden";
+
+/* Language Settings */
+"language_change_title" = "Idioma cambiado";
+"language_change_message" = "Por favor, reinicia la aplicación para aplicar el nuevo idioma.";
+"restart_now" = "Reiniciar ahora";
+"restart_later" = "Más tarde"; 

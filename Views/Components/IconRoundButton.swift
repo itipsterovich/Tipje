@@ -19,7 +19,6 @@ struct IconRoundButton: View {
                 )
         }
         .buttonStyle(PlainButtonStyle())
-        .shadow(color: Color.black.opacity(0.10), radius: 4, x: 0, y: 2)
     }
 }
 

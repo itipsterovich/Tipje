@@ -10,6 +10,7 @@ struct KidsProfileView: View {
     var onNext: (() -> Void)? = nil
     var initialKids: [Kid]? = nil
     var onLoginRequest: (() -> Void)? = nil
+    @EnvironmentObject var store: Store
 
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
@@ -60,9 +61,23 @@ struct KidsProfileView: View {
                             .frame(width: geometry.size.width)
                             .opacity(1.0)
                             .ignoresSafeArea(edges: .bottom)
+                            .offset(y: 35)
                     }
                 }
                 .allowsHitTesting(false)
+                // Overlay Next button for iPad only
+                if horizontalSizeClass != .compact {
+                    VStack {
+                        Spacer()
+                        ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#C48A8A")) {
+                            saveKids()
+                        }
+                        .accessibilityIdentifier("kidsProfileNextButton")
+                        .disabled(!isNextActive || isLoading)
+                        .padding(.bottom, 40)
+                        .zIndex(2)
+                    }
+                }
             }
             .onChange(of: kidNames) { _ in
                 validateNames()
@@ -73,13 +88,14 @@ struct KidsProfileView: View {
         }
     }
 
+    // iPhone layout
     private var kidsProfileiPhone: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 50)
-            Image("mascot_atb")
+            Image("il_emptyrules")
                 .resizable()
                 .scaledToFit()
-                .frame(height: 180)
+                .frame(height: 300)
                 .frame(maxWidth: .infinity)
                 .clipped()
                 .padding(.bottom, 16)
@@ -112,37 +128,53 @@ struct KidsProfileView: View {
         .frame(maxWidth: .infinity)
     }
 
+    // iPad layout
     private var kidsProfileiPad: some View {
-        VStack(spacing: 0) {
-            Spacer().frame(height: 100)
-            Image("mascot_atb")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 300)
+        ZStack {
+            // Background illustration layer
+            GeometryReader { geometry in
+                VStack {
+                    Spacer()
+                    Image("il_emptyrules")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 500)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .padding(.bottom, 80)
+                }
+                .frame(height: geometry.size.height)
+            }
+            
+            // Content layer
+            GeometryReader { geometry in
+                VStack(spacing: 0) {
+                    Spacer().frame(height: geometry.size.height * 0.1)
+                    Text("Who's Joining Tipje?")
+                        .font(.custom("Inter-Regular_SemiBold", size: 40))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(nil)
+                    Spacer().frame(height: 16)
+                    Text("Add your child (or two) to begin your mindful journey.")
+                        .font(.custom("Inter-Regular_Medium", size: 20))
+                        .foregroundColor(.white)
+                        .opacity(0.8)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .frame(maxWidth: 500)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer().frame(height: 40)
+                    kidsFormContent
+                    Spacer()
+                }
                 .frame(maxWidth: .infinity)
-                .clipped()
-                .padding(.bottom, 16)
-            Text("Who's Joining Tipje?")
-                .font(.custom("Inter-Regular_SemiBold", size: 40))
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
-                .fixedSize(horizontal: false, vertical: true)
-                .lineLimit(nil)
-            Spacer().frame(height: 16)
-            Text("Add your child (or two) to begin your mindful journey.")
-                .font(.custom("Inter-Regular_Medium", size: 20))
-                .foregroundColor(.white)
-                .opacity(0.8)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-                .frame(maxWidth: 500)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer().frame(height: 40)
-            kidsFormContent
-            Spacer()
+                .frame(height: geometry.size.height)
+            }
         }
-        .frame(maxWidth: .infinity)
+        .ignoresSafeArea(.keyboard) // Allow content to move up with keyboard
     }
 
     private var kidsFormContent: some View {
@@ -174,16 +206,11 @@ struct KidsProfileView: View {
             }
             if let error = errorMessage {
                 Text(error)
-                    .font(.footnote)
-                    .foregroundColor(.red)
-            }
-            if horizontalSizeClass != .compact {
-                ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#C48A8A")) {
-                    saveKids()
-                }
-                .accessibilityIdentifier("kidsProfileNextButton")
-                .disabled(!isNextActive || isLoading)
-                .padding(.top, 16)
+                    .font(.custom("Inter-Regular_Medium", size: 20))
+                    .foregroundColor(Color(hex: "#494646"))
+                    .opacity(0.5)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
             }
         }
         .padding(.horizontal, 32)
@@ -281,7 +308,17 @@ struct KidsProfileView: View {
             isLoading = false
             if errors.isEmpty {
                 print("[KidsProfileView] Kids saved successfully: \(kidsToSave)")
-                onNext?()
+                // Trigger a fetch and selection of kids in the Store
+                FirestoreManager.shared.fetchKids(userId: userId) { kids in
+                    Task { @MainActor in
+                        if let firstKid = kids.first {
+                            print("[KidsProfileView] Selecting first kid: \(firstKid.name)")
+                            store.kids = kids
+                            store.selectKid(firstKid)
+                        }
+                        onNext?()
+                    }
+                }
             } else {
                 print("[KidsProfileView] Failed to save kids. Errors: \(errors)")
                 errorMessage = String(localized: "Failed to save kids. Please try again.")

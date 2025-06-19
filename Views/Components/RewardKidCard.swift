@@ -90,17 +90,18 @@ struct RewardKidCardiPhone: View {
             .frame(width: 100, height: 70)
         }
         .frame(height: 70)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .opacity((!canBuy && !basketMode) ? 0.75 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
         .onTapGesture {
             if basketMode {
                 onTap?()
             } else if canBuy {
-                withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                     isTapped = true
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                     isTapped = false
                 }
                 onTap?()
@@ -190,17 +191,18 @@ struct RewardKidCardiPad: View {
             .frame(width: 128, height: 90)
         }
         .frame(height: 90)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .opacity((!canBuy && !basketMode) ? 0.75 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
         .onTapGesture {
             if basketMode {
                 onTap?()
             } else if canBuy {
-                withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                     isTapped = true
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                     isTapped = false
                 }
                 onTap?()

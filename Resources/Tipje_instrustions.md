@@ -141,6 +141,7 @@ After successful authentication and Firestore user profile creation, the app mus
    - **When:** After at least one card is present in each tab.
    - **Action:** Show the success modal.
    - **After:** Lock the admin page with the PIN.
+   - **Implementation Note:** The `adminOnboardingComplete` flag **must** be stored in UserDefaults with a user-specific key (e.g., `adminOnboardingComplete_<userId>`) to ensure correct behavior for multi-user support. All checks for admin lock in the main app must use this user-specific key.
 
 5. **Navigating the User:**
    - **If all steps are complete:** User goes directly to the main home view on future launches.

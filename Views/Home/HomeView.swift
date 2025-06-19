@@ -75,7 +75,9 @@ struct HomeViewiPhone: View {
                         if filteredRules.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜"
+                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                imageHeight: 250,
+                                topPadding: -50
                             )
                         } else {
                             ScrollView {
@@ -107,7 +109,9 @@ struct HomeViewiPhone: View {
                         if filteredChores.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜"
+                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                imageHeight: 250,
+                                topPadding: -50
                             )
                         } else {
                             ScrollView {
@@ -136,6 +140,7 @@ struct HomeViewiPhone: View {
                             }
                         }
                     }
+                    
                 }
                 .font(.custom("Inter-Regular-Medium", size: 24))
             }
@@ -160,6 +165,7 @@ struct HomeViewiPhone: View {
 // =======================
 struct HomeViewiPad: View {
     @EnvironmentObject var store: Store
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedTab: TaskKind = .rule
     @State private var showUsedModal: Bool = false
     private var filteredRules: [Rule] { store.rules.filter { $0.isActive } }
@@ -214,7 +220,9 @@ struct HomeViewiPad: View {
                         if filteredRules.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜"
+                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                imageHeight: 450,
+                                topPadding: -200
                             )
                         } else {
                             ScrollView {
@@ -246,7 +254,9 @@ struct HomeViewiPad: View {
                         if filteredChores.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜"
+                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                imageHeight: 450,
+                                topPadding: -200
                             )
                         } else {
                             ScrollView {
@@ -277,6 +287,7 @@ struct HomeViewiPad: View {
                     }
                 }
                 .font(.custom("Inter-Medium", size: 24))
+                .padding(.horizontal, 24)
             }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -290,7 +301,6 @@ struct HomeViewiPad: View {
         .onAppear {
             print("[HomeViewiPad] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
         }
-        .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 
@@ -299,7 +309,7 @@ struct EmptyHomeState: View {
     let text: String
     var body: some View {
         GeometryReader { geometry in
-            let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
+            let mascotHeight: CGFloat = 500
             VStack(spacing: 24) {
                 Image(image)
                     .resizable()

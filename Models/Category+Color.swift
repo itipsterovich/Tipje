@@ -42,3 +42,25 @@ let cardPalette: [Color] = [
 func colorForIndex(_ index: Int) -> Color {
     cardPalette[index % cardPalette.count]
 } 
+
+extension String {
+    /// Returns the substring up to and including the first emoji, or the full string if no emoji is found.
+    func truncatedAfterFirstEmoji() -> String {
+        guard let emojiRange = self.rangeOfCharacter(from: .emojis) else { return self }
+        return String(self[..<emojiRange.upperBound])
+    }
+}
+
+extension CharacterSet {
+    static let emojis: CharacterSet = {
+        var set = CharacterSet()
+        set.insert(charactersIn: "\u{1F600}"..."\u{1F64F}") // Emoticons
+        set.insert(charactersIn: "\u{1F300}"..."\u{1F5FF}") // Misc Symbols and Pictographs
+        set.insert(charactersIn: "\u{1F680}"..."\u{1F6FF}") // Transport and Map
+        set.insert(charactersIn: "\u{2600}"..."\u{26FF}")   // Misc symbols
+        set.insert(charactersIn: "\u{2700}"..."\u{27BF}")   // Dingbats
+        set.insert(charactersIn: "\u{1F900}"..."\u{1F9FF}") // Supplemental Symbols and Pictographs
+        set.insert(charactersIn: "\u{1FA70}"..."\u{1FAFF}") // Symbols and Pictographs Extended-A
+        return set
+    }()
+} 

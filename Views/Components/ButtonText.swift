@@ -26,7 +26,7 @@ struct ButtonText: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.custom("Inter-Medium", size: fontSize))
+                .font(.custom("Inter-Regular-Medium", size: fontSize))
                 .foregroundColor(textColor)
                 .frame(maxWidth: .infinity, minHeight: 56)
                 .background(

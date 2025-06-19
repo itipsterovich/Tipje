@@ -5,11 +5,17 @@ struct MainView: View {
     @State private var selectedTab: MainTab = .home
     @StateObject private var store = Store()
     @AppStorage("shouldShowAdminAfterOnboarding") var shouldShowAdminAfterOnboarding: Bool = false
-    @AppStorage("adminOnboardingComplete") var adminOnboardingComplete: Bool = false
     @AppStorage("skipPinAfterSetup") var skipPinAfterSetup: Bool = false
     @State private var isAdminUnlocked: Bool = false
     @State private var showProfileSwitchModal: Bool = false
     @State private var switchedKid: Kid? = nil
+
+    var adminOnboardingKey: String {
+        "adminOnboardingComplete_\(store.userId)"
+    }
+    var adminOnboardingComplete: Bool {
+        UserDefaults.standard.bool(forKey: adminOnboardingKey)
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -24,21 +30,28 @@ struct MainView: View {
                         AdminView()
                             .environmentObject(store)
                             .onAppear {
+                                print("[DEBUG] MainView: Switching to admin tab. adminOnboardingComplete=\(adminOnboardingComplete), skipPinAfterSetup=\(skipPinAfterSetup), isAdminUnlocked=\(isAdminUnlocked), store.userId=\(store.userId)")
+                                print("[DEBUG] MainView: AdminView appeared. skipPinAfterSetup=\(skipPinAfterSetup)")
                                 if skipPinAfterSetup {
                                     skipPinAfterSetup = false
                                 }
                             }
                     } else if isAdminUnlocked {
                         AdminView().environmentObject(store)
+                            .onAppear {
+                                print("[DEBUG] MainView: Admin unlocked, showing AdminView.")
+                            }
                     } else {
                         PinLockView(userId: store.userId) {
                             isAdminUnlocked = true
+                            print("[DEBUG] MainView: Admin unlocked via PIN.")
+                        }
+                        .onAppear {
+                            print("[DEBUG] MainView: Showing PinLockView for admin.")
                         }
                     }
                 case .settings:
                     SettingsView().environmentObject(store)
-                case .debug:
-                    DebugView().environmentObject(store)
                 }
             }
             .background(
@@ -105,6 +118,15 @@ struct MainView: View {
         }
         .onAppear {
             print("[MainView] onAppear. store.userId=\(store.userId), Auth.auth().currentUser?.uid=\(Auth.auth().currentUser?.uid ?? "nil")")
+            print("[DEBUG] MainView: onAppear adminOnboardingComplete=\(adminOnboardingComplete), skipPinAfterSetup=\(skipPinAfterSetup), isAdminUnlocked=\(isAdminUnlocked)")
+            // MIGRATION: Copy old global key to user-specific key if needed
+            let globalKey = "adminOnboardingComplete"
+            let userKey = adminOnboardingKey
+            let globalValue = UserDefaults.standard.bool(forKey: globalKey)
+            if globalValue && !UserDefaults.standard.bool(forKey: userKey) {
+                print("[DEBUG] MainView: Migrating adminOnboardingComplete from global to user-specific key for userId=\(store.userId)")
+                UserDefaults.standard.set(true, forKey: userKey)
+            }
             if shouldShowAdminAfterOnboarding {
                 selectedTab = .admin
                 shouldShowAdminAfterOnboarding = false
@@ -115,8 +137,10 @@ struct MainView: View {
             }
         }
         .onChange(of: selectedTab) { newTab in
+            print("[DEBUG] MainView: selectedTab changed to \(newTab)")
             if newTab != .admin {
                 isAdminUnlocked = false
+                print("[DEBUG] MainView: Left admin tab, isAdminUnlocked reset to false.")
             }
         }
     }

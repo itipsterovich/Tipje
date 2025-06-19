@@ -16,6 +16,7 @@ struct CatalogChoresModal: View {
         return BannerPanelLayout(
             bannerColor: Color(hex: "#C3BCA5"),
             bannerHeight: 100,
+            containerOffsetY: -36,
             content: {
                 VStack(spacing: 0) {
                     // Fixed header

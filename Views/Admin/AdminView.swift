@@ -191,7 +191,8 @@ struct AdminViewiPhone: View {
             if filteredRules.isEmpty {
                 TipjeEmptyState(
                     imageName: "mascot_ticket",
-                    subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!"
+                    subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
+                    imageHeight: 250
                 )
             } else {
                 ForEach(filteredRules) { RuleRow(rule: $0).environmentObject(store) }
@@ -203,7 +204,8 @@ struct AdminViewiPhone: View {
             if filteredChores.isEmpty {
                 TipjeEmptyState(
                     imageName: "mascot_ticket",
-                    subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog."
+                    subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
+                    imageHeight: 250
                 )
             } else {
                 ForEach(filteredChores) { ChoreRow(chore: $0).environmentObject(store) }
@@ -215,7 +217,8 @@ struct AdminViewiPhone: View {
             if filteredRewards.isEmpty {
                 TipjeEmptyState(
                     imageName: "mascot_ticket",
-                    subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection."
+                    subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
+                    imageHeight: 250
                 )
             } else {
                 ForEach(filteredRewards) { RewardRow(reward: $0).environmentObject(store) }
@@ -237,6 +240,7 @@ struct AdminViewiPhone: View {
                 .padding(.top, 8)
             }
         }
+        .ignoresSafeArea(.container, edges: .horizontal)
     }
     // Modal switch as a @ViewBuilder
     @ViewBuilder
@@ -410,6 +414,7 @@ struct AdminViewiPhone: View {
 // =======================
 struct AdminViewiPad: View {
     @EnvironmentObject var store: Store
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var adminOnboardingComplete: Bool = false
     var adminOnboardingKey: String { "adminOnboardingComplete_\(store.userId)" }
     @State private var selectedTab: AdminTab = .rules
@@ -450,15 +455,15 @@ struct AdminViewiPad: View {
                 .accessibilityIdentifier("addRuleButton")
             }
             .padding(.top, 14)
+            .padding(.horizontal, 14)
             SubTabBar(
                 tabs: AdminTab.allCases,
                 selectedTab: $selectedTab,
                 title: { $0.rawValue }
             )
-            .padding(.horizontal, 24)
             .padding(.vertical, 8)
+            .padding(.horizontal, 24)
         }
-        .padding(.horizontal, 24)
     }
     // Row subviews
     private struct RuleRow: View {
@@ -521,7 +526,9 @@ struct AdminViewiPad: View {
             if filteredRules.isEmpty {
                 TipjeEmptyState(
                     imageName: "mascot_ticket",
-                    subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!"
+                    subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
+                    imageHeight: 450,
+                    topPadding: -40
                 )
             } else {
                 ForEach(filteredRules) { RuleRow(rule: $0).environmentObject(store) }
@@ -533,7 +540,9 @@ struct AdminViewiPad: View {
             if filteredChores.isEmpty {
                 TipjeEmptyState(
                     imageName: "mascot_ticket",
-                    subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog."
+                    subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
+                    imageHeight: 450,
+                    topPadding: -40
                 )
             } else {
                 ForEach(filteredChores) { ChoreRow(chore: $0).environmentObject(store) }
@@ -545,7 +554,9 @@ struct AdminViewiPad: View {
             if filteredRewards.isEmpty {
                 TipjeEmptyState(
                     imageName: "mascot_ticket",
-                    subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection."
+                    subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
+                    imageHeight: 450,
+                    topPadding: -40
                 )
             } else {
                 ForEach(filteredRewards) { RewardRow(reward: $0).environmentObject(store) }
@@ -565,8 +576,10 @@ struct AdminViewiPad: View {
                     }
                 }
                 .padding(.top, 8)
+                .padding(.horizontal, 24)
             }
         }
+        .ignoresSafeArea(.container, edges: .horizontal)
     }
     // Modal switch as a @ViewBuilder
     @ViewBuilder
@@ -734,7 +747,7 @@ struct EmptyAdminState: View {
     let text: String
     var body: some View {
         GeometryReader { geometry in
-            let mascotHeight = min(geometry.size.height * 0.45, 500) * 1.75
+            let mascotHeight: CGFloat = 500
             VStack(spacing: 24) {
                 Image(image)
                     .resizable()

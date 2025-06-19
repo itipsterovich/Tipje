@@ -69,13 +69,10 @@ struct RewardAdultCardiPhone: View {
                         .frame(width: 20, height: 20)
                         .foregroundColor(contentColor)
                     Spacer().frame(width: 12)
-                    Button(action: { onArchive?() }) {
-                        Image(selected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(contentColor)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    Image(selected ? "icon_delete" : "icon_plus")
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(contentColor)
                     Spacer().frame(width: 14)
                 }
                 .frame(height: 70)
@@ -84,15 +81,20 @@ struct RewardAdultCardiPhone: View {
         }
         .frame(height: 70)
         .frame(maxWidth: .infinity)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
-                onTap?()
+                if let onArchive = onArchive {
+                    onArchive()
+                } else {
+                    onTap?()
+                }
             }
         }
         .background(
@@ -130,7 +132,7 @@ struct RewardAdultCardiPad: View {
                     .padding(.trailing, 24)
                     .padding(.vertical, 14)
                     .foregroundColor(contentColor)
-                    .font(.custom("Inter-Medium", size: 24))
+                    .font(.custom("Inter-Regular-Medium", size: 24))
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -147,24 +149,21 @@ struct RewardAdultCardiPad: View {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 HStack(spacing: 0) {
-                    Spacer().frame(width: 24)
+                    Spacer().frame(width: 20)
                     Text("\(reward.cost)")
                         .foregroundColor(contentColor)
                         .font(.custom("Inter-Medium", size: 24))
-                        .frame(width: 20, alignment: .trailing)
+                        .frame(width: 30, alignment: .trailing)
                     Spacer().frame(width: 4)
                     Image("icon_peanut")
                         .resizable()
                         .frame(width: 24, height: 24)
                         .foregroundColor(contentColor)
-                    Spacer().frame(width: 24)
-                    Button(action: { onArchive?() }) {
-                        Image(selected ? "icon_delete" : "icon_plus")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(contentColor)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                    Spacer().frame(width: 14)
+                    Image(selected ? "icon_delete" : "icon_plus")
+                        .resizable()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(contentColor)
                     Spacer().frame(width: 24)
                 }
                 .frame(height: 90)
@@ -173,15 +172,20 @@ struct RewardAdultCardiPad: View {
         }
         .frame(height: 90)
         .frame(maxWidth: .infinity)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
-                onTap?()
+                if let onArchive = onArchive {
+                    onArchive()
+                } else {
+                    onTap?()
+                }
             }
         }
         .background(

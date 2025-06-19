@@ -30,7 +30,7 @@ struct ChoreKidCardiPhone: View {
             ZStack(alignment: .leading) {
                 baseColor
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                Text(catalogItem?.title ?? "")
+                Text(chore.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 14)
@@ -84,13 +84,14 @@ struct ChoreKidCardiPhone: View {
             .opacity(isCompleted ? 0.6 : 1)
         }
         .frame(height: 70)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
                 onTap?()
             }
@@ -175,13 +176,14 @@ struct ChoreKidCardiPad: View {
             .opacity(isCompleted ? 0.6 : 1)
         }
         .frame(height: 90)
-        .scaleEffect(isTapped ? 0.96 : 1.0)
-        .animation(.spring(response: 0.25, dampingFraction: 0.5), value: isTapped)
+        .scaleEffect(isTapped ? 1.08 : 1.0)
+        .rotationEffect(.degrees(isTapped ? 2 : 0))
+        .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
         .onTapGesture {
-            withAnimation(.spring(response: 0.25, dampingFraction: 0.5)) {
+            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
                 isTapped = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
                 isTapped = false
                 onTap?()
             }
