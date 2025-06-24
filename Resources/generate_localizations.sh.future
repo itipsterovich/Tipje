@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# List of language codes
+LANGUAGES=(
+    "en"    # English
+    "nl"    # Dutch
+    "fr"    # French
+    "de"    # German
+    "es"    # Spanish
+    "it"    # Italian
+    "pt"    # Portuguese
+    "ja"    # Japanese
+    "ko"    # Korean
+    "zh"    # Chinese Simplified
+    "ru"    # Russian
+    "ar"    # Arabic
+    "hi"    # Hindi
+    "tr"    # Turkish
+    "pl"    # Polish
+    "vi"    # Vietnamese
+    "id"    # Indonesian
+    "th"    # Thai
+    "sv"    # Swedish
+    "da"    # Danish
+    "fi"    # Finnish
+    "no"    # Norwegian
+    "cs"    # Czech
+    "el"    # Greek
+    "he"    # Hebrew
+    "ro"    # Romanian
+    "sk"    # Slovak
+    "uk"    # Ukrainian
+    "hr"    # Croatian
+    "ca"    # Catalan
+    "hu"    # Hungarian
+    "bg"    # Bulgarian
+)
+
+# Create .lproj directories and copy Localizable.strings
+for lang in "${LANGUAGES[@]}"; do
+    # Create language directory if it doesn't exist
+    mkdir -p "$lang.lproj"
+    
+    # If this is not English, create an empty Localizable.strings
+    # For English, we'll keep the existing one as the base
+    if [ "$lang" != "en" ]; then
+        # Copy the English version as a template
+        cp "en.lproj/Localizable.strings" "$lang.lproj/Localizable.strings"
+    fi
+done
+
+echo "Localization directories created successfully!"
+echo "Next steps:"
+echo "1. Add these directories to your Xcode project"
+echo "2. Translate the strings in each Localizable.strings file"
+echo "3. Use the LanguageManager to handle language switching" 

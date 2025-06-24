@@ -76,8 +76,7 @@ struct HomeViewiPhone: View {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
                                 subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
-                                imageHeight: 250,
-                                topPadding: -50
+                                imageHeight: 250
                             )
                         } else {
                             ScrollView {
@@ -110,8 +109,7 @@ struct HomeViewiPhone: View {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
                                 subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
-                                imageHeight: 250,
-                                topPadding: -50
+                                imageHeight: 250
                             )
                         } else {
                             ScrollView {
@@ -143,6 +141,7 @@ struct HomeViewiPhone: View {
                     
                 }
                 .font(.custom("Inter-Regular-Medium", size: 24))
+                .ignoresSafeArea(.container, edges: .horizontal)
             }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -222,7 +221,7 @@ struct HomeViewiPad: View {
                                 imageName: "mascot_ticket",
                                 subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
                                 imageHeight: 450,
-                                topPadding: -200
+                                topPadding: 0
                             )
                         } else {
                             ScrollView {
@@ -256,7 +255,7 @@ struct HomeViewiPad: View {
                                 imageName: "mascot_ticket",
                                 subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
                                 imageHeight: 450,
-                                topPadding: -200
+                                topPadding: -40
                             )
                         } else {
                             ScrollView {
@@ -288,6 +287,7 @@ struct HomeViewiPad: View {
                 }
                 .font(.custom("Inter-Medium", size: 24))
                 .padding(.horizontal, 24)
+                .ignoresSafeArea(.container, edges: .horizontal)
             }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

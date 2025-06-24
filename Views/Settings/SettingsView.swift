@@ -94,8 +94,7 @@ struct SettingsView: View {
     @State private var isEditingProfiles = false
     @State private var activeAlert: SettingsAlertType?
     @State private var showDeleteAccountModal = false
-    @State private var showRestartAlert = false
-    @StateObject private var languageManager = LanguageManager.shared
+    @State private var showDeleteAccountAlert = false
     let languages = ["en": "English", "nl": "Nederlands"]
 
     private func updateEmailFromAuth() {
@@ -127,47 +126,166 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationView {
-            List {
-                Section {
-                    DropdownRegular(
-                        title: NSLocalizedString("settings_language", comment: "Language setting title"),
-                        options: languageManager.supportedLanguages.map { $0.name },
-                        selectedOption: languageManager.getCurrentLanguageName(),
-                        onOptionSelected: { selectedName in
-                            if let language = languageManager.supportedLanguages.first(where: { $0.name == selectedName }) {
-                                languageManager.setLanguage(language.code)
-                                showRestartAlert = true
-                            }
-                        }
-                    )
-                } header: {
-                    Text(NSLocalizedString("settings_language", comment: "Language section header"))
-                }
-                
-                Section {
-                    SettingsSection(title: nil, trailingIcon: nil, onTrailingIconTap: nil, content: {
-                        loginMethodsSection
-                    })
-                }
-                
-                Section {
-                    planStatusTable
-                }
-            }
-            .navigationTitle(NSLocalizedString("settings_title", comment: "Settings screen title"))
-            .alert(isPresented: $showRestartAlert) {
-                Alert(
-                    title: Text(NSLocalizedString("language_change_title", comment: "Language change alert title")),
-                    message: Text(NSLocalizedString("language_change_message", comment: "Language change alert message")),
-                    primaryButton: .default(Text(NSLocalizedString("restart_now", comment: "Restart now button"))) {
-                        exit(0)
-                    },
-                    secondaryButton: .cancel(Text(NSLocalizedString("restart_later", comment: "Restart later button")))
-                )
-            }
+        if horizontalSizeClass == .compact {
+            SettingsViewiPhone(
+                authManager: authManager,
+                store: store,
+                selectedLanguage: $selectedLanguage,
+                showChangeEmail: $showChangeEmail,
+                showChangePassword: $showChangePassword,
+                showChangePIN: $showChangePIN,
+                showChangePinModal: $showChangePinModal,
+                showSubscription: $showSubscription,
+                showRestorePurchases: $showRestorePurchases,
+                showLogoutAlert: $showLogoutAlert,
+                email: $email,
+                password: $password,
+                newPassword: $newPassword,
+                pin: $pin,
+                subscriptionType: $subscriptionType,
+                cardNumber: $cardNumber,
+                showAlert: $showAlert,
+                alertMessage: $alertMessage,
+                isLinkingGoogle: $isLinkingGoogle,
+                isUnlinkingGoogle: $isUnlinkingGoogle,
+                showDeleteKidAlert: $showDeleteKidAlert,
+                kidToDelete: $kidToDelete,
+                isEditingPin: $isEditingPin,
+                newPin: $newPin,
+                pinChangeError: $pinChangeError,
+                pinChangeSuccess: $pinChangeSuccess,
+                showEditKidsModal: $showEditKidsModal,
+                isEditingEmail: $isEditingEmail,
+                isEditingPassword: $isEditingPassword,
+                originalEmail: $originalEmail,
+                originalPassword: $originalPassword,
+                isPasswordVisible: $isPasswordVisible,
+                isEditMode: $isEditMode,
+                emailError: $emailError,
+                showAddEmailModal: $showAddEmailModal,
+                showChangePasswordModal: $showChangePasswordModal,
+                showUnlinkGoogleAlert: $showUnlinkGoogleAlert,
+                showUnlinkEmailAlert: $showUnlinkEmailAlert,
+                addEmail: $addEmail,
+                addPassword: $addPassword,
+                isEditingProfiles: $isEditingProfiles,
+                languages: languages,
+                updateEmailFromAuth: updateEmailFromAuth,
+                validateEmail: validateEmail,
+                hasChanges: hasChanges,
+                canSave: canSave,
+                isGoogleLinked: isGoogleLinked,
+                isEmailLinked: isEmailLinked
+            )
+        } else {
+            SettingsViewiPad(
+                authManager: authManager,
+                store: store,
+                selectedLanguage: $selectedLanguage,
+                showChangeEmail: $showChangeEmail,
+                showChangePassword: $showChangePassword,
+                showChangePIN: $showChangePIN,
+                showChangePinModal: $showChangePinModal,
+                showSubscription: $showSubscription,
+                showRestorePurchases: $showRestorePurchases,
+                showLogoutAlert: $showLogoutAlert,
+                email: $email,
+                password: $password,
+                newPassword: $newPassword,
+                pin: $pin,
+                subscriptionType: $subscriptionType,
+                cardNumber: $cardNumber,
+                showAlert: $showAlert,
+                alertMessage: $alertMessage,
+                isLinkingGoogle: $isLinkingGoogle,
+                isUnlinkingGoogle: $isUnlinkingGoogle,
+                showDeleteKidAlert: $showDeleteKidAlert,
+                kidToDelete: $kidToDelete,
+                isEditingPin: $isEditingPin,
+                newPin: $newPin,
+                pinChangeError: $pinChangeError,
+                pinChangeSuccess: $pinChangeSuccess,
+                showEditKidsModal: $showEditKidsModal,
+                isEditingEmail: $isEditingEmail,
+                isEditingPassword: $isEditingPassword,
+                originalEmail: $originalEmail,
+                originalPassword: $originalPassword,
+                isPasswordVisible: $isPasswordVisible,
+                isEditMode: $isEditMode,
+                emailError: $emailError,
+                showAddEmailModal: $showAddEmailModal,
+                showChangePasswordModal: $showChangePasswordModal,
+                showUnlinkGoogleAlert: $showUnlinkGoogleAlert,
+                showUnlinkEmailAlert: $showUnlinkEmailAlert,
+                addEmail: $addEmail,
+                addPassword: $addPassword,
+                isEditingProfiles: $isEditingProfiles,
+                languages: languages,
+                updateEmailFromAuth: updateEmailFromAuth,
+                validateEmail: validateEmail,
+                hasChanges: hasChanges,
+                canSave: canSave,
+                isGoogleLinked: isGoogleLinked,
+                isEmailLinked: isEmailLinked
+            )
         }
     }
+}
+
+// =======================
+// iPhone layout
+// =======================
+struct SettingsViewiPhone: View {
+    @ObservedObject var authManager: AuthManager
+    @ObservedObject var store: Store
+    @Binding var selectedLanguage: String
+    @Binding var showChangeEmail: Bool
+    @Binding var showChangePassword: Bool
+    @Binding var showChangePIN: Bool
+    @Binding var showChangePinModal: Bool
+    @Binding var showSubscription: Bool
+    @Binding var showRestorePurchases: Bool
+    @Binding var showLogoutAlert: Bool
+    @Binding var email: String
+    @Binding var password: String
+    @Binding var newPassword: String
+    @Binding var pin: String
+    @Binding var subscriptionType: String
+    @Binding var cardNumber: String
+    @Binding var showAlert: Bool
+    @Binding var alertMessage: String
+    @Binding var isLinkingGoogle: Bool
+    @Binding var isUnlinkingGoogle: Bool
+    @Binding var showDeleteKidAlert: Bool
+    @Binding var kidToDelete: Kid?
+    @Binding var isEditingPin: Bool
+    @Binding var newPin: String
+    @Binding var pinChangeError: String?
+    @Binding var pinChangeSuccess: Bool
+    @Binding var showEditKidsModal: Bool
+    @Binding var isEditingEmail: Bool
+    @Binding var isEditingPassword: Bool
+    @Binding var originalEmail: String
+    @Binding var originalPassword: String
+    @Binding var isPasswordVisible: Bool
+    @Binding var isEditMode: Bool
+    @Binding var emailError: String?
+    @Binding var showAddEmailModal: Bool
+    @Binding var showChangePasswordModal: Bool
+    @Binding var showUnlinkGoogleAlert: Bool
+    @Binding var showUnlinkEmailAlert: Bool
+    @Binding var addEmail: String
+    @Binding var addPassword: String
+    @Binding var isEditingProfiles: Bool
+    @State private var showDeleteAccountAlert = false
+    @State private var activeAlert: SettingsAlertType?
+    let languages: [String: String]
+    let updateEmailFromAuth: () -> Void
+    let validateEmail: (String) -> Bool
+    let hasChanges: Bool
+    let canSave: Bool
+    let isGoogleLinked: Bool
+    let isEmailLinked: Bool
 
     // Extracted Login Methods section
     private var loginMethodsSection: some View {
@@ -329,62 +447,6 @@ struct SettingsView: View {
         .padding(.horizontal, 14)
         .padding(.bottom, 24)
     }
-}
-
-// =======================
-// iPhone layout
-// =======================
-struct SettingsViewiPhone: View {
-    @ObservedObject var authManager: AuthManager
-    @ObservedObject var store: Store
-    @Binding var selectedLanguage: String
-    @Binding var showChangeEmail: Bool
-    @Binding var showChangePassword: Bool
-    @Binding var showChangePIN: Bool
-    @Binding var showChangePinModal: Bool
-    @Binding var showSubscription: Bool
-    @Binding var showRestorePurchases: Bool
-    @Binding var showLogoutAlert: Bool
-    @Binding var email: String
-    @Binding var password: String
-    @Binding var newPassword: String
-    @Binding var pin: String
-    @Binding var subscriptionType: String
-    @Binding var cardNumber: String
-    @Binding var showAlert: Bool
-    @Binding var alertMessage: String
-    @Binding var isLinkingGoogle: Bool
-    @Binding var isUnlinkingGoogle: Bool
-    @Binding var showDeleteKidAlert: Bool
-    @Binding var kidToDelete: Kid?
-    @Binding var isEditingPin: Bool
-    @Binding var newPin: String
-    @Binding var pinChangeError: String?
-    @Binding var pinChangeSuccess: Bool
-    @Binding var showEditKidsModal: Bool
-    @Binding var isEditingEmail: Bool
-    @Binding var isEditingPassword: Bool
-    @Binding var originalEmail: String
-    @Binding var originalPassword: String
-    @Binding var isPasswordVisible: Bool
-    @Binding var isEditMode: Bool
-    @Binding var emailError: String?
-    @Binding var showAddEmailModal: Bool
-    @Binding var showChangePasswordModal: Bool
-    @Binding var showUnlinkGoogleAlert: Bool
-    @Binding var showUnlinkEmailAlert: Bool
-    @Binding var addEmail: String
-    @Binding var addPassword: String
-    @Binding var isEditingProfiles: Bool
-    @State private var showDeleteAccountModal = false
-    @State private var activeAlert: SettingsAlertType?
-    let languages: [String: String]
-    let updateEmailFromAuth: () -> Void
-    let validateEmail: (String) -> Bool
-    let hasChanges: Bool
-    let canSave: Bool
-    let isGoogleLinked: Bool
-    let isEmailLinked: Bool
 
     var body: some View {
         let content = ScrollView {
@@ -473,7 +535,7 @@ struct SettingsViewiPad: View {
     @Binding var addEmail: String
     @Binding var addPassword: String
     @Binding var isEditingProfiles: Bool
-    @State private var showDeleteAccountModal = false
+    @State private var showDeleteAccountAlert = false
     @State private var activeAlert: SettingsAlertType?
     let languages: [String: String]
     let updateEmailFromAuth: () -> Void
@@ -593,20 +655,6 @@ struct SettingsViewiPad: View {
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 44)
                                 .font(.custom("Inter-Regular_Medium", size: 24))
-                                Spacer().frame(height: 12)
-                                HStack(alignment: .center, spacing: 4) {
-                                    Text("settings_language")
-                                        .font(.custom("Inter-Regular_Medium", size: 24))
-                                        .foregroundColor(Color(hex: "#799B44"))
-                                        .padding(.top, 14)
-                                        .padding(.bottom, 8)
-                                }
-                                DropdownRegular(
-                                    selection: $selectedLanguage,
-                                    options: languages.keys.sorted(),
-                                    display: { code in languages[code] ?? code }
-                                )
-                                .frame(maxWidth: .infinity, minHeight: 44)
                             }
                         }, customTitle: { AnyView(EmptyView()) })
                     }

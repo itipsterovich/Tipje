@@ -14,6 +14,8 @@
 		6212A9C42DEDF03300C809B7 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6212A9C32DEDF03300C809B7 /* GoogleSignInSwift */; };
 		622BF0E62DF4EA470003532F /* File.txt in Resources */ = {isa = PBXBuildFile; fileRef = 622BF0E52DF4EA470003532F /* File.txt */; };
 		622BF0E82DF4EC240003532F /* Stickers.xcstickers in Resources */ = {isa = PBXBuildFile; fileRef = 622BF0E72DF4EC240003532F /* Stickers.xcstickers */; };
+		622BF1202E0455B70003532F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 622BF11B2E0455B70003532F /* Localizable.strings */; };
+		622BF1212E0455B70003532F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 622BF11E2E0455B70003532F /* Localizable.strings */; };
 		629ABF502DEE168F00362CEC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */; };
 		629ABF592DEF2A2E00362CEC /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 629ABF582DEF2A2E00362CEC /* ActivityIndicatorView */; };
 		629ABF632DF043A400362CEC /* il_clouds.png in Resources */ = {isa = PBXBuildFile; fileRef = 629ABF622DF043A400362CEC /* il_clouds.png */; };
@@ -51,6 +53,8 @@
 		622BF0E52DF4EA470003532F /* File.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = File.txt; sourceTree = "<group>"; };
 		622BF0E72DF4EC240003532F /* Stickers.xcstickers */ = {isa = PBXFileReference; lastKnownFileType = folder.stickers; path = Stickers.xcstickers; sourceTree = "<group>"; };
 		622BF0F32DF603360003532F /* TipjeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TipjeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		622BF11A2E0455B70003532F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Localizable.strings; sourceTree = "<group>"; };
+		622BF11D2E0455B70003532F /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = Localizable.strings; sourceTree = "<group>"; };
 		626E81012DE9AA7700715C38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		629ABF4F2DEE168F00362CEC /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		629ABF622DF043A400362CEC /* il_clouds.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = il_clouds.png; sourceTree = "<group>"; };
@@ -89,7 +93,6 @@
 				CustomUI/mascot_peanuts.png,
 				CustomUI/mascot_ticket.png,
 				"Inter-VariableFont_opsz,wght.ttf",
-				Localizable.strings,
 				SeedData/chores.json,
 				SeedData/rewards.json,
 				SeedData/rules.json,
@@ -209,9 +212,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		622BF11C2E0455B70003532F /* en.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				622BF11B2E0455B70003532F /* Localizable.strings */,
+			);
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		622BF11F2E0455B70003532F /* nl.lproj */ = {
+			isa = PBXGroup;
+			children = (
+				622BF11E2E0455B70003532F /* Localizable.strings */,
+			);
+			path = nl.lproj;
+			sourceTree = "<group>";
+		};
 		62C4C3E92DDDC962001CAB3B = {
 			isa = PBXGroup;
 			children = (
+				622BF11C2E0455B70003532F /* en.lproj */,
+				622BF11F2E0455B70003532F /* nl.lproj */,
 				62C4C5AD2DDDE8BA001CAB3B /* Assets.xcassets */,
 				622BF0E72DF4EC240003532F /* Stickers.xcstickers */,
 				622BF0E52DF4EA470003532F /* File.txt */,
@@ -320,6 +341,7 @@
 			knownRegions = (
 				en,
 				Base,
+				nl,
 			);
 			mainGroup = 62C4C3E92DDDC962001CAB3B;
 			minimizedProjectReferenceProxies = 1;
@@ -357,6 +379,8 @@
 				62C4C5962DDDE0A2001CAB3B /* README.md in Resources */,
 				622BF0E62DF4EA470003532F /* File.txt in Resources */,
 				622BF0E82DF4EC240003532F /* Stickers.xcstickers in Resources */,
+				622BF1202E0455B70003532F /* Localizable.strings in Resources */,
+				622BF1212E0455B70003532F /* Localizable.strings in Resources */,
 				629ABF632DF043A400362CEC /* il_clouds.png in Resources */,
 				62C4C5882DDDE0A2001CAB3B /* success.aiff in Resources */,
 			);
@@ -389,6 +413,25 @@
 			targetProxy = 622BF0F92DF603360003532F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		622BF11B2E0455B70003532F /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				622BF11A2E0455B70003532F /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		622BF11E2E0455B70003532F /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				622BF11D2E0455B70003532F /* nl */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		622BF0FC2DF603360003532F /* Debug */ = {

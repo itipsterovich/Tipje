@@ -1,0 +1,62 @@
+/* Tipje Dutch localization */
+"app_name" = "Tipje";
+// TODO: Add all user-facing strings
+// TODO: Add NL localization 
+
+/* Settings */
+"settings_title" = "Instellingen";
+"settings_account" = "Account";
+"settings_security" = "Beveiliging";
+"settings_language" = "Taal";
+"settings_subscription" = "Abonnement";
+"settings_app_info" = "App Info";
+"settings_change_password" = "Wachtwoord wijzigen";
+"settings_change_email" = "E-mail wijzigen";
+"settings_logout" = "Uitloggen";
+"settings_pin" = "PIN (4 cijfers)";
+"settings_change_pin" = "PIN wijzigen";
+"settings_forgot_pin" = "PIN vergeten?";
+"settings_link_google" = "Google-account koppelen";
+"settings_unlink_google" = "Google-account ontkoppelen";
+"settings_kids" = "Kinderen";
+"settings_delete_kid" = "Verwijderen";
+"settings_delete_kid_confirm" = "Weet je zeker dat je dit kind en al zijn/haar gegevens wilt verwijderen? Dit kan niet ongedaan worden gemaakt.";
+"settings_delete_kid_success" = "Kind succesvol verwijderd.";
+"settings_delete_kid_fail" = "Kind verwijderen mislukt.";
+
+/* Onboarding */
+"onboarding.headline" = "Zelfverzekerde kinderen opvoeden, verbinden als gezin";
+"onboarding.subtitle" = "Tipje helpt je gewoontes op te bouwen, verbonden te blijven en meer van het ouderschap te genieten.";
+"onboarding.subtitle.extended" = "Tipje helpt je gewoontes op te bouwen, verbonden te blijven en meer van het ouderschap te genieten.";
+
+/* PIN & Errors */
+"pin_invalid" = "Voer een geldige 4-cijferige PIN in.";
+"pin_success" = "PIN succesvol gewijzigd.";
+"pin_fail" = "PIN wijzigen mislukt: %@";
+"pin_incorrect" = "Onjuiste PIN. Als je je PIN bent vergeten, kun je deze resetten.";
+"pin_correct" = "Je PIN is correct.";
+"pin_locked_out" = "Te veel mislukte pogingen. Probeer het later opnieuw.";
+
+/* General */
+"ok" = "OK";
+"cancel" = "Annuleren";
+"yes" = "Ja";
+"no" = "Nee";
+
+/* Pin Setup */
+"pinsetup_title" = "Beveilig je beheerdersgedeelte";
+"pinsetup_subtitle" = "Maak een 4-cijferige PIN aan om het beheerdersgedeelte te beveiligen—ouders beheren hier de regels, terwijl kinderen zich kunnen concentreren op het voltooien van taken.";
+"pinsetup_save_fail" = "PIN opslaan mislukt. Probeer het opnieuw.";
+
+/* Login */
+"login_title" = "Bouw je mindful gezinshuis met een gratis proefperiode van 7 dagen";
+"login_google" = "Inloggen met Google";
+"login_or" = "OF";
+"login_email" = "E-mail";
+"login_password" = "Wachtwoord";
+"login_repeat_password" = "Wachtwoord herhalen";
+"login_signup" = "Registreren";
+"login_signin" = "Inloggen";
+"login_have_account" = "Heb je al een account?";
+"login_no_account" = "Nog geen account?";
+"login_passwords_no_match" = "Wachtwoorden komen niet overeen"; 

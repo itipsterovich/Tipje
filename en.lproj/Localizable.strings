@@ -1,7 +1,10 @@
 /* Tipje English localization */
 "app_name" = "Tipje";
-// TODO: Add all user-facing strings
-// TODO: Add NL localization 
+
+/* Onboarding */
+"onboarding.headline" = "Raise confident kids, connect as a family";
+"onboarding.subtitle" = "Tipje helps you build habits, stay connected, and enjoy parenting.";
+"onboarding.subtitle.extended" = "Tipje helps you build habits, stay connected, and enjoy parenting more.";
 
 /* Settings */
 "settings_title" = "Settings";
@@ -61,10 +64,4 @@
 "login_signin" = "Sign In";
 "login_have_account" = "Have an account?";
 "login_no_account" = "Don't have an account?";
-"login_passwords_no_match" = "Passwords do not match";
-
-/* Language Settings */
-"language_change_title" = "Language Changed";
-"language_change_message" = "Please restart the app to apply the new language.";
-"restart_now" = "Restart Now";
-"restart_later" = "Later"; 
+"login_passwords_no_match" = "Passwords do not match"; 

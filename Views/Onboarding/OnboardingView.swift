@@ -131,6 +131,7 @@ struct OnboardingSlidesView: View {
                                 options: languageOptions,
                                 display: languageDisplay
                             )
+                            .opacity(0)
                             Spacer(minLength: 32)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -179,12 +180,6 @@ struct OnboardingSlidesView: View {
                                         .fixedSize(horizontal: false, vertical: true)
                                         .lineLimit(nil)
                                 }
-                                .padding(.bottom, 24)
-                                CustomDropdownCompact(
-                                    selection: $selectedLanguage,
-                                    options: languageOptions,
-                                    display: languageDisplay
-                                )
                                 .padding(.bottom, 24)
                                 ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#D78C28"), action: {
                                     withAnimation { currentPage = 1 }

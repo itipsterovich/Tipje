@@ -1,0 +1,126 @@
+import Foundation
+import SwiftUI
+
+class LanguageManager: ObservableObject {
+    @Published var currentLanguage: String {
+        didSet {
+            UserDefaults.standard.set(currentLanguage, forKey: "app_language")
+            UserDefaults.standard.synchronize()
+        }
+    }
+    
+    static let shared = LanguageManager()
+    
+    // All supported languages in the app
+    static let supportedLanguages = [
+        "en",    // English
+        "nl",    // Dutch
+        "fr",    // French
+        "de",    // German
+        "es",    // Spanish
+        "it",    // Italian
+        "pt",    // Portuguese
+        "ja",    // Japanese
+        "ko",    // Korean
+        "zh",    // Chinese Simplified
+        "ru",    // Russian
+        "ar",    // Arabic
+        "hi",    // Hindi
+        "tr",    // Turkish
+        "pl",    // Polish
+        "vi",    // Vietnamese
+        "id",    // Indonesian
+        "th",    // Thai
+        "sv",    // Swedish
+        "da",    // Danish
+        "fi",    // Finnish
+        "no",    // Norwegian
+        "cs",    // Czech
+        "el",    // Greek
+        "he",    // Hebrew
+        "ro",    // Romanian
+        "sk",    // Slovak
+        "uk",    // Ukrainian
+        "hr",    // Croatian
+        "ca",    // Catalan
+        "hu",    // Hungarian
+        "bg"     // Bulgarian
+    ]
+    
+    // Language names for display in settings
+    static let languageNames = [
+        "en": "English",
+        "nl": "Nederlands",
+        "fr": "Français",
+        "de": "Deutsch",
+        "es": "Español",
+        "it": "Italiano",
+        "pt": "Português",
+        "ja": "日本語",
+        "ko": "한국어",
+        "zh": "简体中文",
+        "ru": "Русский",
+        "ar": "العربية",
+        "hi": "हिन्दी",
+        "tr": "Türkçe",
+        "pl": "Polski",
+        "vi": "Tiếng Việt",
+        "id": "Bahasa Indonesia",
+        "th": "ไทย",
+        "sv": "Svenska",
+        "da": "Dansk",
+        "fi": "Suomi",
+        "no": "Norsk",
+        "cs": "Čeština",
+        "el": "Ελληνικά",
+        "he": "עברית",
+        "ro": "Română",
+        "sk": "Slovenčina",
+        "uk": "Українська",
+        "hr": "Hrvatski",
+        "ca": "Català",
+        "hu": "Magyar",
+        "bg": "Български"
+    ]
+    
+    private init() {
+        // Get saved language or use system language
+        if let savedLanguage = UserDefaults.standard.string(forKey: "app_language") {
+            self.currentLanguage = savedLanguage
+        } else {
+            // Get system language
+            let systemLanguage = Locale.current.language.languageCode?.identifier ?? "en"
+            // Check if system language is supported, otherwise default to English
+            self.currentLanguage = LanguageManager.supportedLanguages.contains(systemLanguage) ? systemLanguage : "en"
+            UserDefaults.standard.set(self.currentLanguage, forKey: "app_language")
+        }
+    }
+    
+    func setLanguage(_ languageCode: String) {
+        guard LanguageManager.supportedLanguages.contains(languageCode) else { return }
+        currentLanguage = languageCode
+    }
+    
+    func getLanguageName(_ code: String) -> String {
+        return LanguageManager.languageNames[code] ?? code
+    }
+    
+    func getCurrentLanguageName() -> String {
+        return getLanguageName(currentLanguage)
+    }
+}
+
+// Extension to make localization easier in SwiftUI
+extension String {
+    var localized: String {
+        let bundle = Bundle.main
+        let languageCode = LanguageManager.shared.currentLanguage
+        
+        if let path = bundle.path(forResource: languageCode, ofType: "lproj"),
+           let bundle = Bundle(path: path) {
+            return NSLocalizedString(self, tableName: nil, bundle: bundle, value: "", comment: "")
+        }
+        
+        return NSLocalizedString(self, comment: "")
+    }
+} 
