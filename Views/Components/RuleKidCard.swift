@@ -4,13 +4,14 @@ import SwiftUI
 struct RuleKidCard: View {
     let rule: Rule
     var isCompleted: Bool
+    var cardColor: Color = Color(.systemGray5)
     var onTap: (() -> Void)? = nil
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var body: some View {
         if horizontalSizeClass == .compact {
-            RuleKidCardiPhone(rule: rule, isCompleted: isCompleted, onTap: onTap)
+            RuleKidCardiPhone(rule: rule, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap)
         } else {
-            RuleKidCardiPad(rule: rule, isCompleted: isCompleted, onTap: onTap)
+            RuleKidCardiPad(rule: rule, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap)
         }
     }
 }
@@ -21,11 +22,11 @@ struct RuleKidCard: View {
 struct RuleKidCardiPhone: View {
     let rule: Rule
     var isCompleted: Bool
+    var cardColor: Color = Color(.systemGray5)
     var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
-        let catalogItem = rulesCatalog.first(where: { $0.id == rule.id })
-        let baseColor = catalogItem?.color ?? Color(.systemGray5)
+        let baseColor = cardColor
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {
                 baseColor
@@ -53,15 +54,14 @@ struct RuleKidCardiPhone: View {
             .foregroundColor(isCompleted ? baseColor.opacity(0.3) : baseColor)
             .frame(width: 1.5, height: 40)
             .padding(.vertical, 14)
-            .opacity(isCompleted ? 0.6 : 1)
             ZStack {
                 (isCompleted ? baseColor.opacity(0.3) : baseColor)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 if isCompleted {
-                    Image("icon_complete")
+                    Image(systemName: "checkmark.circle.fill")
                         .resizable()
-                        .frame(width: 36, height: 36)
-                        .foregroundColor(baseColor)
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(Color(hex: "#799B44"))
                         .opacity(1.0)
                 } else {
                     HStack(spacing: 0) {
@@ -81,7 +81,6 @@ struct RuleKidCardiPhone: View {
                 }
             }
             .frame(width: 100, height: 70)
-            .opacity(isCompleted ? 0.6 : 1)
         }
         .frame(height: 70)
         .scaleEffect(isTapped ? 1.08 : 1.0)
@@ -113,16 +112,16 @@ struct RuleKidCardiPhone: View {
 struct RuleKidCardiPad: View {
     let rule: Rule
     var isCompleted: Bool
+    var cardColor: Color = Color(.systemGray5)
     var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
-        let catalogItem = rulesCatalog.first(where: { $0.id == rule.id })
-        let baseColor = catalogItem?.color ?? Color(.systemGray5)
+        let baseColor = cardColor
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {
                 baseColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                Text(catalogItem?.title ?? "")
+                Text(rule.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
@@ -145,15 +144,14 @@ struct RuleKidCardiPad: View {
             .foregroundColor(isCompleted ? baseColor.opacity(0.3) : baseColor)
             .frame(width: 1.5, height: 60)
             .padding(.vertical, 15)
-            .opacity(isCompleted ? 0.6 : 1)
             ZStack {
                 (isCompleted ? baseColor.opacity(0.3) : baseColor)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 if isCompleted {
-                    Image("icon_complete")
+                    Image(systemName: "checkmark.circle.fill")
                         .resizable()
                         .frame(width: 36, height: 36)
-                        .foregroundColor(baseColor)
+                        .foregroundColor(Color(hex: "#799B44"))
                         .opacity(1.0)
                 } else {
                     HStack(spacing: 0) {
@@ -173,7 +171,6 @@ struct RuleKidCardiPad: View {
                 }
             }
             .frame(width: 128, height: 90)
-            .opacity(isCompleted ? 0.6 : 1)
         }
         .frame(height: 90)
         .scaleEffect(isTapped ? 1.08 : 1.0)

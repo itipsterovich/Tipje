@@ -4,13 +4,14 @@ import SwiftUI
 struct ChoreKidCard: View {
     let chore: Chore
     var isCompleted: Bool
+    var cardColor: Color
     var onTap: (() -> Void)? = nil
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var body: some View {
         if horizontalSizeClass == .compact {
-            ChoreKidCardiPhone(chore: chore, isCompleted: isCompleted, onTap: onTap)
+            ChoreKidCardiPhone(chore: chore, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap)
         } else {
-            ChoreKidCardiPad(chore: chore, isCompleted: isCompleted, onTap: onTap)
+            ChoreKidCardiPad(chore: chore, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap)
         }
     }
 }
@@ -21,11 +22,11 @@ struct ChoreKidCard: View {
 struct ChoreKidCardiPhone: View {
     let chore: Chore
     var isCompleted: Bool
+    var cardColor: Color
     var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
-        let catalogItem = choresCatalog.first(where: { $0.id == chore.id })
-        let baseColor = catalogItem?.color ?? Color(.systemGray5)
+        let baseColor = cardColor
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {
                 baseColor
@@ -58,10 +59,10 @@ struct ChoreKidCardiPhone: View {
                 (isCompleted ? baseColor.opacity(0.3) : baseColor)
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 if isCompleted {
-                    Image("icon_complete")
+                    Image(systemName: "checkmark.circle.fill")
                         .resizable()
-                        .frame(width: 36, height: 36)
-                        .foregroundColor(baseColor)
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(Color(hex: "#799B44"))
                         .opacity(1.0)
                 } else {
                     HStack(spacing: 0) {
@@ -113,23 +114,23 @@ struct ChoreKidCardiPhone: View {
 struct ChoreKidCardiPad: View {
     let chore: Chore
     var isCompleted: Bool
+    var cardColor: Color
     var onTap: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
-        let catalogItem = choresCatalog.first(where: { $0.id == chore.id })
-        let baseColor = catalogItem?.color ?? Color(.systemGray5)
+        let baseColor = cardColor
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {
                 baseColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                Text(catalogItem?.title ?? "")
+                Text(chore.title)
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
                     .padding(.trailing, 24)
                     .padding(.vertical, 14)
                     .foregroundColor(.white)
-                    .font(.custom("Inter-Medium", size: 24))
+                    .font(.custom("Inter-Regular-Medium", size: 24))
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -150,10 +151,10 @@ struct ChoreKidCardiPad: View {
                 (isCompleted ? baseColor.opacity(0.3) : baseColor)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 if isCompleted {
-                    Image("icon_complete")
+                    Image(systemName: "checkmark.circle.fill")
                         .resizable()
                         .frame(width: 36, height: 36)
-                        .foregroundColor(baseColor)
+                        .foregroundColor(Color(hex: "#799B44"))
                         .opacity(1.0)
                 } else {
                     HStack(spacing: 0) {
@@ -202,7 +203,7 @@ struct ChoreKidCardiPad: View {
 #if DEBUG
 struct ChoreKidCard_Previews: PreviewProvider {
     static var previews: some View {
-        ChoreKidCard(chore: Chore(id: "chore1", title: "Make your bed", peanutValue: 2, isActive: true), isCompleted: false)
+        ChoreKidCard(chore: Chore(id: "chore1", title: "Make your bed", peanutValue: 2, isActive: true), isCompleted: false, cardColor: Color(.systemGray5))
             .previewLayout(.sizeThatFits)
     }
 }

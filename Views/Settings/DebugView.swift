@@ -6,7 +6,7 @@ struct DebugView: View {
     @AppStorage("didLogin") var didLogin: Bool = false
     @AppStorage("didRegister") var didRegister: Bool = false
     @AppStorage("hasActiveSubscription") var hasActiveSubscription: Bool = false
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
     @State private var showRestartAlert = false
     @State private var testUserId: String? = nil
     @State private var showKidsProfile = false
@@ -227,7 +227,7 @@ struct DebugButton: View {
 #if DEBUG
 struct DebugView_Previews: PreviewProvider {
     static var previews: some View {
-        DebugView().environmentObject(Store())
+        DebugView().environmentObject(TipjeStore())
     }
 }
 #endif 

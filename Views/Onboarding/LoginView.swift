@@ -9,6 +9,7 @@ struct LoginView: View {
     @State private var isSignUp: Bool = true
     @StateObject private var authManager = AuthManager()
     @State private var localErrorMessage: String? = nil
+    @State private var isLoading: Bool = false
     var onLogin: ((String) -> Void)? = nil
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
@@ -43,16 +44,24 @@ struct LoginView: View {
 
             Group {
                 if horizontalSizeClass == .compact {
-                    ScrollView {
+                    GeometryReader { geometry in
+                        VStack {
+                            Spacer()
                         loginFormContent
+                            Spacer()
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
                     }
-                    .padding(.bottom, 40)
                     .ignoresSafeArea(.keyboard, edges: .bottom)
                 } else {
                     loginFormContent
                         .padding(.bottom, 120)
                 }
             }
+        }
+        if isLoading {
+            TipjeLoadingView()
+                .zIndex(100)
         }
     }
 
@@ -62,57 +71,129 @@ struct LoginView: View {
                 // --- iPhone layout start ---
                 ZStack {
                     VStack(spacing: 0) {
-                        VStack(spacing: 24) {
+                        VStack(spacing: 16) {
                             Text("Get Started")
                                 .font(.custom("Inter-Regular_SemiBold", size: 32))
                                 .foregroundColor(Color(hex: "#494646"))
                                 .multilineTextAlignment(.center)
-                            Text("Enjoy 7 days of Tipje with no commitment—see how peaceful parenting can feel.")
-                                .font(.custom("Inter-Regular", size: 20))
-                                .foregroundColor(Color(hex: "#494646").opacity(0.5))
+                            Text("Free trial. No pressure. Just clarity.")
+                                .font(.custom("Inter-Regular", size: 18))
+                                .foregroundColor(Color(hex: "#494646").opacity(0.7))
                                 .multilineTextAlignment(.center)
-                            ButtonText(title: String(localized: "login_google"), variant: .secondary, action: {
-                                print("[LoginView] Google login button tapped")
-                                localErrorMessage = nil
-                                guard let rootVC = UIApplication.shared
-                                    .connectedScenes
-                                    .compactMap({ $0 as? UIWindowScene })
-                                    .flatMap({ $0.windows })
-                                    .first(where: { $0.isKeyWindow })?
-                                    .rootViewController
-                                else {
-                                    print("[LoginView] Unable to access root view controller.")
-                                    localErrorMessage = "Unable to access root view controller."
-                                    return
-                                }
-                                print("[LoginView] Starting Google signInWithGoogle...")
-                                authManager.signInWithGoogle(
-                                    presentingViewController: rootVC
-                                ) { success, errorString in
-                                    print("[LoginView] Google signInWithGoogle completion: success=\(success), error=\(String(describing: errorString))")
-                                    if success {
-                                        didLogin = true
-                                        if let uid = Auth.auth().currentUser?.uid {
-                                            print("[LoginView] Google login successful, uid=\(uid)")
-                                            onLogin?(uid)
-                                        } else {
-                                            print("[LoginView] Google login success but no uid found!")
-                                        }
-                                    } else {
-                                        print("[LoginView] Google login failed: \(String(describing: errorString))")
-                                        localErrorMessage = errorString
+                            VStack(spacing: 16) {
+                                Button(action: {
+                                    isLoading = true
+                                    print("[LoginView] Google login button tapped")
+                                    localErrorMessage = nil
+                                    guard let rootVC = UIApplication.shared
+                                        .connectedScenes
+                                        .compactMap({ $0 as? UIWindowScene })
+                                        .flatMap({ $0.windows })
+                                        .first(where: { $0.isKeyWindow })?
+                                        .rootViewController
+                                    else {
+                                        print("[LoginView] Unable to access root view controller.")
+                                        localErrorMessage = "Unable to access root view controller."
+                                        isLoading = false
+                                        return
                                     }
+                                    print("[LoginView] Starting Google signInWithGoogle...")
+                                    authManager.signInWithGoogle(
+                                        presentingViewController: rootVC
+                                    ) { success, errorString in
+                                        print("[LoginView] Google signInWithGoogle completion: success=\(success), error=\(String(describing: errorString))")
+                                        if success {
+                                            didLogin = true
+                                            if let uid = Auth.auth().currentUser?.uid {
+                                                print("[LoginView] Google login successful, uid=\(uid)")
+                                                onLogin?(uid)
+                                                // Keep isLoading = true until parent view switches
+                                            } else {
+                                                print("[LoginView] Google login success but no uid found!")
+                                                isLoading = false
+                                            }
+                                        } else {
+                                            print("[LoginView] Google login failed: \(String(describing: errorString))")
+                                            localErrorMessage = errorString
+                                            isLoading = false
+                                        }
+                                    }
+                                }) {
+                                    ZStack {
+                                        HStack {
+                                            Image("GoogleLogo")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 24, height: 24)
+                                            Spacer()
+                                        }
+                                        Text("Sign in with Google")
+                                            .font(.custom("Inter-Regular_Medium", size: 24))
+                                            .foregroundColor(Color(hex: "#799B44"))
+                                            .frame(maxWidth: .infinity, alignment: .center)
+                                    }
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 24)
+                                    .background(Color(hex: "#EAF3EA"))
+                                    .cornerRadius(28)
                                 }
-                            }, fontSize: 24)
-                            .overlay(
-                                HStack {
-                                    Image("GoogleLogo")
-                                        .resizable()
-                                        .frame(width: 32, height: 32)
-                                        .padding(.leading, 12)
-                                    Spacer()
+                                .frame(maxWidth: .infinity)
+                                .buttonStyle(PlainButtonStyle())
+
+                                Button(action: {
+                                    isLoading = true
+                                    print("[LoginView] Apple sign-in button tapped (DEBUG)")
+                                    print("[LoginView] About to call signInWithApple")
+                                    localErrorMessage = nil
+                                    authManager.signInWithApple { success, errorString in
+                                        print("[LoginView] signInWithApple completion: success=\(success), error=\(String(describing: errorString))")
+                                        if success {
+                                            didLogin = true
+                                            if let uid = Auth.auth().currentUser?.uid {
+                                                print("[LoginView] Apple login successful, uid=\(uid)")
+                                                onLogin?(uid)
+                                                // Keep isLoading = true until parent view switches
+                                            } else {
+                                                print("[LoginView] Apple login success but no uid found!")
+                                                isLoading = false
+                                            }
+                                        } else {
+                                            // Only show error if NOT user cancellation
+                                            if let errorString = errorString?.lowercased(),
+                                                !errorString.contains("canceled") &&
+                                                !errorString.contains("cancelled") &&
+                                                !errorString.contains("authorizationerror error 1") {
+                                            localErrorMessage = errorString
+                                            } else {
+                                                // User cancelled, do not show error
+                                                localErrorMessage = nil
+                                            }
+                                            isLoading = false
+                                        }
+                                    }
+                                }) {
+                                    ZStack {
+                                        HStack {
+                                            Image("AppleLogo")
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .frame(width: 24, height: 24)
+                                                .foregroundColor(.white)
+                                            Spacer()
+                                        }
+                                        Text("Sign in with Apple")
+                                            .font(.custom("Inter-Regular_Medium", size: 24))
+                                            .foregroundColor(.white)
+                                            .frame(maxWidth: .infinity, alignment: .center)
+                                    }
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 24)
+                                    .background(Color.black)
+                                    .cornerRadius(28)
                                 }
-                            )
+                                .frame(maxWidth: .infinity)
+                                .buttonStyle(PlainButtonStyle())
+                            }
                             HStack {
                                 Rectangle()
                                     .frame(height: 1)
@@ -134,10 +215,12 @@ struct LoginView: View {
                                         .font(.caption)
                                 }
                                 Button {
+                                    isLoading = true
                                     print("[LoginView] Email sign up button tapped")
                                     guard password == repeatPassword else {
                                         print("[LoginView] Passwords do not match")
                                         localErrorMessage = String(localized: "login_passwords_no_match")
+                                        isLoading = false
                                         return
                                     }
                                     localErrorMessage = nil
@@ -149,17 +232,20 @@ struct LoginView: View {
                                             if let uid = Auth.auth().currentUser?.uid {
                                                 print("[LoginView] Email sign up successful, uid=\(uid)")
                                                 onLogin?(uid)
+                                                // Keep isLoading = true until parent view switches
                                             } else {
                                                 print("[LoginView] Email sign up success but no uid found!")
+                                                isLoading = false
                                             }
                                         } else {
                                             print("[LoginView] Email sign up failed: \(String(describing: err))")
                                             localErrorMessage = err
+                                            isLoading = false
                                         }
                                     }
                                 } label: {
-                                    Text("login_signup")
-                                        .font(.custom("Inter-Medium", size: 24))
+                                    Text("Start your free trial")
+                                        .font(.custom("Inter-Regular_Medium", size: 24))
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity, minHeight: 56)
                                         .background(Color(hex: "#799B44"))
@@ -187,6 +273,7 @@ struct LoginView: View {
                                         .font(.caption)
                                 }
                                 Button {
+                                    isLoading = true
                                     print("[LoginView] Email sign in button tapped")
                                     localErrorMessage = nil
                                     authManager.signIn(email: email, password: password) { success, err in
@@ -196,17 +283,20 @@ struct LoginView: View {
                                             if let uid = Auth.auth().currentUser?.uid {
                                                 print("[LoginView] Email sign in successful, uid=\(uid)")
                                                 onLogin?(uid)
+                                                // Keep isLoading = true until parent view switches
                                             } else {
                                                 print("[LoginView] Email sign in success but no uid found!")
+                                                isLoading = false
                                             }
                                         } else {
                                             print("[LoginView] Email sign in failed: \(String(describing: err))")
                                             localErrorMessage = err
+                                            isLoading = false
                                         }
                                     }
                                 } label: {
                                     Text("login_signin")
-                                        .font(.custom("Inter-Medium", size: 24))
+                                        .font(.custom("Inter-Regular_Medium", size: 24))
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity, minHeight: 56)
                                         .background(Color(hex: "#799B44"))
@@ -252,52 +342,124 @@ struct LoginView: View {
                             .foregroundColor(Color(hex: "#494646"))
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
-                        Text("Enjoy 7 days of Tipje with no commitment—see how peaceful parenting can feel.")
-                            .font(.custom("Inter-Regular", size: 20))
-                            .foregroundColor(Color(hex: "#494646").opacity(0.5))
+                        Text("Free trial. No pressure. Just clarity.")
+                            .font(.custom("Inter-Regular", size: 18))
+                            .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             .multilineTextAlignment(.center)
-                        ButtonText(title: String(localized: "login_google"), variant: .secondary, action: {
-                            print("[LoginView] Google login button tapped")
-                            localErrorMessage = nil
-                            guard let rootVC = UIApplication.shared
-                                .connectedScenes
-                                .compactMap({ $0 as? UIWindowScene })
-                                .flatMap({ $0.windows })
-                                .first(where: { $0.isKeyWindow })?
-                                .rootViewController
-                            else {
-                                print("[LoginView] Unable to access root view controller.")
-                                localErrorMessage = "Unable to access root view controller."
-                                return
-                            }
-                            print("[LoginView] Starting Google signInWithGoogle...")
-                            authManager.signInWithGoogle(
-                                presentingViewController: rootVC
-                            ) { success, errorString in
-                                print("[LoginView] Google signInWithGoogle completion: success=\(success), error=\(String(describing: errorString))")
-                                if success {
-                                    didLogin = true
-                                    if let uid = Auth.auth().currentUser?.uid {
-                                        print("[LoginView] Google login successful, uid=\(uid)")
-                                        onLogin?(uid)
-                                    } else {
-                                        print("[LoginView] Google login success but no uid found!")
-                                    }
-                                } else {
-                                    print("[LoginView] Google login failed: \(String(describing: errorString))")
-                                    localErrorMessage = errorString
+                        VStack(spacing: 16) {
+                            Button(action: {
+                                isLoading = true
+                                print("[LoginView] Google login button tapped")
+                                localErrorMessage = nil
+                                guard let rootVC = UIApplication.shared
+                                    .connectedScenes
+                                    .compactMap({ $0 as? UIWindowScene })
+                                    .flatMap({ $0.windows })
+                                    .first(where: { $0.isKeyWindow })?
+                                    .rootViewController
+                                else {
+                                    print("[LoginView] Unable to access root view controller.")
+                                    localErrorMessage = "Unable to access root view controller."
+                                    isLoading = false
+                                    return
                                 }
+                                print("[LoginView] Starting Google signInWithGoogle...")
+                                authManager.signInWithGoogle(
+                                    presentingViewController: rootVC
+                                ) { success, errorString in
+                                    print("[LoginView] Google signInWithGoogle completion: success=\(success), error=\(String(describing: errorString))")
+                                    if success {
+                                        didLogin = true
+                                        if let uid = Auth.auth().currentUser?.uid {
+                                            print("[LoginView] Google login successful, uid=\(uid)")
+                                            onLogin?(uid)
+                                            // Keep isLoading = true until parent view switches
+                                        } else {
+                                            print("[LoginView] Google login success but no uid found!")
+                                            isLoading = false
+                                        }
+                                    } else {
+                                        print("[LoginView] Google login failed: \(String(describing: errorString))")
+                                        localErrorMessage = errorString
+                                        isLoading = false
+                                    }
+                                }
+                            }) {
+                                ZStack {
+                                    HStack {
+                                        Image("GoogleLogo")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 24, height: 24)
+                                        Spacer()
+                                    }
+                                    Text("Sign in with Google")
+                                        .font(.custom("Inter-Regular_Medium", size: 24))
+                                        .foregroundColor(Color(hex: "#799B44"))
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 24)
+                                .background(Color(hex: "#EAF3EA"))
+                                .cornerRadius(28)
                             }
-                        }, fontSize: 24)
-                        .overlay(
-                            HStack {
-                                Image("GoogleLogo")
-                                    .resizable()
-                                    .frame(width: 32, height: 32)
-                                    .padding(.leading, 12)
-                                Spacer()
+                            .frame(maxWidth: .infinity)
+                            .buttonStyle(PlainButtonStyle())
+
+                            Button(action: {
+                                isLoading = true
+                                print("[LoginView] Apple sign-in button tapped (DEBUG)")
+                                print("[LoginView] About to call signInWithApple")
+                                localErrorMessage = nil
+                                authManager.signInWithApple { success, errorString in
+                                    print("[LoginView] signInWithApple completion: success=\(success), error=\(String(describing: errorString))")
+                                    if success {
+                                        didLogin = true
+                                        if let uid = Auth.auth().currentUser?.uid {
+                                            print("[LoginView] Apple login successful, uid=\(uid)")
+                                            onLogin?(uid)
+                                            // Keep isLoading = true until parent view switches
+                                        } else {
+                                            print("[LoginView] Apple login success but no uid found!")
+                                            isLoading = false
+                                        }
+                                    } else {
+                                        // Only show error if NOT user cancellation
+                                        if let errorString = errorString?.lowercased(),
+                                            !errorString.contains("canceled") &&
+                                            !errorString.contains("cancelled") &&
+                                            !errorString.contains("authorizationerror error 1") {
+                                        localErrorMessage = errorString
+                                        } else {
+                                            // User cancelled, do not show error
+                                            localErrorMessage = nil
+                                        }
+                                        isLoading = false
+                                    }
+                                }
+                            }) {
+                                ZStack {
+                                    HStack {
+                                        Image("AppleLogo")
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                            .frame(width: 24, height: 24)
+                                            .foregroundColor(.white)
+                                        Spacer()
+                                    }
+                                    Text("Sign in with Apple")
+                                        .font(.custom("Inter-Regular_Medium", size: 24))
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity, alignment: .center)
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 24)
+                                .background(Color.black)
+                                .cornerRadius(28)
                             }
-                        )
+                            .frame(maxWidth: .infinity)
+                            .buttonStyle(PlainButtonStyle())
+                        }
                         HStack {
                             Rectangle()
                                 .frame(height: 1)
@@ -319,10 +481,12 @@ struct LoginView: View {
                                     .font(.caption)
                             }
                             Button {
+                                isLoading = true
                                 print("[LoginView] Email sign up button tapped")
                                 guard password == repeatPassword else {
                                     print("[LoginView] Passwords do not match")
                                     localErrorMessage = String(localized: "login_passwords_no_match")
+                                    isLoading = false
                                     return
                                 }
                                 localErrorMessage = nil
@@ -334,17 +498,20 @@ struct LoginView: View {
                                         if let uid = Auth.auth().currentUser?.uid {
                                             print("[LoginView] Email sign up successful, uid=\(uid)")
                                             onLogin?(uid)
+                                            // Keep isLoading = true until parent view switches
                                         } else {
                                             print("[LoginView] Email sign up success but no uid found!")
+                                            isLoading = false
                                         }
                                     } else {
                                         print("[LoginView] Email sign up failed: \(String(describing: err))")
                                         localErrorMessage = err
+                                        isLoading = false
                                     }
                                 }
                             } label: {
-                                Text("login_signup")
-                                    .font(.custom("Inter-Medium", size: 24))
+                                Text("Start your free trial")
+                                    .font(.custom("Inter-Regular_Medium", size: 24))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, minHeight: 56)
                                     .background(Color(hex: "#799B44"))
@@ -372,6 +539,7 @@ struct LoginView: View {
                                     .font(.caption)
                             }
                             Button {
+                                isLoading = true
                                 print("[LoginView] Email sign in button tapped")
                                 localErrorMessage = nil
                                 authManager.signIn(email: email, password: password) { success, err in
@@ -381,17 +549,20 @@ struct LoginView: View {
                                         if let uid = Auth.auth().currentUser?.uid {
                                             print("[LoginView] Email sign in successful, uid=\(uid)")
                                             onLogin?(uid)
+                                            // Keep isLoading = true until parent view switches
                                         } else {
                                             print("[LoginView] Email sign in success but no uid found!")
+                                            isLoading = false
                                         }
                                     } else {
                                         print("[LoginView] Email sign in failed: \(String(describing: err))")
                                         localErrorMessage = err
+                                        isLoading = false
                                     }
                                 }
                             } label: {
                                 Text("login_signin")
-                                    .font(.custom("Inter-Medium", size: 24))
+                                    .font(.custom("Inter-Regular_Medium", size: 24))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, minHeight: 56)
                                     .background(Color(hex: "#799B44"))

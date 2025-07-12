@@ -2,10 +2,33 @@
 import SwiftUI
 
 struct CatalogRule: Identifiable, Equatable {
-    let id: String
-    let title: String
-    let peanuts: Int
-    let color: Color
+    var id: String
+    var title: String
+    var peanuts: Int
+    var color: Color
+    var colorHex: String? // for Firestore compatibility
+    var isCustom: Bool // true for custom rules, false for curated
+    // Failable initializer for Firestore
+    init?(id: String, data: [String: Any]) {
+        guard let title = data["title"] as? String,
+              let peanuts = data["peanuts"] as? Int,
+              let colorHex = data["color"] as? String else { return nil }
+        self.id = id
+        self.title = title
+        self.peanuts = peanuts
+        self.colorHex = colorHex
+        self.color = Color(hex: colorHex)
+        self.isCustom = true
+    }
+    // For curated rules
+    init(id: String, title: String, peanuts: Int, color: Color, colorHex: String? = nil, isCustom: Bool = false) {
+        self.id = id
+        self.title = title
+        self.peanuts = peanuts
+        self.color = color
+        self.colorHex = colorHex
+        self.isCustom = isCustom
+    }
 }
 
 let rulesCatalog: [CatalogRule] = [
@@ -62,10 +85,33 @@ let rulesCatalog: [CatalogRule] = [
 ]
 
 struct CatalogChore: Identifiable, Equatable {
-    let id: String
-    let title: String
-    let peanuts: Int
-    let color: Color
+    var id: String
+    var title: String
+    var peanuts: Int
+    var color: Color
+    var colorHex: String? // for Firestore compatibility
+    var isCustom: Bool // true for custom chores, false for curated
+    // Failable initializer for Firestore
+    init?(id: String, data: [String: Any]) {
+        guard let title = data["title"] as? String,
+              let peanuts = data["peanuts"] as? Int,
+              let colorHex = data["color"] as? String else { return nil }
+        self.id = id
+        self.title = title
+        self.peanuts = peanuts
+        self.colorHex = colorHex
+        self.color = Color(hex: colorHex)
+        self.isCustom = true
+    }
+    // For curated chores
+    init(id: String, title: String, peanuts: Int, color: Color, colorHex: String? = nil, isCustom: Bool = false) {
+        self.id = id
+        self.title = title
+        self.peanuts = peanuts
+        self.color = color
+        self.colorHex = colorHex ?? color.toHexString()
+        self.isCustom = isCustom
+    }
 }
 
 let choresCatalog: [CatalogChore] = [
@@ -122,10 +168,33 @@ let choresCatalog: [CatalogChore] = [
 ]
 
 struct CatalogReward: Identifiable, Equatable {
-    let id: String
-    let title: String
-    let peanuts: Int
-    let color: Color
+    var id: String
+    var title: String
+    var peanuts: Int
+    var color: Color
+    var colorHex: String? // for Firestore compatibility
+    var isCustom: Bool // true for custom rewards, false for curated
+    // Failable initializer for Firestore
+    init?(id: String, data: [String: Any]) {
+        guard let title = data["title"] as? String,
+              let peanuts = data["peanuts"] as? Int,
+              let colorHex = data["color"] as? String else { return nil }
+        self.id = id
+        self.title = title
+        self.peanuts = peanuts
+        self.colorHex = colorHex
+        self.color = Color(hex: colorHex)
+        self.isCustom = true
+    }
+    // For curated rewards
+    init(id: String, title: String, peanuts: Int, color: Color, colorHex: String? = nil, isCustom: Bool = false) {
+        self.id = id
+        self.title = title
+        self.peanuts = peanuts
+        self.color = color
+        self.colorHex = colorHex
+        self.isCustom = isCustom
+    }
 }
 
 let rewardsCatalog: [CatalogReward] = [

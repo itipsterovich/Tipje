@@ -16,6 +16,8 @@ struct User: Identifiable, Codable {
     var pinLockoutUntil: Date?
     // Onboarding completion
     var adminOnboardingComplete: Bool?
+    // 7-day trial start date
+    var trialStartDate: Date?
     
     func toDict() -> [String: Any] {
         return [
@@ -27,7 +29,8 @@ struct User: Identifiable, Codable {
             "updatedAt": updatedAt ?? FieldValue.serverTimestamp(),
             "pinFailedAttempts": pinFailedAttempts as Any,
             "pinLockoutUntil": pinLockoutUntil as Any,
-            "adminOnboardingComplete": adminOnboardingComplete as Any
+            "adminOnboardingComplete": adminOnboardingComplete as Any,
+            "trialStartDate": trialStartDate ?? FieldValue.serverTimestamp()
         ]
     }
     
@@ -41,7 +44,8 @@ struct User: Identifiable, Codable {
         let pinFailedAttempts = dict["pinFailedAttempts"] as? Int
         let pinLockoutUntil = (dict["pinLockoutUntil"] as? Timestamp)?.dateValue()
         let adminOnboardingComplete = dict["adminOnboardingComplete"] as? Bool
-        return User(id: id, email: email, displayName: displayName, authProvider: authProvider, pinHash: pinHash, createdAt: createdAt, updatedAt: updatedAt, pinFailedAttempts: pinFailedAttempts, pinLockoutUntil: pinLockoutUntil, adminOnboardingComplete: adminOnboardingComplete)
+        let trialStartDate = (dict["trialStartDate"] as? Timestamp)?.dateValue()
+        return User(id: id, email: email, displayName: displayName, authProvider: authProvider, pinHash: pinHash, createdAt: createdAt, updatedAt: updatedAt, pinFailedAttempts: pinFailedAttempts, pinLockoutUntil: pinLockoutUntil, adminOnboardingComplete: adminOnboardingComplete, trialStartDate: trialStartDate)
     }
 }
 
@@ -208,7 +212,11 @@ class FirestoreManager {
 
     // MARK: - User
     func createUser(_ user: User, completion: @escaping (Error?) -> Void) {
-        db.collection("users").document(user.id).setData(user.toDict(), merge: true) { error in
+        var userWithTrial = user
+        if userWithTrial.trialStartDate == nil {
+            userWithTrial.trialStartDate = Date()
+        }
+        db.collection("users").document(user.id).setData(userWithTrial.toDict(), merge: true) { error in
             completion(error)
         }
     }
@@ -563,5 +571,84 @@ class FirestoreManager {
                 }
             }
         }
+    }
+}
+
+extension FirestoreManager {
+    // MARK: - Custom Rules
+    func fetchCustomRules(userId: String, completion: @escaping ([CatalogRule]) -> Void) {
+        db.collection("users").document(userId).collection("customRules").getDocuments { snapshot, error in
+            let rules = snapshot?.documents.compactMap { doc in
+                CatalogRule(id: doc.documentID, data: doc.data())
+            } ?? []
+            completion(rules)
+        }
+    }
+    func addCustomRule(userId: String, rule: CatalogRule, completion: @escaping (Error?) -> Void) {
+        guard let colorHex = rule.colorHex else { completion(NSError(domain: "FirestoreManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Missing colorHex"])) ; return }
+        let data: [String: Any] = [
+            "title": rule.title,
+            "peanuts": rule.peanuts,
+            "color": colorHex
+        ]
+        db.collection("users").document(userId).collection("customRules").document(rule.id).setData(data, merge: true) { error in
+            completion(error)
+        }
+    }
+    func updateCustomRule(userId: String, rule: CatalogRule, completion: @escaping (Error?) -> Void) {
+        addCustomRule(userId: userId, rule: rule, completion: completion)
+    }
+    func deleteCustomRule(userId: String, ruleId: String, completion: @escaping (Error?) -> Void) {
+        db.collection("users").document(userId).collection("customRules").document(ruleId).delete(completion: completion)
+    }
+
+    // MARK: - Custom Rewards
+    func fetchCustomRewards(userId: String, completion: @escaping ([CatalogReward]) -> Void) {
+        let ref = db.collection("users").document(userId).collection("customRewards")
+        ref.getDocuments { snapshot, error in
+            guard let documents = snapshot?.documents else { completion([]); return }
+            let rewards = documents.compactMap { CatalogReward(id: $0.documentID, data: $0.data()) }
+            completion(rewards)
+        }
+    }
+    func addCustomReward(userId: String, reward: CatalogReward, completion: @escaping (Error?) -> Void) {
+        let ref = db.collection("users").document(userId).collection("customRewards").document(reward.id)
+        let data: [String: Any] = [
+            "title": reward.title,
+            "peanuts": reward.peanuts,
+            "color": reward.colorHex ?? "#D5A412"
+        ]
+        ref.setData(data, completion: completion)
+    }
+    func deleteCustomReward(userId: String, rewardId: String, completion: @escaping (Error?) -> Void) {
+        let ref = db.collection("users").document(userId).collection("customRewards").document(rewardId)
+        ref.delete(completion: completion)
+    }
+
+    // MARK: - Custom Chores
+    func fetchCustomChores(userId: String, completion: @escaping ([CatalogChore]) -> Void) {
+        db.collection("users").document(userId).collection("customChores").getDocuments { snapshot, error in
+            let chores = snapshot?.documents.compactMap { doc in
+                CatalogChore(id: doc.documentID, data: doc.data())
+            } ?? []
+            completion(chores)
+        }
+    }
+    func addCustomChore(userId: String, chore: CatalogChore, completion: @escaping (Error?) -> Void) {
+        guard let colorHex = chore.colorHex else { completion(NSError(domain: "FirestoreManager", code: 400, userInfo: [NSLocalizedDescriptionKey: "Missing colorHex"])) ; return }
+        let data: [String: Any] = [
+            "title": chore.title,
+            "peanuts": chore.peanuts,
+            "color": colorHex
+        ]
+        db.collection("users").document(userId).collection("customChores").document(chore.id).setData(data, merge: true) { error in
+            completion(error)
+        }
+    }
+    func updateCustomChore(userId: String, chore: CatalogChore, completion: @escaping (Error?) -> Void) {
+        addCustomChore(userId: userId, chore: chore, completion: completion)
+    }
+    func deleteCustomChore(userId: String, choreId: String, completion: @escaping (Error?) -> Void) {
+        db.collection("users").document(userId).collection("customChores").document(choreId).delete(completion: completion)
     }
 } 

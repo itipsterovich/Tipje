@@ -5,14 +5,15 @@ struct RewardAdultCard: View {
     let reward: Reward
     var onArchive: (() -> Void)? = nil
     var selected: Bool = false
-    var baseColor: Color = Color(hex: "#F7C873")
+    var baseColor: Color = Color(hex: "#A2AFC1")
     var onTap: (() -> Void)? = nil
+    var expanded: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var body: some View {
         if horizontalSizeClass == .compact {
-            RewardAdultCardiPhone(reward: reward, onArchive: onArchive, selected: selected, baseColor: baseColor, onTap: onTap)
+            RewardAdultCardiPhone(reward: reward, onArchive: onArchive, selected: selected, baseColor: baseColor, onTap: onTap, expanded: expanded)
         } else {
-            RewardAdultCardiPad(reward: reward, onArchive: onArchive, selected: selected, baseColor: baseColor, onTap: onTap)
+            RewardAdultCardiPad(reward: reward, onArchive: onArchive, selected: selected, baseColor: baseColor, onTap: onTap, expanded: expanded)
         }
     }
 }
@@ -24,8 +25,9 @@ struct RewardAdultCardiPhone: View {
     let reward: Reward
     var onArchive: (() -> Void)? = nil
     var selected: Bool = false
-    var baseColor: Color = Color(hex: "#F7C873")
+    var baseColor: Color = Color(hex: "#A2AFC1")
     var onTap: (() -> Void)? = nil
+    var expanded: Bool = false
     @State private var isTapped: Bool = false
     var body: some View {
         let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
@@ -35,17 +37,26 @@ struct RewardAdultCardiPhone: View {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 Text(reward.title)
-                    .lineLimit(2)
+                    .lineLimit(expanded ? nil : 2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 14)
                     .padding(.trailing, 14)
                     .padding(.vertical, 14)
                     .foregroundColor(contentColor)
                     .font(.custom("Inter-Medium", size: 17))
-                    .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 70, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onTap?()
+                }
+            }
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
                 path.addLine(to: CGPoint(x: 0.75, y: 42))
@@ -78,25 +89,22 @@ struct RewardAdultCardiPhone: View {
                 .frame(height: 70)
             }
             .frame(width: 100, height: 70)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onArchive?()
+                }
+            }
         }
         .frame(height: 70)
         .frame(maxWidth: .infinity)
         .scaleEffect(isTapped ? 1.08 : 1.0)
         .rotationEffect(.degrees(isTapped ? 2 : 0))
         .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
-        .onTapGesture {
-            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
-                isTapped = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                isTapped = false
-                if let onArchive = onArchive {
-                    onArchive()
-                } else {
-                    onTap?()
-                }
-            }
-        }
         .background(
             GeometryReader { geo in
                 Color.clear
@@ -115,8 +123,9 @@ struct RewardAdultCardiPad: View {
     let reward: Reward
     var onArchive: (() -> Void)? = nil
     var selected: Bool = false
-    var baseColor: Color = Color(hex: "#F7C873")
+    var baseColor: Color = Color(hex: "#A2AFC1")
     var onTap: (() -> Void)? = nil
+    var expanded: Bool = false
     @State private var isTapped: Bool = false
     var body: some View {
         let backgroundColor = selected ? baseColor : baseColor.opacity(0.2)
@@ -126,17 +135,26 @@ struct RewardAdultCardiPad: View {
                 backgroundColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 Text(reward.title)
-                    .lineLimit(2)
+                    .lineLimit(expanded ? nil : 2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
                     .padding(.trailing, 24)
                     .padding(.vertical, 14)
                     .foregroundColor(contentColor)
                     .font(.custom("Inter-Regular-Medium", size: 24))
-                    .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onTap?()
+                }
+            }
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
                 path.addLine(to: CGPoint(x: 0.75, y: 60))
@@ -169,25 +187,22 @@ struct RewardAdultCardiPad: View {
                 .frame(height: 90)
             }
             .frame(width: 144, height: 90)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onArchive?()
+                }
+            }
         }
         .frame(height: 90)
         .frame(maxWidth: .infinity)
         .scaleEffect(isTapped ? 1.08 : 1.0)
         .rotationEffect(.degrees(isTapped ? 2 : 0))
         .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
-        .onTapGesture {
-            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
-                isTapped = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                isTapped = false
-                if let onArchive = onArchive {
-                    onArchive()
-                } else {
-                    onTap?()
-                }
-            }
-        }
         .background(
             GeometryReader { geo in
                 Color.clear

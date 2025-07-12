@@ -9,6 +9,7 @@ struct ButtonText: View {
     var variant: ButtonTextVariant = .primary
     var action: () -> Void
     var fontSize: CGFloat = 24
+    var fullWidth: Bool = false
     
     var fillColor: Color {
         switch variant {
@@ -25,10 +26,21 @@ struct ButtonText: View {
     
     var body: some View {
         Button(action: action) {
+            Group {
+                if fullWidth {
             Text(title)
-                .font(.custom("Inter-Regular-Medium", size: fontSize))
+                .font(.custom("Inter-Regular_Medium", size: fontSize))
                 .foregroundColor(textColor)
+                        .padding(.horizontal, 0)
                 .frame(maxWidth: .infinity, minHeight: 56)
+                } else {
+                    Text(title)
+                        .font(.custom("Inter-Regular_Medium", size: fontSize))
+                        .foregroundColor(textColor)
+                        .padding(.horizontal, 24)
+                        .frame(minWidth: 120, minHeight: 56)
+                }
+            }
                 .background(
                     RoundedRectangle(cornerRadius: 28, style: .continuous)
                         .fill(fillColor)

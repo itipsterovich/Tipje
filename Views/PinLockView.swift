@@ -53,13 +53,11 @@ struct PinLockViewiPhone: View {
                 startPoint: .top,
                 endPoint: .bottom
             ).ignoresSafeArea()
-            VStack(spacing: 0) {
-                Spacer()
-                Image("il_clouds")
+            GeometryReader { geometry in
+                Image("on_3a")
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 440)
+                    .frame(width: geometry.size.width)
                     .opacity(0.85)
                     .ignoresSafeArea(edges: .bottom)
             }
@@ -144,13 +142,11 @@ struct PinLockViewiPad: View {
                 startPoint: .top,
                 endPoint: .bottom
             ).ignoresSafeArea()
-            VStack(spacing: 0) {
-                Spacer()
-                Image("il_clouds")
+            GeometryReader { geometry in
+                Image("on_3a")
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 700)
+                    .frame(width: geometry.size.width)
                     .opacity(1.0)
                     .ignoresSafeArea(edges: .bottom)
             }
@@ -158,18 +154,18 @@ struct PinLockViewiPad: View {
                 Spacer(minLength: 0)
                 VStack(spacing: 0) {
                     Text("Enter PIN")
-                        .font(.custom("Inter-Regular_SemiBold", size: 40))
+                        .font(.custom("Inter-Regular_SemiBold", size: 48))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
                     Spacer().frame(height: 12)
-                    Text("Enter your 4-digit PIN to unlock Mindful Home Hub")
-                        .font(.custom("Inter-Regular_Medium", size: 20))
+                    Text("Enter your 4-digit PIN to unlock Parent Control Center")
+                        .font(.custom("Inter-Regular_Medium", size: 24))
                         .foregroundColor(.white)
                         .opacity(0.8)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
-                        .frame(maxWidth: 350)
+                        .frame(maxWidth: 500)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer().frame(height: 32)
                     PinInputFields(pin: $pin, focusedIndex: _focusedIndex, showNumbers: false)

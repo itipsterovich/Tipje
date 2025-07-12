@@ -48,7 +48,7 @@ struct BannerOnly<Content: View>: View {
 
 /// Main switcher: delegates to iPhone/iPad sub-structs based on horizontalSizeClass.
 struct AdminView: View {
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var onComplete: (() -> Void)? = nil
     var body: some View {
@@ -64,23 +64,27 @@ struct AdminView: View {
 // iPhone layout
 // =======================
 struct AdminViewiPhone: View {
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
     @State private var adminOnboardingComplete: Bool = false
     var adminOnboardingKey: String { "adminOnboardingComplete_\(store.userId)" }
     @State private var selectedTab: AdminTab = .rules
     @State private var showCatalogueModal = false
     @State private var showCongratsModal = false
     @State private var showNoKidAlert = false
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastIcon: String? = nil
+    @State private var toastIconColor: Color = Color(hex: "#799B44")
+    @State private var expandedRuleId: String? = nil
+    @State private var expandedChoreId: String? = nil
+    @State private var expandedRewardId: String? = nil
     let bannerHeight: CGFloat = 300
     let cornerRadius: CGFloat = 24
     var onComplete: (() -> Void)? = nil
     // Computed properties for filtering
-    var ruleIds: [String] { rulesCatalog.map { $0.id } }
-    var filteredRules: [Rule] { store.rules.filter { $0.isActive && ruleIds.contains($0.id) } }
-    var choresCatalogIds: [String] { choresCatalog.map { $0.id } }
-    var filteredChores: [Chore] { store.chores.filter { $0.isActive && choresCatalogIds.contains($0.id) } }
-    var rewardsCatalogIds: [String] { rewardsCatalog.map { $0.id } }
-    var filteredRewards: [Reward] { store.rewards.filter { $0.isActive && rewardsCatalogIds.contains($0.id) } }
+    var filteredRules: [Rule] { store.rules.filter { $0.isActive } }
+    var filteredChores: [Chore] { store.chores.filter { $0.isActive } }
+    var filteredRewards: [Reward] { store.rewards.filter { $0.isActive } }
     var activeRuleIDs: [String] { filteredRules.map { $0.id } }
     var activeChoreIDs: [String] { filteredChores.map { $0.id } }
     var activeRewardIDs: [String] { filteredRewards.map { $0.id } }
@@ -90,7 +94,7 @@ struct AdminViewiPhone: View {
             Image("il_admin")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(height: bannerHeight * 1.1)
+                .frame(height: bannerHeight * 1.3)
                 .offset(x: 14, y: 10)
         }
         .frame(height: bannerHeight)
@@ -98,7 +102,7 @@ struct AdminViewiPhone: View {
     // Header view
     var headerView: some View {
         VStack(spacing: 4) {
-            PageTitle("Mindful Home Hub") {
+            PageTitle("Parent Control Center") {
                 IconRoundButton(iconName: "icon_plus") {
                     showCatalogueModal = true
                 }
@@ -133,55 +137,113 @@ struct AdminViewiPhone: View {
     // Row subviews
     private struct RuleRow: View {
         let rule: Rule
-        @EnvironmentObject var store: Store
+        let baseColor: Color
+        @EnvironmentObject var store: TipjeStore
+        @Binding var showToast: Bool
+        @Binding var toastMessage: String
+        @Binding var toastIcon: String?
+        @Binding var toastIconColor: Color
+        @Binding var expandedRuleId: String?
         var body: some View {
             RuleAdultCard(
                 rule: rule,
                 onArchive: {
                     if rule.isActive {
                         store.archiveRule(rule)
+                        toastMessage = "Removed from your Hub"
+                        toastIcon = "trash.fill"
+                        toastIconColor = Color(hex: "#BBB595")
+                        withAnimation { showToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addRule(rule)
+                        toastMessage = "Added to your Hub"
                     }
                 },
                 selected: true,
-                baseColor: (rulesCatalog.first { $0.id == rule.id }?.color) ?? Color(.systemGray5)
+                baseColor: baseColor,
+                onTap: {
+                    if expandedRuleId == rule.id {
+                        expandedRuleId = nil
+                    } else {
+                        expandedRuleId = rule.id
+                    }
+                },
+                expanded: expandedRuleId == rule.id
             )
         }
     }
     private struct ChoreRow: View {
         let chore: Chore
-        @EnvironmentObject var store: Store
+        @EnvironmentObject var store: TipjeStore
+        @Binding var showToast: Bool
+        @Binding var toastMessage: String
+        @Binding var toastIcon: String?
+        @Binding var toastIconColor: Color
+        @Binding var expandedChoreId: String?
         var body: some View {
             ChoreAdultCard(
                 chore: chore,
                 onArchive: {
                     if chore.isActive {
                         store.archiveChore(chore)
+                        toastMessage = "Removed from your Hub"
+                        toastIcon = "trash.fill"
+                        toastIconColor = Color(hex: "#BBB595")
+                        withAnimation { showToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addChore(chore)
+                        toastMessage = "Added to your Hub"
                     }
                 },
                 selected: true,
-                baseColor: (choresCatalog.first { $0.id == chore.id }?.color) ?? Color(.systemGray5)
+                baseColor: (choresCatalog + store.customChores).first { $0.id == chore.id }?.color ?? Color(.systemGray5),
+                onTap: {
+                    if expandedChoreId == chore.id {
+                        expandedChoreId = nil
+                    } else {
+                        expandedChoreId = chore.id
+                    }
+                },
+                expanded: expandedChoreId == chore.id
             )
         }
     }
     private struct RewardRow: View {
         let reward: Reward
-        @EnvironmentObject var store: Store
+        @EnvironmentObject var store: TipjeStore
+        @Binding var showToast: Bool
+        @Binding var toastMessage: String
+        @Binding var toastIcon: String?
+        @Binding var toastIconColor: Color
+        @Binding var expandedRewardId: String?
         var body: some View {
             RewardAdultCard(
                 reward: reward,
                 onArchive: {
                     if reward.isActive {
                         store.archiveReward(reward)
+                        toastMessage = "Removed from your Hub"
+                        toastIcon = "trash.fill"
+                        toastIconColor = Color(hex: "#BBB595")
+                        withAnimation { showToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addReward(reward)
+                        toastMessage = "Added to your Hub"
                     }
                 },
                 selected: true,
-                baseColor: (rewardsCatalog.first { $0.id == reward.id }?.color) ?? Color(.systemGray5)
+                baseColor: (rewardsCatalog + store.customRewards).first { $0.id == reward.id }?.color ?? Color(.systemGray5),
+                onTap: {
+                    if expandedRewardId == reward.id {
+                        expandedRewardId = nil
+                    } else {
+                        expandedRewardId = reward.id
+                    }
+                },
+                expanded: expandedRewardId == reward.id
             )
         }
     }
@@ -189,39 +251,55 @@ struct AdminViewiPhone: View {
     private var rulesList: some View {
         Group {
             if filteredRules.isEmpty {
-                TipjeEmptyState(
+                TipjeEmptyStateiPhone(
                     imageName: "mascot_ticket",
                     subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
-                    imageHeight: 250
+                    imageHeight: 300,
+                    topPadding: 25,
+                    centered: true
                 )
             } else {
-                ForEach(filteredRules) { RuleRow(rule: $0).environmentObject(store) }
+                ForEach(Array(filteredRules.enumerated()), id: \.element.id) { index, rule in
+                    RuleRow(
+                        rule: rule,
+                        baseColor: (rulesCatalog + store.customRules).first { $0.id == rule.id }?.color ?? Color(.systemGray5),
+                        showToast: $showToast,
+                        toastMessage: $toastMessage,
+                        toastIcon: $toastIcon,
+                        toastIconColor: $toastIconColor,
+                        expandedRuleId: $expandedRuleId
+                    ).environmentObject(store)
+                }
             }
         }
     }
     private var choresList: some View {
         Group {
             if filteredChores.isEmpty {
-                TipjeEmptyState(
+                TipjeEmptyStateiPhone(
                     imageName: "mascot_ticket",
                     subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
-                    imageHeight: 250
+                    imageHeight: 300,
+                    topPadding: 25,
+                    centered: true
                 )
             } else {
-                ForEach(filteredChores) { ChoreRow(chore: $0).environmentObject(store) }
+                ForEach(filteredChores) { ChoreRow(chore: $0, showToast: $showToast, toastMessage: $toastMessage, toastIcon: $toastIcon, toastIconColor: $toastIconColor, expandedChoreId: $expandedChoreId).environmentObject(store) }
             }
         }
     }
     private var rewardsList: some View {
         Group {
             if filteredRewards.isEmpty {
-                TipjeEmptyState(
+                TipjeEmptyStateiPhone(
                     imageName: "mascot_ticket",
                     subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
-                    imageHeight: 250
+                    imageHeight: 300,
+                    topPadding: 25,
+                    centered: true
                 )
             } else {
-                ForEach(filteredRewards) { RewardRow(reward: $0).environmentObject(store) }
+                ForEach(filteredRewards) { RewardRow(reward: $0, showToast: $showToast, toastMessage: $toastMessage, toastIcon: $toastIcon, toastIconColor: $toastIconColor, expandedRewardId: $expandedRewardId).environmentObject(store) }
             }
         }
     }
@@ -241,6 +319,15 @@ struct AdminViewiPhone: View {
             }
         }
         .ignoresSafeArea(.container, edges: .horizontal)
+        .overlay(
+            Group {
+                if showToast {
+                    AppleStyleToast(message: toastMessage, systemImage: toastIcon, iconColor: toastIconColor)
+                        .zIndex(1)
+                }
+            },
+            alignment: .center
+        )
     }
     // Modal switch as a @ViewBuilder
     @ViewBuilder
@@ -248,64 +335,77 @@ struct AdminViewiPhone: View {
         switch selectedTab {
         case .rules:
             CatalogRulesModal(
-                onSave: handleRulesSave(_:),
+                onSave: handleRulesSave(_:customRules:),
                 initiallySelected: activeRuleIDs
             )
         case .chores:
             CatalogChoresModal(
-                onSave: handleChoresSave(_:),
+                onSave: handleChoresSave(_:customChores:),
                 initiallySelected: activeChoreIDs
             )
             .accessibilityIdentifier("choresCatalogModal")
         case .shop:
             CatalogRewardsModal(
-                onSave: handleRewardsSave(_:),
+                onSave: handleRewardsSave(_:customRewards:),
                 initiallySelected: activeRewardIDs
             )
             .accessibilityIdentifier("rewardsCatalogModal")
         }
     }
     // Save handlers
-    private func handleRulesSave(_ selectedIds: [String]) {
-        guard store.selectedKid != nil else { showNoKidAlert = true; return }
+    private func handleRulesSave(_ selectedIds: [String], customRules: [CatalogRule]) {
+        guard let kid = store.selectedKid else { showNoKidAlert = true; return }
         // Archive rules that are active and in the catalog but not selected
-        for rule in store.rules.filter({ $0.isActive && rulesCatalog.map { $0.id }.contains($0.id) }) {
+        for rule in store.rules.filter({ $0.isActive && (rulesCatalog.map { $0.id } + customRules.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(rule.id) {
                 store.archiveRule(rule)
             }
         }
-        // Add or reactivate selected rules from the catalog
+        // Add or reactivate selected rules from the catalog or custom
+        let allCatalogRules = rulesCatalog + customRules
         for id in selectedIds {
             if let rule = store.rules.first(where: { $0.id == id }) {
                 if !rule.isActive {
-                    if let cat = rulesCatalog.first(where: { $0.id == id }) {
+                    if let cat = allCatalogRules.first(where: { $0.id == id }) {
                         var reactivated = rule
                         reactivated.title = cat.title
                         reactivated.peanutValue = cat.peanuts
                         reactivated.isActive = true
+                        print("[DEBUG] Reactivating rule: \(reactivated)")
                         store.addRule(reactivated)
+                        // Also write to Firestore under kid's rules collection
+                        FirestoreManager.shared.addRule(userId: store.userId, kidId: kid.id, rule: reactivated) { _ in }
                     }
                 }
-            } else if let cat = rulesCatalog.first(where: { $0.id == id }) {
+            } else if let cat = allCatalogRules.first(where: { $0.id == id }) {
+                // This will catch both curated and custom rules
                 let newRule = Rule(id: cat.id, title: cat.title, peanutValue: cat.peanuts, isActive: true)
+                print("[DEBUG] Adding new rule: \(newRule)")
                 store.addRule(newRule)
+                // Also write to Firestore under kid's rules collection
+                FirestoreManager.shared.addRule(userId: store.userId, kidId: kid.id, rule: newRule) { _ in }
+            } else {
+                print("[DEBUG] Could not find CatalogRule for id: \(id)")
             }
         }
+        // Ensure Admin always reflects the latest custom rules
+        store.customRules = customRules
         showCatalogueModal = false
     }
-    private func handleChoresSave(_ selectedIds: [String]) {
+    private func handleChoresSave(_ selectedIds: [String], customChores: [CatalogChore]) {
         guard store.selectedKid != nil else { showNoKidAlert = true; return }
-        // Archive chores that are active and in the catalog but not selected
-        for chore in store.chores.filter({ $0.isActive && choresCatalog.map { $0.id }.contains($0.id) }) {
+        // Archive chores that are active and in the catalog (curated or custom) but not selected
+        for chore in store.chores.filter({ $0.isActive && (choresCatalog.map { $0.id } + customChores.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(chore.id) {
                 store.archiveChore(chore)
             }
         }
-        // Add or reactivate selected chores from the catalog
+        // Add or reactivate selected chores from the catalog or custom
+        let allCatalogChores = choresCatalog + customChores
         for id in selectedIds {
             if let chore = store.chores.first(where: { $0.id == id }) {
                 if !chore.isActive {
-                    if let cat = choresCatalog.first(where: { $0.id == id }) {
+                    if let cat = allCatalogChores.first(where: { $0.id == id }) {
                         var reactivated = chore
                         reactivated.title = cat.title
                         reactivated.peanutValue = cat.peanuts
@@ -313,39 +413,48 @@ struct AdminViewiPhone: View {
                         store.addChore(reactivated)
                     }
                 }
-            } else if let cat = choresCatalog.first(where: { $0.id == id }) {
+            } else if let cat = allCatalogChores.first(where: { $0.id == id }) {
                 let newChore = Chore(id: cat.id, title: cat.title, peanutValue: cat.peanuts, isActive: true)
                 store.addChore(newChore)
             }
         }
+        // Ensure Admin always reflects the latest custom chores
+        store.customChores = customChores
         showCatalogueModal = false
     }
-    private func handleRewardsSave(_ selectedIds: [String]) {
-        guard store.selectedKid != nil else { showNoKidAlert = true; return }
-        // Archive rewards that are active and in the catalog but not selected
-        for reward in store.rewards.filter({ $0.isActive && rewardsCatalog.map { $0.id }.contains($0.id) }) {
+    private func handleRewardsSave(_ selectedIds: [String], customRewards: [CatalogReward]) {
+        guard let kid = store.selectedKid else { showNoKidAlert = true; return }
+        // Archive rewards that are active and in the catalog (curated or custom) but not selected
+        for reward in store.rewards.filter({ $0.isActive && (rewardsCatalog.map { $0.id } + customRewards.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(reward.id) {
                 store.archiveReward(reward)
             }
         }
-        // Add or reactivate selected rewards from the catalog
+        // Add or reactivate selected rewards from the catalog or custom
+        let allCatalogRewards = rewardsCatalog + customRewards
         for id in selectedIds {
             if let reward = store.rewards.first(where: { $0.id == id }) {
                 if !reward.isActive {
-                    if let cat = rewardsCatalog.first(where: { $0.id == id }) {
+                    if let cat = allCatalogRewards.first(where: { $0.id == id }) {
                         var reactivated = reward
                         reactivated.title = cat.title
                         reactivated.cost = cat.peanuts
                         reactivated.isActive = true
                         store.addReward(reactivated)
+                        // Also write to Firestore under kid's rewards collection
+                        FirestoreManager.shared.addReward(userId: store.userId, kidId: kid.id, reward: reactivated) { _ in }
                     }
                 }
-            } else if let cat = rewardsCatalog.first(where: { $0.id == id }) {
+            } else if let cat = allCatalogRewards.first(where: { $0.id == id }) {
                 let newReward = Reward(id: cat.id, title: cat.title, cost: cat.peanuts, isActive: true)
                 store.addReward(newReward)
+                // Also write to Firestore under kid's rewards collection
+                FirestoreManager.shared.addReward(userId: store.userId, kidId: kid.id, reward: newReward) { _ in }
             }
         }
-        showCatalogueModal = false
+        // Ensure Admin always reflects the latest custom rewards
+        store.customRewards = customRewards
+        showCatalogueModal = false;
     }
     var body: some View {
         GeometryReader { geo in
@@ -359,6 +468,7 @@ struct AdminViewiPhone: View {
                 bannerContent: { adminBanner },
                 content: { adminContent }
             )
+            .ignoresSafeArea(.container, edges: .bottom)
         }
         .fullScreenCover(isPresented: $showCatalogueModal) {
             catalogModal()
@@ -401,9 +511,11 @@ struct AdminViewiPhone: View {
         }
     }
     private func checkShowCongrats() {
+        // Only check for onboarding completion if it hasn't already been completed
+        if adminOnboardingComplete { return }
         let hasAll = !filteredRules.isEmpty && !filteredChores.isEmpty && !filteredRewards.isEmpty
         print("[AdminViewiPhone] checkShowCongrats: hasAll=\(hasAll), adminOnboardingComplete=\(adminOnboardingComplete), showCongratsModal=\(showCongratsModal)")
-        if hasAll && !adminOnboardingComplete && !showCongratsModal {
+        if hasAll && !showCongratsModal {
             showCongratsModal = true
         }
     }
@@ -413,7 +525,7 @@ struct AdminViewiPhone: View {
 // iPad layout
 // =======================
 struct AdminViewiPad: View {
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var adminOnboardingComplete: Bool = false
     var adminOnboardingKey: String { "adminOnboardingComplete_\(store.userId)" }
@@ -421,16 +533,20 @@ struct AdminViewiPad: View {
     @State private var showCatalogueModal = false
     @State private var showCongratsModal = false
     @State private var showNoKidAlert = false
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastIcon: String? = nil
+    @State private var toastIconColor: Color = Color(hex: "#799B44")
+    @State private var expandedRuleId: String? = nil
+    @State private var expandedChoreId: String? = nil
+    @State private var expandedRewardId: String? = nil
     let bannerHeight: CGFloat = 300
     let cornerRadius: CGFloat = 24
     var onComplete: (() -> Void)? = nil
     // Computed properties for filtering
-    var ruleIds: [String] { rulesCatalog.map { $0.id } }
-    var filteredRules: [Rule] { store.rules.filter { $0.isActive && ruleIds.contains($0.id) } }
-    var choresCatalogIds: [String] { choresCatalog.map { $0.id } }
-    var filteredChores: [Chore] { store.chores.filter { $0.isActive && choresCatalogIds.contains($0.id) } }
-    var rewardsCatalogIds: [String] { rewardsCatalog.map { $0.id } }
-    var filteredRewards: [Reward] { store.rewards.filter { $0.isActive && rewardsCatalogIds.contains($0.id) } }
+    var filteredRules: [Rule] { store.rules.filter { $0.isActive } }
+    var filteredChores: [Chore] { store.chores.filter { $0.isActive } }
+    var filteredRewards: [Reward] { store.rewards.filter { $0.isActive } }
     var activeRuleIDs: [String] { filteredRules.map { $0.id } }
     var activeChoreIDs: [String] { filteredChores.map { $0.id } }
     var activeRewardIDs: [String] { filteredRewards.map { $0.id } }
@@ -439,16 +555,16 @@ struct AdminViewiPad: View {
         ZStack {
             Image("il_admin")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(height: bannerHeight * 1.1)
-                .offset(x: 14, y: 10)
+                .aspectRatio(contentMode: .fill)
+                .frame(maxWidth: .infinity, maxHeight: bannerHeight * 1.1, alignment: .center)
+                .clipped()
         }
         .frame(height: bannerHeight)
     }
     // Header view
     var headerView: some View {
         VStack(spacing: 4) {
-            PageTitle("Mindful Home Hub") {
+            PageTitle("Parent Control Center") {
                 IconRoundButton(iconName: "icon_plus") {
                     showCatalogueModal = true
                 }
@@ -468,55 +584,112 @@ struct AdminViewiPad: View {
     // Row subviews
     private struct RuleRow: View {
         let rule: Rule
-        @EnvironmentObject var store: Store
+        @EnvironmentObject var store: TipjeStore
+        @Binding var showToast: Bool
+        @Binding var toastMessage: String
+        @Binding var toastIcon: String?
+        @Binding var toastIconColor: Color
+        @Binding var expandedRuleId: String?
         var body: some View {
             RuleAdultCard(
                 rule: rule,
                 onArchive: {
                     if rule.isActive {
                         store.archiveRule(rule)
+                        toastMessage = "Removed from your Hub"
+                        toastIcon = "trash.fill"
+                        toastIconColor = Color(hex: "#BBB595")
+                        withAnimation { showToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addRule(rule)
+                        toastMessage = "Added to your Hub"
                     }
                 },
                 selected: true,
-                baseColor: (rulesCatalog.first { $0.id == rule.id }?.color) ?? Color(.systemGray5)
+                baseColor: (rulesCatalog + store.customRules).first { $0.id == rule.id }?.color ?? Color(.systemGray5),
+                onTap: {
+                    if expandedRuleId == rule.id {
+                        expandedRuleId = nil
+                    } else {
+                        expandedRuleId = rule.id
+                    }
+                },
+                expanded: expandedRuleId == rule.id
             )
         }
     }
     private struct ChoreRow: View {
         let chore: Chore
-        @EnvironmentObject var store: Store
+        @EnvironmentObject var store: TipjeStore
+        @Binding var showToast: Bool
+        @Binding var toastMessage: String
+        @Binding var toastIcon: String?
+        @Binding var toastIconColor: Color
+        @Binding var expandedChoreId: String?
         var body: some View {
             ChoreAdultCard(
                 chore: chore,
                 onArchive: {
                     if chore.isActive {
                         store.archiveChore(chore)
+                        toastMessage = "Removed from your Hub"
+                        toastIcon = "trash.fill"
+                        toastIconColor = Color(hex: "#BBB595")
+                        withAnimation { showToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addChore(chore)
+                        toastMessage = "Added to your Hub"
                     }
                 },
                 selected: true,
-                baseColor: (choresCatalog.first { $0.id == chore.id }?.color) ?? Color(.systemGray5)
+                baseColor: (choresCatalog + store.customChores).first { $0.id == chore.id }?.color ?? Color(.systemGray5),
+                onTap: {
+                    if expandedChoreId == chore.id {
+                        expandedChoreId = nil
+                    } else {
+                        expandedChoreId = chore.id
+                    }
+                },
+                expanded: expandedChoreId == chore.id
             )
         }
     }
     private struct RewardRow: View {
         let reward: Reward
-        @EnvironmentObject var store: Store
+        @EnvironmentObject var store: TipjeStore
+        @Binding var showToast: Bool
+        @Binding var toastMessage: String
+        @Binding var toastIcon: String?
+        @Binding var toastIconColor: Color
+        @Binding var expandedRewardId: String?
         var body: some View {
             RewardAdultCard(
                 reward: reward,
                 onArchive: {
                     if reward.isActive {
                         store.archiveReward(reward)
+                        toastMessage = "Removed from your Hub"
+                        toastIcon = "trash.fill"
+                        toastIconColor = Color(hex: "#BBB595")
+                        withAnimation { showToast = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addReward(reward)
+                        toastMessage = "Added to your Hub"
                     }
                 },
                 selected: true,
-                baseColor: (rewardsCatalog.first { $0.id == reward.id }?.color) ?? Color(.systemGray5)
+                baseColor: (rewardsCatalog + store.customRewards).first { $0.id == reward.id }?.color ?? Color(.systemGray5),
+                onTap: {
+                    if expandedRewardId == reward.id {
+                        expandedRewardId = nil
+                    } else {
+                        expandedRewardId = reward.id
+                    }
+                },
+                expanded: expandedRewardId == reward.id
             )
         }
     }
@@ -524,42 +697,72 @@ struct AdminViewiPad: View {
     private var rulesList: some View {
         Group {
             if filteredRules.isEmpty {
-                TipjeEmptyState(
-                    imageName: "mascot_ticket",
-                    subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
-                    imageHeight: 450,
-                    topPadding: -40
-                )
+                VStack(spacing: 0) {
+                    TipjeEmptyState(
+                        imageName: "mascot_ticket",
+                        subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
+                        imageHeight: 400,
+                        topPadding: 0
+                    )
+                }
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(filteredRules) { RuleRow(rule: $0).environmentObject(store) }
+                ScrollView(showsIndicators: true) {
+                    VStack(spacing: 14) {
+                        ForEach(filteredRules) { RuleRow(rule: $0, showToast: $showToast, toastMessage: $toastMessage, toastIcon: $toastIcon, toastIconColor: $toastIconColor, expandedRuleId: $expandedRuleId).environmentObject(store) }
+                    }
+                    .padding(.top, 8)
+                    .padding(.horizontal, 24)
+                }
             }
         }
     }
     private var choresList: some View {
         Group {
             if filteredChores.isEmpty {
-                TipjeEmptyState(
-                    imageName: "mascot_ticket",
-                    subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
-                    imageHeight: 450,
-                    topPadding: -40
-                )
+                VStack(spacing: 0) {
+                    TipjeEmptyState(
+                        imageName: "mascot_ticket",
+                        subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
+                        imageHeight: 400,
+                        topPadding: 0
+                    )
+                }
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(filteredChores) { ChoreRow(chore: $0).environmentObject(store) }
+                ScrollView(showsIndicators: true) {
+                    VStack(spacing: 14) {
+                        ForEach(filteredChores) { ChoreRow(chore: $0, showToast: $showToast, toastMessage: $toastMessage, toastIcon: $toastIcon, toastIconColor: $toastIconColor, expandedChoreId: $expandedChoreId).environmentObject(store) }
+                    }
+                    .padding(.top, 8)
+                    .padding(.horizontal, 24)
+                }
             }
         }
     }
     private var rewardsList: some View {
         Group {
             if filteredRewards.isEmpty {
-                TipjeEmptyState(
-                    imageName: "mascot_ticket",
-                    subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
-                    imageHeight: 450,
-                    topPadding: -40
-                )
+                VStack(spacing: 0) {
+                    TipjeEmptyState(
+                        imageName: "mascot_ticket",
+                        subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
+                        imageHeight: 400,
+                        topPadding: 0
+                    )
+                }
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(filteredRewards) { RewardRow(reward: $0).environmentObject(store) }
+                ScrollView(showsIndicators: true) {
+                    VStack(spacing: 14) {
+                        ForEach(filteredRewards) { RewardRow(reward: $0, showToast: $showToast, toastMessage: $toastMessage, toastIcon: $toastIcon, toastIconColor: $toastIconColor, expandedRewardId: $expandedRewardId).environmentObject(store) }
+                    }
+                    .padding(.top, 8)
+                    .padding(.horizontal, 24)
+                }
             }
         }
     }
@@ -567,19 +770,25 @@ struct AdminViewiPad: View {
     var adminContent: some View {
         VStack(spacing: 0) {
             headerView
-            ScrollView(showsIndicators: true) {
-                VStack(spacing: 14) {
-                    switch selectedTab {
-                    case .rules:   rulesList
-                    case .chores:  choresList
-                    case .shop:    rewardsList
-                    }
+            Group {
+                switch selectedTab {
+                case .rules:   rulesList
+                case .chores:  choresList
+                case .shop:    rewardsList
                 }
-                .padding(.top, 8)
-                .padding(.horizontal, 24)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .ignoresSafeArea(.container, edges: .horizontal)
+        .overlay(
+            Group {
+                if showToast {
+                    AppleStyleToast(message: toastMessage, systemImage: toastIcon, iconColor: toastIconColor)
+                        .zIndex(1)
+                }
+            },
+            alignment: .center
+        )
     }
     // Modal switch as a @ViewBuilder
     @ViewBuilder
@@ -587,64 +796,77 @@ struct AdminViewiPad: View {
         switch selectedTab {
         case .rules:
             CatalogRulesModal(
-                onSave: handleRulesSave(_:),
+                onSave: { ids, custom in handleRulesSave(ids, customRules: custom) },
                 initiallySelected: activeRuleIDs
             )
         case .chores:
             CatalogChoresModal(
-                onSave: handleChoresSave(_:),
+                onSave: { ids, custom in handleChoresSave(ids, customChores: custom) },
                 initiallySelected: activeChoreIDs
             )
             .accessibilityIdentifier("choresCatalogModal")
         case .shop:
             CatalogRewardsModal(
-                onSave: handleRewardsSave(_:),
+                onSave: handleRewardsSave(_:customRewards:),
                 initiallySelected: activeRewardIDs
             )
             .accessibilityIdentifier("rewardsCatalogModal")
         }
     }
     // Save handlers
-    private func handleRulesSave(_ selectedIds: [String]) {
-        guard store.selectedKid != nil else { showNoKidAlert = true; return }
+    private func handleRulesSave(_ selectedIds: [String], customRules: [CatalogRule]) {
+        guard let kid = store.selectedKid else { showNoKidAlert = true; return }
         // Archive rules that are active and in the catalog but not selected
-        for rule in store.rules.filter({ $0.isActive && rulesCatalog.map { $0.id }.contains($0.id) }) {
+        for rule in store.rules.filter({ $0.isActive && (rulesCatalog.map { $0.id } + customRules.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(rule.id) {
                 store.archiveRule(rule)
             }
         }
-        // Add or reactivate selected rules from the catalog
+        // Add or reactivate selected rules from the catalog or custom
+        let allCatalogRules = rulesCatalog + customRules
         for id in selectedIds {
             if let rule = store.rules.first(where: { $0.id == id }) {
                 if !rule.isActive {
-                    if let cat = rulesCatalog.first(where: { $0.id == id }) {
+                    if let cat = allCatalogRules.first(where: { $0.id == id }) {
                         var reactivated = rule
                         reactivated.title = cat.title
                         reactivated.peanutValue = cat.peanuts
                         reactivated.isActive = true
+                        print("[DEBUG] Reactivating rule: \(reactivated)")
                         store.addRule(reactivated)
+                        // Also write to Firestore under kid's rules collection
+                        FirestoreManager.shared.addRule(userId: store.userId, kidId: kid.id, rule: reactivated) { _ in }
                     }
                 }
-            } else if let cat = rulesCatalog.first(where: { $0.id == id }) {
+            } else if let cat = allCatalogRules.first(where: { $0.id == id }) {
+                // This will catch both curated and custom rules
                 let newRule = Rule(id: cat.id, title: cat.title, peanutValue: cat.peanuts, isActive: true)
+                print("[DEBUG] Adding new rule: \(newRule)")
                 store.addRule(newRule)
+                // Also write to Firestore under kid's rules collection
+                FirestoreManager.shared.addRule(userId: store.userId, kidId: kid.id, rule: newRule) { _ in }
+            } else {
+                print("[DEBUG] Could not find CatalogRule for id: \(id)")
             }
         }
+        // Ensure Admin always reflects the latest custom rules
+        store.customRules = customRules
         showCatalogueModal = false
     }
-    private func handleChoresSave(_ selectedIds: [String]) {
+    private func handleChoresSave(_ selectedIds: [String], customChores: [CatalogChore]) {
         guard store.selectedKid != nil else { showNoKidAlert = true; return }
-        // Archive chores that are active and in the catalog but not selected
-        for chore in store.chores.filter({ $0.isActive && choresCatalog.map { $0.id }.contains($0.id) }) {
+        // Archive chores that are active and in the catalog (curated or custom) but not selected
+        for chore in store.chores.filter({ $0.isActive && (choresCatalog.map { $0.id } + customChores.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(chore.id) {
                 store.archiveChore(chore)
             }
         }
-        // Add or reactivate selected chores from the catalog
+        // Add or reactivate selected chores from the catalog or custom
+        let allCatalogChores = choresCatalog + customChores
         for id in selectedIds {
             if let chore = store.chores.first(where: { $0.id == id }) {
                 if !chore.isActive {
-                    if let cat = choresCatalog.first(where: { $0.id == id }) {
+                    if let cat = allCatalogChores.first(where: { $0.id == id }) {
                         var reactivated = chore
                         reactivated.title = cat.title
                         reactivated.peanutValue = cat.peanuts
@@ -652,39 +874,48 @@ struct AdminViewiPad: View {
                         store.addChore(reactivated)
                     }
                 }
-            } else if let cat = choresCatalog.first(where: { $0.id == id }) {
+            } else if let cat = allCatalogChores.first(where: { $0.id == id }) {
                 let newChore = Chore(id: cat.id, title: cat.title, peanutValue: cat.peanuts, isActive: true)
                 store.addChore(newChore)
             }
         }
+        // Ensure Admin always reflects the latest custom chores
+        store.customChores = customChores
         showCatalogueModal = false
     }
-    private func handleRewardsSave(_ selectedIds: [String]) {
-        guard store.selectedKid != nil else { showNoKidAlert = true; return }
-        // Archive rewards that are active and in the catalog but not selected
-        for reward in store.rewards.filter({ $0.isActive && rewardsCatalog.map { $0.id }.contains($0.id) }) {
+    private func handleRewardsSave(_ selectedIds: [String], customRewards: [CatalogReward]) {
+        guard let kid = store.selectedKid else { showNoKidAlert = true; return }
+        // Archive rewards that are active and in the catalog (curated or custom) but not selected
+        for reward in store.rewards.filter({ $0.isActive && (rewardsCatalog.map { $0.id } + customRewards.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(reward.id) {
                 store.archiveReward(reward)
             }
         }
-        // Add or reactivate selected rewards from the catalog
+        // Add or reactivate selected rewards from the catalog or custom
+        let allCatalogRewards = rewardsCatalog + customRewards
         for id in selectedIds {
             if let reward = store.rewards.first(where: { $0.id == id }) {
                 if !reward.isActive {
-                    if let cat = rewardsCatalog.first(where: { $0.id == id }) {
+                    if let cat = allCatalogRewards.first(where: { $0.id == id }) {
                         var reactivated = reward
                         reactivated.title = cat.title
                         reactivated.cost = cat.peanuts
                         reactivated.isActive = true
                         store.addReward(reactivated)
+                        // Also write to Firestore under kid's rewards collection
+                        FirestoreManager.shared.addReward(userId: store.userId, kidId: kid.id, reward: reactivated) { _ in }
                     }
                 }
-            } else if let cat = rewardsCatalog.first(where: { $0.id == id }) {
+            } else if let cat = allCatalogRewards.first(where: { $0.id == id }) {
                 let newReward = Reward(id: cat.id, title: cat.title, cost: cat.peanuts, isActive: true)
                 store.addReward(newReward)
+                // Also write to Firestore under kid's rewards collection
+                FirestoreManager.shared.addReward(userId: store.userId, kidId: kid.id, reward: newReward) { _ in }
             }
         }
-        showCatalogueModal = false
+        // Ensure Admin always reflects the latest custom rewards
+        store.customRewards = customRewards
+        showCatalogueModal = false;
     }
     var body: some View {
         BannerPanelLayout(
@@ -734,9 +965,10 @@ struct AdminViewiPad: View {
         }
     }
     private func checkShowCongrats() {
+        if adminOnboardingComplete { return }
         let hasAll = !filteredRules.isEmpty && !filteredChores.isEmpty && !filteredRewards.isEmpty
         print("[AdminViewiPad] checkShowCongrats: hasAll=\(hasAll), adminOnboardingComplete=\(adminOnboardingComplete), showCongratsModal=\(showCongratsModal)")
-        if hasAll && !adminOnboardingComplete && !showCongratsModal {
+        if hasAll && !showCongratsModal {
             showCongratsModal = true
         }
     }
@@ -817,7 +1049,8 @@ struct MinimalBannerTestView: View {
 #if DEBUG
 struct AdminView_Previews: PreviewProvider {
     static var previews: some View {
-        AdminView().environmentObject(Store())
+        AdminView()
+            .environmentObject(TipjeStore())
     }
 }
 

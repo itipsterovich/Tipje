@@ -10,7 +10,7 @@ struct KidsProfileView: View {
     var onNext: (() -> Void)? = nil
     var initialKids: [Kid]? = nil
     var onLoginRequest: (() -> Void)? = nil
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
 
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
@@ -37,7 +37,7 @@ struct KidsProfileView: View {
             )
         } else {
             ZStack {
-                Color(hex: "#C48A8A").ignoresSafeArea()
+                Color(hex: "#BBB595").ignoresSafeArea()
                 LinearGradient(
                     gradient: Gradient(colors: [Color.white.opacity(0.0), Color.white.opacity(0.2)]),
                     startPoint: .top,
@@ -51,7 +51,7 @@ struct KidsProfileView: View {
                         kidsProfileiPad
                     }
                 }
-                // Overlay the on_4b image at the bottom, full width, 1.0 opacity
+                // Overlay the mascot image at the bottom, full width, 1.0 opacity
                 GeometryReader { geometry in
                     VStack {
                         Spacer()
@@ -69,7 +69,7 @@ struct KidsProfileView: View {
                 if horizontalSizeClass != .compact {
                     VStack {
                         Spacer()
-                        ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#C48A8A")) {
+                        ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#BBB595")) {
                             saveKids()
                         }
                         .accessibilityIdentifier("kidsProfileNextButton")
@@ -92,7 +92,7 @@ struct KidsProfileView: View {
     private var kidsProfileiPhone: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 50)
-            Image("il_emptyrules")
+            Image("mascot_empty")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 300)
@@ -118,7 +118,7 @@ struct KidsProfileView: View {
             Spacer().frame(height: 32)
             kidsFormContent
             Spacer()
-            ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#C48A8A")) {
+            ButtonLarge(iconName: "icon_next", iconColor: Color(hex: "#BBB595")) {
                 saveKids()
             }
             .accessibilityIdentifier("kidsProfileNextButton")
@@ -135,10 +135,10 @@ struct KidsProfileView: View {
             GeometryReader { geometry in
                 VStack {
                     Spacer()
-                    Image("il_emptyrules")
+                    Image("mascot_empty")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 500)
+                        .frame(height: 700)
                         .frame(maxWidth: .infinity)
                         .clipped()
                         .padding(.bottom, 80)
@@ -159,7 +159,7 @@ struct KidsProfileView: View {
                         .lineLimit(nil)
                     Spacer().frame(height: 16)
                     Text("Add your child (or two) to begin your mindful journey.")
-                        .font(.custom("Inter-Regular_Medium", size: 20))
+                        .font(.custom("Inter-Regular_Medium", size: 24))
                         .foregroundColor(.white)
                         .opacity(0.8)
                         .multilineTextAlignment(.center)
@@ -189,12 +189,13 @@ struct KidsProfileView: View {
                         }
                     },
                     placeholder: index == 0 ? String(localized: "onboarding_child_name") : String(localized: "onboarding_child_name_2"),
-                    index: index
+                    index: index,
+                    deleteIconColor: Color(hex: "#BBB595")
                 )
                 .id(index)
             }
             if kidNames.count < 2 {
-                ButtonRegular(iconName: "icon_plus", variant: .rose) {
+                ButtonRegular(iconName: "icon_plus") {
                     kidNames.append("")
                 }
                 .padding(.top, 16)
@@ -342,6 +343,7 @@ struct KidInputRow: View {
     var onDelete: () -> Void
     var placeholder: String
     var index: Int
+    var deleteIconColor: Color = Color(hex: "#ADA57F")
     var body: some View {
         HStack(spacing: 24) {
             Spacer()
@@ -352,7 +354,7 @@ struct KidInputRow: View {
             )
             .frame(width: 240, height: 56)
             if showDelete {
-                IconRoundButton(iconName: "icon_delete", iconColor: Color(hex: "#ADA57F"), action: onDelete)
+                IconRoundButton(iconName: "icon_delete", iconColor: deleteIconColor, action: onDelete)
             }
             Spacer()
         }

@@ -38,17 +38,49 @@ struct ShopView: View {
 // iPhone layout
 // =======================
 struct ShopViewiPhone: View {
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
     @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
     @State private var activeModal: ShopModal? = nil
     @State private var pendingPurchase: RewardPurchase? = nil
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastIcon: String? = nil
+    @State private var toastIconColor: Color = Color(hex: "#799B44")
 
     private var availableRewards: [Reward] {
         store.rewards.filter { $0.isActive }
     }
     private var basketEntries: [RewardPurchase] {
         store.rewardPurchases.filter { $0.status == "IN_BASKET" }
+    }
+
+    private func rewardCard(for reward: Reward) -> some View {
+        let catalogReward = (rewardsCatalog + store.customRewards).first(where: { $0.id == reward.id })
+        let title = catalogReward?.title ?? reward.title
+        let peanuts = catalogReward?.peanuts ?? reward.cost
+        let canBuy = store.balance >= peanuts
+        let displayReward = Reward(id: reward.id, title: title, cost: peanuts, isActive: reward.isActive)
+        return RewardKidCard(
+            reward: displayReward,
+            canBuy: canBuy,
+            onTap: {
+                if canBuy {
+                    store.purchaseReward(reward)
+                    showConfetti = true
+                    SoundPlayer.shared.playSound(named: "reward.aiff")
+                    toastMessage = "Yay! Added to your Basket"
+                    toastIcon = "cart.fill"
+                    toastIconColor = Color(hex: "#799B44")
+                    withAnimation { showToast = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { showConfetti = false }
+                } else {
+                    activeModal = .notEnoughPeanutsForReward
+                }
+            }
+        )
+        .frame(maxWidth: .infinity)
     }
 
     var body: some View {
@@ -104,23 +136,9 @@ struct ShopViewiPhone: View {
                             )
                         } else {
                             ScrollView {
-                                VStack(spacing: 8) {
+                                VStack(spacing: 14) {
                                     ForEach(availableRewards) { reward in
-                                        let canBuy = store.balance >= reward.cost
-                                        RewardKidCard(reward: reward, canBuy: canBuy) {
-                                            if canBuy {
-                                                store.purchaseReward(reward)
-                                                showConfetti = true
-                                                SoundPlayer.shared.playSound(named: "reward.aiff")
-                                                activeModal = .addedToBasket
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                    showConfetti = false
-                                                }
-                                            } else {
-                                                activeModal = .notEnoughPeanutsForReward
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
+                                        rewardCard(for: reward)
                                     }
                                 }
                                 .padding(.top, 8)
@@ -136,7 +154,7 @@ struct ShopViewiPhone: View {
                             )
                         } else {
                             ScrollView {
-                                VStack(spacing: 8) {
+                                VStack(spacing: 14) {
                                     ForEach(basketEntries) { entry in
                                         BasketCard(purchase: entry, onConfirm: {
                                             store.decrementOrRemovePurchase(purchase: entry)
@@ -196,6 +214,15 @@ struct ShopViewiPhone: View {
             print("[ShopViewiPhone] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
         }
         .ignoresSafeArea(.container, edges: .bottom)
+        .overlay(
+            Group {
+                if showToast {
+                    AppleStyleToast(message: toastMessage, systemImage: toastIcon, iconColor: toastIconColor)
+                        .zIndex(1)
+                }
+            },
+            alignment: .center
+        )
     }
 }
 
@@ -203,18 +230,50 @@ struct ShopViewiPhone: View {
 // iPad layout
 // =======================
 struct ShopViewiPad: View {
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
     @State private var activeModal: ShopModal? = nil
     @State private var pendingPurchase: RewardPurchase? = nil
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @State private var toastIcon: String? = nil
+    @State private var toastIconColor: Color = Color(hex: "#799B44")
 
     private var availableRewards: [Reward] {
         store.rewards.filter { $0.isActive }
     }
     private var basketEntries: [RewardPurchase] {
         store.rewardPurchases.filter { $0.status == "IN_BASKET" }
+    }
+
+    private func rewardCard(for reward: Reward) -> some View {
+        let catalogReward = (rewardsCatalog + store.customRewards).first(where: { $0.id == reward.id })
+        let title = catalogReward?.title ?? reward.title
+        let peanuts = catalogReward?.peanuts ?? reward.cost
+        let canBuy = store.balance >= peanuts
+        let displayReward = Reward(id: reward.id, title: title, cost: peanuts, isActive: reward.isActive)
+        return RewardKidCard(
+            reward: displayReward,
+            canBuy: canBuy,
+            onTap: {
+                if canBuy {
+                    store.purchaseReward(reward)
+                    showConfetti = true
+                    SoundPlayer.shared.playSound(named: "reward.aiff")
+                    toastMessage = "Yay! Added to your Basket"
+                    toastIcon = "cart.fill"
+                    toastIconColor = Color(hex: "#799B44")
+                    withAnimation { showToast = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { showConfetti = false }
+                } else {
+                    activeModal = .notEnoughPeanutsForReward
+                }
+            }
+        )
+        .frame(maxWidth: .infinity)
     }
 
     var body: some View {
@@ -266,27 +325,14 @@ struct ShopViewiPad: View {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
                                 subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn.",
-                                imageHeight: 450
+                                imageHeight: 400,
+                                topPadding: -200
                             )
                         } else {
                             ScrollView {
                                 VStack(spacing: 14) {
                                     ForEach(availableRewards) { reward in
-                                        let canBuy = store.balance >= reward.cost
-                                        RewardKidCard(reward: reward, canBuy: canBuy) {
-                                            if canBuy {
-                                                store.purchaseReward(reward)
-                                                showConfetti = true
-                                                SoundPlayer.shared.playSound(named: "reward.aiff")
-                                                activeModal = .addedToBasket
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                    showConfetti = false
-                                                }
-                                            } else {
-                                                activeModal = .notEnoughPeanutsForReward
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity)
+                                        rewardCard(for: reward)
                                     }
                                 }
                                 .padding(.top, 8)
@@ -297,7 +343,8 @@ struct ShopViewiPad: View {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
                                 subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!",
-                                imageHeight: 450
+                                imageHeight: 600,
+                                topPadding: 0
                             )
                         } else {
                             ScrollView {
@@ -316,7 +363,7 @@ struct ShopViewiPad: View {
                         }
                     }
                 }
-                .font(.custom("Inter-Medium", size: 24))
+                .font(.custom("Inter-Regular_Medium", size: 24))
                 .padding(.horizontal, 24)
                 .ignoresSafeArea(.container, edges: .horizontal)
             }
@@ -360,6 +407,15 @@ struct ShopViewiPad: View {
         .onAppear {
             print("[ShopViewiPad] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
         }
+        .overlay(
+            Group {
+                if showToast {
+                    AppleStyleToast(message: toastMessage, systemImage: toastIcon, iconColor: toastIconColor)
+                        .zIndex(1)
+                }
+            },
+            alignment: .center
+        )
     }
 }
 
@@ -376,7 +432,7 @@ struct EmptyShopState: View {
                     .frame(height: mascotHeight)
                     .padding(.top, -100)
                 Text(text)
-                    .font(.custom("Inter-Medium", size: 24))
+                    .font(.custom("Inter-Regular_Medium", size: 24))
                     .foregroundColor(Color(hex: "#8E9293"))
             }
             .padding(.top, 32)
@@ -389,7 +445,7 @@ struct EmptyShopState: View {
 #if DEBUG
 struct ShopView_Previews: PreviewProvider {
     static var previews: some View {
-        ShopView().environmentObject(Store())
+        ShopView().environmentObject(TipjeStore())
     }
 }
 #endif 
