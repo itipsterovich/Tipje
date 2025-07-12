@@ -3,7 +3,7 @@ import FirebaseAuth
 
 struct MainView: View {
     @State private var selectedTab: MainTab = .home
-    @StateObject private var store = Store()
+    @StateObject private var store = TipjeStore()
     @AppStorage("shouldShowAdminAfterOnboarding") var shouldShowAdminAfterOnboarding: Bool = false
     @AppStorage("skipPinAfterSetup") var skipPinAfterSetup: Bool = false
     @State private var isAdminUnlocked: Bool = false

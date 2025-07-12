@@ -24,6 +24,31 @@ extension Color {
         )
     }
 
+    /// Returns the hex string (e.g. "#D5A412") for this Color if possible, or a default if not.
+    func toHexString() -> String {
+        #if canImport(UIKit)
+        typealias NativeColor = UIColor
+        #elseif canImport(AppKit)
+        typealias NativeColor = NSColor
+        #endif
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        #if canImport(UIKit)
+        let native = NativeColor(self)
+        native.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        #elseif canImport(AppKit)
+        if let native = NativeColor(self).usingColorSpace(.sRGB) {
+            native.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        }
+        #endif
+        let r = Int(red * 255)
+        let g = Int(green * 255)
+        let b = Int(blue * 255)
+        return String(format: "#%02X%02X%02X", r, g, b)
+    }
+
     static var titlePrimary: Color { Color(hex: "#282927") }
 }
 
@@ -41,7 +66,7 @@ let cardPalette: [Color] = [
 /// Returns a palette color for a given index, rotating and ensuring no two adjacent are the same
 func colorForIndex(_ index: Int) -> Color {
     cardPalette[index % cardPalette.count]
-} 
+}
 
 extension String {
     /// Returns the substring up to and including the first emoji, or the full string if no emoji is found.

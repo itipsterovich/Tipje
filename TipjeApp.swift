@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftData
+// import SwiftData // Removed to avoid Store ambiguity
 import FirebaseCore
 import FirebaseAuth
 
@@ -7,8 +7,9 @@ import FirebaseAuth
 struct TipjeApp: App {
     @AppStorage("didCompleteOnboarding") var didCompleteOnboarding: Bool = false
     @StateObject var authManager = AuthManager()
-    @StateObject var onboardingState = OnboardingStateManager()
-    let store = Store()
+    @StateObject var onboardingState = OnboardingStateManager.shared
+    let store = TipjeStore()
+    @State private var isAppReady: Bool = false
     
     init() {
         FirebaseApp.configure()
@@ -16,59 +17,63 @@ struct TipjeApp: App {
     
     var body: some Scene {
         WindowGroup {
-            Group {
-                if authManager.firebaseUser == nil {
-                    // Not authenticated: show login/intro
-                    OnboardingView(isStage1: true)
-                        .environmentObject(store)
-                        .environmentObject(authManager)
-                        .environmentObject(onboardingState)
-                } else if onboardingState.isLoading {
+            ZStack {
+                if !isAppReady {
                     TipjeLoadingView()
-                        .onAppear {
-                            // User is authenticated, now check onboarding state
-                            if let uid = authManager.firebaseUser?.uid {
-                                print("[TipjeApp] User is authenticated, uid=\(uid). Setting userId in store and onboardingState.")
-                                store.setUser(userId: uid)
-                                onboardingState.userId = uid
-                                onboardingState.checkOnboardingState(userId: uid)
-                            }
-                        }
-                } else if onboardingState.needsOnboarding && onboardingState.onboardingStep != .done {
-                    // Only show onboarding if authenticated and not done!
-                    OnboardingView(isStage1: false)
-                        .environmentObject(store)
-                        .environmentObject(authManager)
-                        .environmentObject(onboardingState)
                 } else {
-                    // Onboarding complete, show main app
-                    MainView()
+                    switch onboardingState.currentStep {
+                    case .intro:
+                        OnboardingView(isStage1: true)
+                            .environmentObject(store)
+                            .environmentObject(authManager)
+                            .environmentObject(onboardingState)
+                    case .subscription:
+                        SubscriptionView(onPlanSelected: { plan in
+                            onboardingState.hasActiveSubscription = true
+                            onboardingState.refreshState(for: onboardingState.userId)
+                        })
+                            .environmentObject(store)
+                            .environmentObject(authManager)
+                            .environmentObject(onboardingState)
+                    case .kidsProfile:
+                        KidsProfileView(userId: onboardingState.userId, onNext: {
+                            onboardingState.refreshState(for: onboardingState.userId)
+                        })
                         .environmentObject(store)
                         .environmentObject(authManager)
+                    case .pinSetup:
+                        PinSetupView(userId: onboardingState.userId, onPinSet: {
+                            onboardingState.refreshState(for: onboardingState.userId)
+                        })
+                        .environmentObject(store)
+                        .environmentObject(authManager)
+                    case .cardsSetup:
+                        AdminView(onComplete: {
+                            onboardingState.refreshState(for: onboardingState.userId)
+                        })
+                        .environmentObject(store)
+                        .environmentObject(authManager)
+                    case .main:
+                        MainView()
+                            .environmentObject(store)
+                            .environmentObject(authManager)
+                    }
                 }
             }
             .onAppear {
-                print("[TipjeApp] authManager.firebaseUser=\(String(describing: authManager.firebaseUser)), Auth.auth().currentUser=\(String(describing: Auth.auth().currentUser))")
-                // Force token refresh to check if user is still valid
-                if let user = Auth.auth().currentUser {
-                    user.getIDToken(completion: { token, error in
-                        if let error = error {
-                            print("[TipjeApp] getIDToken failed, signing out. Error: \(error.localizedDescription)")
-                            do {
-                                try Auth.auth().signOut()
-                                authManager.firebaseUser = nil
-                                onboardingState.userId = ""
-                                onboardingState.isLoading = false
-                                onboardingState.needsOnboarding = true
-                                onboardingState.onboardingStep = .slides
-                                print("[TipjeApp] Signed out due to invalid user session.")
-                            } catch {
-                                print("[TipjeApp] Error signing out: \(error.localizedDescription)")
-                            }
-                        } else {
-                            print("[TipjeApp] getIDToken succeeded, user session is valid.")
-                        }
-                    })
+                Task {
+                    // Simulate async setup (replace with your real checks)
+                    if let user = Auth.auth().currentUser {
+                        await onboardingState.refreshState(for: user.uid)
+                    } else {
+                        onboardingState.userId = ""
+                        onboardingState.didLogin = false
+                        onboardingState.hasActiveSubscription = false
+                        // Optionally reset other onboarding flags if needed
+                    }
+                    // Add a small delay to show the loading view (remove in production)
+                    try? await Task.sleep(nanoseconds: 800_000_000)
+                    isAppReady = true
                 }
             }
         }

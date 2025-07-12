@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 enum SettingsAlertType: Identifiable {
     case logout, deleteAccount, deleteKid, unlinkGoogle, unlinkEmail, custom(String)
@@ -51,7 +52,8 @@ struct SettingsSection<Content: View>: View {
 
 struct SettingsView: View {
     @StateObject var authManager = AuthManager()
-    @EnvironmentObject var store: Store
+    @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var onboardingState: OnboardingStateManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedLanguage: String = Locale.current.languageCode ?? "en"
     @State private var showChangeEmail = false
@@ -126,107 +128,133 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        if horizontalSizeClass == .compact {
-            SettingsViewiPhone(
-                authManager: authManager,
-                store: store,
-                selectedLanguage: $selectedLanguage,
-                showChangeEmail: $showChangeEmail,
-                showChangePassword: $showChangePassword,
-                showChangePIN: $showChangePIN,
-                showChangePinModal: $showChangePinModal,
-                showSubscription: $showSubscription,
-                showRestorePurchases: $showRestorePurchases,
-                showLogoutAlert: $showLogoutAlert,
-                email: $email,
-                password: $password,
-                newPassword: $newPassword,
-                pin: $pin,
-                subscriptionType: $subscriptionType,
-                cardNumber: $cardNumber,
-                showAlert: $showAlert,
-                alertMessage: $alertMessage,
-                isLinkingGoogle: $isLinkingGoogle,
-                isUnlinkingGoogle: $isUnlinkingGoogle,
-                showDeleteKidAlert: $showDeleteKidAlert,
-                kidToDelete: $kidToDelete,
-                isEditingPin: $isEditingPin,
-                newPin: $newPin,
-                pinChangeError: $pinChangeError,
-                pinChangeSuccess: $pinChangeSuccess,
-                showEditKidsModal: $showEditKidsModal,
-                isEditingEmail: $isEditingEmail,
-                isEditingPassword: $isEditingPassword,
-                originalEmail: $originalEmail,
-                originalPassword: $originalPassword,
-                isPasswordVisible: $isPasswordVisible,
-                isEditMode: $isEditMode,
-                emailError: $emailError,
-                showAddEmailModal: $showAddEmailModal,
-                showChangePasswordModal: $showChangePasswordModal,
-                showUnlinkGoogleAlert: $showUnlinkGoogleAlert,
-                showUnlinkEmailAlert: $showUnlinkEmailAlert,
-                addEmail: $addEmail,
-                addPassword: $addPassword,
-                isEditingProfiles: $isEditingProfiles,
-                languages: languages,
-                updateEmailFromAuth: updateEmailFromAuth,
-                validateEmail: validateEmail,
-                hasChanges: hasChanges,
-                canSave: canSave,
-                isGoogleLinked: isGoogleLinked,
-                isEmailLinked: isEmailLinked
-            )
-        } else {
-            SettingsViewiPad(
-                authManager: authManager,
-                store: store,
-                selectedLanguage: $selectedLanguage,
-                showChangeEmail: $showChangeEmail,
-                showChangePassword: $showChangePassword,
-                showChangePIN: $showChangePIN,
-                showChangePinModal: $showChangePinModal,
-                showSubscription: $showSubscription,
-                showRestorePurchases: $showRestorePurchases,
-                showLogoutAlert: $showLogoutAlert,
-                email: $email,
-                password: $password,
-                newPassword: $newPassword,
-                pin: $pin,
-                subscriptionType: $subscriptionType,
-                cardNumber: $cardNumber,
-                showAlert: $showAlert,
-                alertMessage: $alertMessage,
-                isLinkingGoogle: $isLinkingGoogle,
-                isUnlinkingGoogle: $isUnlinkingGoogle,
-                showDeleteKidAlert: $showDeleteKidAlert,
-                kidToDelete: $kidToDelete,
-                isEditingPin: $isEditingPin,
-                newPin: $newPin,
-                pinChangeError: $pinChangeError,
-                pinChangeSuccess: $pinChangeSuccess,
-                showEditKidsModal: $showEditKidsModal,
-                isEditingEmail: $isEditingEmail,
-                isEditingPassword: $isEditingPassword,
-                originalEmail: $originalEmail,
-                originalPassword: $originalPassword,
-                isPasswordVisible: $isPasswordVisible,
-                isEditMode: $isEditMode,
-                emailError: $emailError,
-                showAddEmailModal: $showAddEmailModal,
-                showChangePasswordModal: $showChangePasswordModal,
-                showUnlinkGoogleAlert: $showUnlinkGoogleAlert,
-                showUnlinkEmailAlert: $showUnlinkEmailAlert,
-                addEmail: $addEmail,
-                addPassword: $addPassword,
-                isEditingProfiles: $isEditingProfiles,
-                languages: languages,
-                updateEmailFromAuth: updateEmailFromAuth,
-                validateEmail: validateEmail,
-                hasChanges: hasChanges,
-                canSave: canSave,
-                isGoogleLinked: isGoogleLinked,
-                isEmailLinked: isEmailLinked
+        Group {
+            if horizontalSizeClass == .compact {
+                ZStack(alignment: .bottom) {
+                    VStack(spacing: 0) {
+                SettingsViewiPhone(
+                    authManager: authManager,
+                    store: store,
+                    selectedLanguage: $selectedLanguage,
+                    showChangeEmail: $showChangeEmail,
+                    showChangePassword: $showChangePassword,
+                    showChangePIN: $showChangePIN,
+                    showChangePinModal: $showChangePinModal,
+                    showSubscription: $showSubscription,
+                    showRestorePurchases: $showRestorePurchases,
+                    showLogoutAlert: $showLogoutAlert,
+                    email: $email,
+                    password: $password,
+                    newPassword: $newPassword,
+                    pin: $pin,
+                    subscriptionType: $subscriptionType,
+                    cardNumber: $cardNumber,
+                    showAlert: $showAlert,
+                    alertMessage: $alertMessage,
+                    isLinkingGoogle: $isLinkingGoogle,
+                    isUnlinkingGoogle: $isUnlinkingGoogle,
+                    showDeleteKidAlert: $showDeleteKidAlert,
+                    kidToDelete: $kidToDelete,
+                    isEditingPin: $isEditingPin,
+                    newPin: $newPin,
+                    pinChangeError: $pinChangeError,
+                    pinChangeSuccess: $pinChangeSuccess,
+                    showEditKidsModal: $showEditKidsModal,
+                    isEditingEmail: $isEditingEmail,
+                    isEditingPassword: $isEditingPassword,
+                    originalEmail: $originalEmail,
+                    originalPassword: $originalPassword,
+                    isPasswordVisible: $isPasswordVisible,
+                    isEditMode: $isEditMode,
+                    emailError: $emailError,
+                    showAddEmailModal: $showAddEmailModal,
+                    showChangePasswordModal: $showChangePasswordModal,
+                    showUnlinkGoogleAlert: $showUnlinkGoogleAlert,
+                    showUnlinkEmailAlert: $showUnlinkEmailAlert,
+                    addEmail: $addEmail,
+                    addPassword: $addPassword,
+                    isEditingProfiles: $isEditingProfiles,
+                    languages: languages,
+                    updateEmailFromAuth: updateEmailFromAuth,
+                    validateEmail: validateEmail,
+                    hasChanges: hasChanges,
+                    canSave: canSave,
+                    isGoogleLinked: isGoogleLinked,
+                    isEmailLinked: isEmailLinked
+                )
+                    }
+                }
+            } else {
+                ZStack(alignment: .bottom) {
+                    VStack(spacing: 0) {
+                SettingsViewiPad(
+                    authManager: authManager,
+                    store: store,
+                    selectedLanguage: $selectedLanguage,
+                    showChangeEmail: $showChangeEmail,
+                    showChangePassword: $showChangePassword,
+                    showChangePIN: $showChangePIN,
+                    showChangePinModal: $showChangePinModal,
+                    showSubscription: $showSubscription,
+                    showRestorePurchases: $showRestorePurchases,
+                    showLogoutAlert: $showLogoutAlert,
+                    email: $email,
+                    password: $password,
+                    newPassword: $newPassword,
+                    pin: $pin,
+                    subscriptionType: $subscriptionType,
+                    cardNumber: $cardNumber,
+                    showAlert: $showAlert,
+                    alertMessage: $alertMessage,
+                    isLinkingGoogle: $isLinkingGoogle,
+                    isUnlinkingGoogle: $isUnlinkingGoogle,
+                    showDeleteKidAlert: $showDeleteKidAlert,
+                    kidToDelete: $kidToDelete,
+                    isEditingPin: $isEditingPin,
+                    newPin: $newPin,
+                    pinChangeError: $pinChangeError,
+                    pinChangeSuccess: $pinChangeSuccess,
+                    showEditKidsModal: $showEditKidsModal,
+                    isEditingEmail: $isEditingEmail,
+                    isEditingPassword: $isEditingPassword,
+                    originalEmail: $originalEmail,
+                    originalPassword: $originalPassword,
+                    isPasswordVisible: $isPasswordVisible,
+                    isEditMode: $isEditMode,
+                    emailError: $emailError,
+                    showAddEmailModal: $showAddEmailModal,
+                    showChangePasswordModal: $showChangePasswordModal,
+                    showUnlinkGoogleAlert: $showUnlinkGoogleAlert,
+                    showUnlinkEmailAlert: $showUnlinkEmailAlert,
+                    addEmail: $addEmail,
+                    addPassword: $addPassword,
+                    isEditingProfiles: $isEditingProfiles,
+                    languages: languages,
+                    updateEmailFromAuth: updateEmailFromAuth,
+                    validateEmail: validateEmail,
+                    hasChanges: hasChanges,
+                    canSave: canSave,
+                    isGoogleLinked: isGoogleLinked,
+                    isEmailLinked: isEmailLinked
+                )
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showChangePasswordModal) {
+            ChangePasswordModal(
+                onChange: { current, new in
+                    authManager.changePassword(currentPassword: current, newPassword: new) { success, error in
+                        if success {
+                            showChangePasswordModal = false
+                        } else {
+                            // Show error in modal
+                        }
+                    }
+                },
+                onCancel: {
+                    showChangePasswordModal = false
+                }
             )
         }
     }
@@ -237,7 +265,7 @@ struct SettingsView: View {
 // =======================
 struct SettingsViewiPhone: View {
     @ObservedObject var authManager: AuthManager
-    @ObservedObject var store: Store
+    @ObservedObject var store: TipjeStore
     @Binding var selectedLanguage: String
     @Binding var showChangeEmail: Bool
     @Binding var showChangePassword: Bool
@@ -290,77 +318,42 @@ struct SettingsViewiPhone: View {
     // Extracted Login Methods section
     private var loginMethodsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Login Methods")
+            Text("Sign-in Method")
                 .font(.custom("Inter-Regular_Medium", size: 17))
                 .foregroundColor(Color(hex: "#799B44"))
                 .padding(.top, 0)
                 .padding(.bottom, 8)
             if isGoogleLinked {
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack(spacing: 8) {
+                HStack {
                         Image("GoogleLogo").resizable().frame(width: 24, height: 24)
                         Text("Google")
                             .font(.custom("Inter-Regular", size: 17))
                             .foregroundColor(Color(hex: "#799B44"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
                         Spacer()
-                        ButtonTextiPhone(title: "Unlink", variant: .secondary) {
-                            showUnlinkGoogleAlert = true
-                        }
-                        .disabled(!isEmailLinked)
-                        .frame(maxWidth: .infinity)
-                        .font(.custom("Inter-Regular_Medium", size: 17))
-                    }
                 }
-                .frame(maxWidth: .infinity)
+            } else if let provider = authManager.firebaseUser?.providerData.first(where: { $0.providerID == "apple.com" }) {
+                HStack {
+                    Image(systemName: "applelogo").resizable().frame(width: 24, height: 24)
+                    Text("Apple")
+                        .font(.custom("Inter-Regular", size: 17))
+                        .foregroundColor(Color(hex: "#799B44"))
+                    Spacer()
+                }
             } else if isEmailLinked {
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack(spacing: 8) {
+                HStack {
                         Text("Email/Password")
                             .font(.custom("Inter-Regular", size: 17))
                             .foregroundColor(Color(hex: "#799B44"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer()
                         ButtonTextiPhone(title: "Change Password", variant: .secondary) {
+                            print("[Settings] Change Password button tapped, presenting modal")
                             showChangePasswordModal = true
                         }
                         .frame(maxWidth: .infinity)
                         .font(.custom("Inter-Regular_Medium", size: 17))
                     }
                 }
-                .frame(maxWidth: .infinity)
-            } else {
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack(spacing: 8) {
-                        Image("GoogleLogo").resizable().frame(width: 24, height: 24)
-                        Text("Google")
-                            .font(.custom("Inter-Regular", size: 17))
-                            .foregroundColor(Color(hex: "#799B44"))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    ButtonTextiPhone(title: "Link Account", variant: .secondary) {
-                        isLinkingGoogle = true
-                        if let rootVC = UIApplication.shared.windows.first?.rootViewController {
-                            authManager.linkWithGoogle(presentingViewController: rootVC) { success, error in
-                                isLinkingGoogle = false
-                                alertMessage = success ? "Google account linked successfully." : (error ?? "Failed to link Google account.")
-                                activeAlert = .custom(alertMessage)
-                            }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .font(.custom("Inter-Regular_Medium", size: 17))
-                    Text("Email/Password")
-                        .font(.custom("Inter-Regular", size: 17))
-                        .foregroundColor(Color(hex: "#799B44"))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    ButtonTextiPhone(title: "Add", variant: .secondary) {
-                        showAddEmailModal = true
-                    }
-                    .frame(maxWidth: .infinity)
-                    .font(.custom("Inter-Regular_Medium", size: 17))
-                }
-                .frame(maxWidth: .infinity)
-            }
+            // --- Kids Profiles Section ---
             Text("Kids Profiles")
                 .font(.custom("Inter-Regular_Medium", size: 17))
                 .foregroundColor(Color(hex: "#799B44"))
@@ -384,7 +377,27 @@ struct SettingsViewiPhone: View {
                 showEditKidsModal = true
             }
             .frame(maxWidth: .infinity)
-            .font(.custom("Inter-Regular_Medium", size: 17))
+            ButtonTextiPhone(title: "Delete Account", variant: .secondary) {
+                showDeleteAccountAlert = true
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 12)
+            .foregroundColor(.red)
+            .alert(isPresented: $showDeleteAccountAlert) {
+                Alert(
+                    title: Text("Delete Account"),
+                    message: Text("Are you sure you want to permanently delete your account and all data? This cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        guard let userId = authManager.firebaseUser?.uid else { return }
+                        FirestoreManager.shared.cascadeDeleteUser(userId: userId) { _ in
+                            authManager.deleteCurrentUser { _, _ in
+                                authManager.signOut()
+                            }
+                        }
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
     }
 
@@ -396,8 +409,8 @@ struct SettingsViewiPhone: View {
                     .font(.custom("Inter-Regular", size: 17))
                     .foregroundColor(Color(hex: "#799B44"))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Premium Monthly")
-                    .font(.custom("Inter-Regular", size: 17))
+                Text(subscriptionType == "Yearly" ? "Tipje Yearly" : "Tipje Monthly")
+                    .font(.custom("Inter-Regular_SemiBold", size: 17))
                     .foregroundColor(Color(hex: "#7FAD98"))
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
@@ -431,7 +444,6 @@ struct SettingsViewiPhone: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .font(.custom("Inter-Regular_Medium", size: 17))
                 VStack(alignment: .center) {
                     ButtonTextiPhone(title: String(localized: "settings_logout"), variant: .primary) {
                         print("[Settings] Logout button action triggered")
@@ -495,7 +507,7 @@ struct SettingsViewiPhone: View {
 // =======================
 struct SettingsViewiPad: View {
     @ObservedObject var authManager: AuthManager
-    @ObservedObject var store: Store
+    @ObservedObject var store: TipjeStore
     @Binding var selectedLanguage: String
     @Binding var showChangeEmail: Bool
     @Binding var showChangePassword: Bool
@@ -545,92 +557,44 @@ struct SettingsViewiPad: View {
     let isGoogleLinked: Bool
     let isEmailLinked: Bool
 
-    var body: some View {
-        BannerPanelLayout(
-            bannerColor: Color(hex: "#BCC4C3"),
-            bannerHeight: 100,
-            containerOffsetY: -36,
-            content: {
-                VStack(alignment: .leading, spacing: 14) {
-                    PageTitle("Family Settings")
-                        .padding(.top, 14)
-                        .padding(.bottom, 0)
-                        .padding(.horizontal, 24)
-                    Group {
-                        SettingsSection(title: nil, trailingIcon: nil, onTrailingIconTap: nil, content: {
+    private var loginMethodsSectioniPad: some View {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Login Methods")
+            Text("Sign-in Method")
                                     .font(.custom("Inter-Regular_Medium", size: 24))
                                     .foregroundColor(Color(hex: "#799B44"))
                                     .padding(.top, 0)
                                     .padding(.bottom, 8)
                                 if isGoogleLinked {
-                                    VStack(alignment: .leading, spacing: 14) {
-                                        HStack(spacing: 8) {
+                HStack {
                                             Image("GoogleLogo").resizable().frame(width: 24, height: 24)
                                             Text("Google")
                                                 .font(.custom("Inter-Regular", size: 24))
                                                 .foregroundColor(Color(hex: "#799B44"))
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                            ButtonText(title: "Unlink", variant: .secondary) {
-                                                showUnlinkGoogleAlert = true
-                                            }
-                                            .disabled(!isEmailLinked)
-                                            .frame(maxWidth: .infinity)
-                                            .font(.custom("Inter-Regular_Medium", size: 24))
-                                        }
-                                    }
-                                    .frame(maxWidth: .infinity)
+                    Spacer()
+                }
+            } else if let provider = authManager.firebaseUser?.providerData.first(where: { $0.providerID == "apple.com" }) {
+                HStack {
+                    Image(systemName: "applelogo").resizable().frame(width: 24, height: 24)
+                    Text("Apple")
+                        .font(.custom("Inter-Regular", size: 24))
+                        .foregroundColor(Color(hex: "#799B44"))
+                    Spacer()
+                }
                                 } else if isEmailLinked {
-                                    VStack(alignment: .leading, spacing: 14) {
-                                        HStack(spacing: 8) {
+                HStack {
                                             Text("Email/Password")
                                                 .font(.custom("Inter-Regular", size: 24))
                                                 .foregroundColor(Color(hex: "#799B44"))
-                                                .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer()
                                             ButtonText(title: "Change Password", variant: .secondary) {
+                                                print("[Settings] Change Password button tapped, presenting modal")
                                                 showChangePasswordModal = true
                                             }
                                                     .frame(maxWidth: .infinity)
                                                     .font(.custom("Inter-Regular_Medium", size: 24))
                                         }
                                     }
-                                    .frame(maxWidth: .infinity)
-                                } else {
-                                    VStack(alignment: .leading, spacing: 14) {
-                                        HStack(spacing: 8) {
-                                            Image("GoogleLogo").resizable().frame(width: 24, height: 24)
-                                            Text("Google")
-                                                .font(.custom("Inter-Regular", size: 24))
-                                                .foregroundColor(Color(hex: "#799B44"))
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-                                        ButtonText(title: "Link Account", variant: .secondary) {
-                                            isLinkingGoogle = true
-                                            if let rootVC = UIApplication.shared.windows.first?.rootViewController {
-                                                authManager.linkWithGoogle(presentingViewController: rootVC) { success, error in
-                                                    isLinkingGoogle = false
-                                                    alertMessage = success ? "Google account linked successfully." : (error ?? "Failed to link Google account.")
-                                                    activeAlert = .custom(alertMessage)
-                                                }
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity, minHeight: 44)
-                                        .font(.custom("Inter-Regular_Medium", size: 24))
-                                        Text("Email/Password")
-                                            .font(.custom("Inter-Regular", size: 24))
-                                            .foregroundColor(Color(hex: "#799B44"))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        ButtonText(title: "Add", variant: .secondary) {
-                                            showAddEmailModal = true
-                                        }
-                                        .frame(maxWidth: .infinity, minHeight: 44)
-                                        .font(.custom("Inter-Regular_Medium", size: 24))
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.horizontal, 24)
-                                }
-                                Spacer().frame(height: 12)
+            // --- Kids Profiles Section ---
                                 Text("Kids Profiles")
                                     .font(.custom("Inter-Regular_Medium", size: 24))
                                     .foregroundColor(Color(hex: "#799B44"))
@@ -655,7 +619,43 @@ struct SettingsViewiPad: View {
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 44)
                                 .font(.custom("Inter-Regular_Medium", size: 24))
+                                ButtonText(title: "Delete Account", variant: .secondary) {
+                                    showDeleteAccountAlert = true
+                                }
+                                .padding(.top, 12)
+                                .foregroundColor(.red)
+                                .alert(isPresented: $showDeleteAccountAlert) {
+                                    Alert(
+                                        title: Text("Delete Account"),
+                                        message: Text("Are you sure you want to permanently delete your account and all data? This cannot be undone."),
+                                        primaryButton: .destructive(Text("Delete")) {
+                                            guard let userId = authManager.firebaseUser?.uid else { return }
+                                            FirestoreManager.shared.cascadeDeleteUser(userId: userId) { _ in
+                                                authManager.deleteCurrentUser { _, _ in
+                                                    authManager.signOut()
+                                                }
+                                            }
+                                        },
+                                        secondaryButton: .cancel()
+                                    )
+                                }
                             }
+    }
+
+    var body: some View {
+        BannerPanelLayout(
+            bannerColor: Color(hex: "#ADA57F"),
+            bannerHeight: 100,
+            containerOffsetY: -36,
+            content: {
+                VStack(alignment: .leading, spacing: 14) {
+                    PageTitle("Family Settings")
+                        .padding(.top, 14)
+                        .padding(.bottom, 0)
+                        .padding(.horizontal, 24)
+                    Group {
+                        SettingsSection(title: nil, trailingIcon: nil, onTrailingIconTap: nil, content: {
+                            loginMethodsSectioniPad
                         }, customTitle: { AnyView(EmptyView()) })
                     }
                     .background(Color(hex: "#EAF3EA").opacity(0.5))
@@ -670,8 +670,8 @@ struct SettingsViewiPad: View {
                                 .font(.custom("Inter-Regular", size: 24))
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text("Premium Monthly")
-                                .font(.custom("Inter-Regular", size: 24))
+                            Text(subscriptionType == "Yearly" ? "Tipje Yearly" : "Tipje Monthly")
+                                .font(.custom("Inter-Regular_SemiBold", size: 24))
                                 .foregroundColor(Color(hex: "#7FAD98"))
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                         }
@@ -851,20 +851,137 @@ struct ButtonTextiPhone: View {
     let title: String
     let variant: ButtonTextVariant
     let action: () -> Void
+    var fullWidth: Bool = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
     var body: some View {
         Button(action: action) {
+            Group {
+                if fullWidth {
             Text(title)
                 .font(.custom("Inter-Regular_Medium", size: horizontalSizeClass == .compact ? 17 : 24))
                 .foregroundColor(variant == .primary ? Color.white : Color(hex: "#799B44"))
-                .frame(minWidth: horizontalSizeClass == .compact ? 0 : 120, minHeight: 44)
+                        .padding(.horizontal, 0)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                } else {
+                    Text(title)
+                        .font(.custom("Inter-Regular_Medium", size: horizontalSizeClass == .compact ? 17 : 24))
+                        .foregroundColor(variant == .primary ? Color.white : Color(hex: "#799B44"))
                 .padding(.horizontal, horizontalSizeClass == .compact ? 18 : 24)
+                        .frame(minWidth: horizontalSizeClass == .compact ? 0 : 120, minHeight: 44)
+                }
+            }
                 .background(
                     variant == .primary ? Color(hex: "#799B44") : Color(hex: "#EAF3EA")
                 )
                 .cornerRadius(horizontalSizeClass == .compact ? 12 : 20)
         }
+    }
+}
+
+struct ChangePasswordModal: View {
+    var onChange: (String, String) -> Void
+    var onCancel: () -> Void
+    var body: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            ChangePasswordModal_iPad(onChange: onChange, onCancel: onCancel)
+        } else {
+            ChangePasswordModal_iPhone(onChange: onChange, onCancel: onCancel)
+        }
+    }
+}
+
+struct ChangePasswordModal_iPhone: View {
+    @State private var currentPassword: String = ""
+    @State private var newPassword: String = ""
+    @State private var errorMessage: String? = nil
+    @State private var isLoading: Bool = false
+    var onChange: (String, String) -> Void
+    var onCancel: () -> Void
+    var body: some View {
+        VStack(spacing: 24) {
+            Image("mascot_empty_chores")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 200)
+            Text("Change Password")
+                .font(.custom("Inter-Regular_SemiBold", size: 24))
+                .foregroundColor(Color(hex: "#494646"))
+            CustomInputField(placeholder: "Current Password", text: $currentPassword, isSecure: true)
+                .frame(maxWidth: .infinity)
+            CustomInputField(placeholder: "New Password", text: $newPassword, isSecure: true)
+                .frame(maxWidth: .infinity)
+            if let error = errorMessage {
+                Text(error)
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+            HStack(spacing: 12) {
+                ButtonTextiPhone(title: "Change", variant: .primary) {
+                    guard !currentPassword.isEmpty, !newPassword.isEmpty else {
+                        errorMessage = "Please fill in all fields."
+                        return
+                    }
+                    isLoading = true
+                    errorMessage = nil
+                    onChange(currentPassword, newPassword)
+                }
+                .disabled(isLoading)
+                .frame(maxWidth: .infinity)
+                ButtonTextiPhone(title: "Cancel", variant: .secondary) {
+                    onCancel()
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.horizontal, 40)
+        .padding(.vertical, 40)
+    }
+}
+
+struct ChangePasswordModal_iPad: View {
+    @State private var currentPassword: String = ""
+    @State private var newPassword: String = ""
+    @State private var errorMessage: String? = nil
+    @State private var isLoading: Bool = false
+    var onChange: (String, String) -> Void
+    var onCancel: () -> Void
+    var body: some View {
+        VStack(spacing: 24) {
+            Image("mascot_empty_chores")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 250)
+            Text("Change Password")
+                .font(.custom("Inter-Regular_Medium", size: 32))
+                .foregroundColor(Color(hex: "#494646"))
+            CustomInputField(placeholder: "Current Password", text: $currentPassword, isSecure: true)
+                .frame(maxWidth: .infinity)
+            CustomInputField(placeholder: "New Password", text: $newPassword, isSecure: true)
+                .frame(maxWidth: .infinity)
+            if let error = errorMessage {
+                Text(error)
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
+            HStack(spacing: 12) {
+                ButtonText(title: "Change", variant: .primary, action: {
+                    guard !currentPassword.isEmpty, !newPassword.isEmpty else {
+                        errorMessage = "Please fill in all fields."
+                        return
+                    }
+                    isLoading = true
+                    errorMessage = nil
+                    onChange(currentPassword, newPassword)
+                })
+                .disabled(isLoading)
+                .frame(maxWidth: .infinity)
+                ButtonText(title: "Cancel", variant: .secondary, action: onCancel)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.horizontal, 40)
+        .padding(.vertical, 40)
     }
 }
 

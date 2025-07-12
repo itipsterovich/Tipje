@@ -26,8 +26,9 @@ struct RewardKidCardiPhone: View {
     var basketMode: Bool = false
     var quantity: Int = 1
     @State private var isTapped: Bool = false
+    @EnvironmentObject var store: TipjeStore
     var body: some View {
-        let catalogItem = rewardsCatalog.first(where: { $0.id == reward.id })
+        let catalogItem = (rewardsCatalog + store.customRewards).first(where: { $0.id == reward.id })
         let baseColor = catalogItem?.color ?? Color(.systemGray5)
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {
@@ -131,8 +132,9 @@ struct RewardKidCardiPad: View {
     var basketMode: Bool = false
     var quantity: Int = 1
     @State private var isTapped: Bool = false
+    @EnvironmentObject var store: TipjeStore
     var body: some View {
-        let catalogItem = rewardsCatalog.first(where: { $0.id == reward.id })
+        let catalogItem = (rewardsCatalog + store.customRewards).first(where: { $0.id == reward.id })
         let baseColor = catalogItem?.color ?? Color(.systemGray5)
         HStack(spacing: 0) {
             ZStack(alignment: .leading) {

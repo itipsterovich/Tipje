@@ -23,10 +23,11 @@ struct BasketCardiPhone: View {
     var reward: Reward? = nil
     var onConfirm: (() -> Void)? = nil
     @State private var isTapped: Bool = false
+    @EnvironmentObject var store: TipjeStore
     var body: some View {
         let resolvedReward: Reward? = {
             if let reward = reward { return reward }
-            if let cat = rewardsCatalog.first(where: { $0.id == purchase.rewardRef.documentID }) {
+            if let cat = (rewardsCatalog + store.customRewards).first(where: { $0.id == purchase.rewardRef.documentID }) {
                 return Reward(id: cat.id, title: cat.title, cost: cat.peanuts, isActive: true)
             }
             return nil
@@ -50,18 +51,8 @@ struct BasketCardiPhone: View {
                             .foregroundColor(.white)
                     )
             }
-            if purchase.quantity > 1 {
-                Text("\(purchase.quantity)×")
-                    .font(.custom("Inter-Medium", size: 20))
-                    .foregroundColor(.white)
-                    .padding(.vertical, 2)
-                    .padding(.horizontal, 8)
-                    .background(Color.black.opacity(0.18))
-                    .cornerRadius(12)
-                    .padding([.top, .trailing], 12)
-            }
         }
-        .frame(height: 90)
+        .frame(height: 70)
         .scaleEffect(isTapped ? 1.08 : 1.0)
         .rotationEffect(.degrees(isTapped ? 2 : 0))
         .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
@@ -93,10 +84,11 @@ struct BasketCardiPad: View {
     var reward: Reward? = nil
     var onConfirm: (() -> Void)? = nil
     @State private var isTapped: Bool = false
+    @EnvironmentObject var store: TipjeStore
     var body: some View {
         let resolvedReward: Reward? = {
             if let reward = reward { return reward }
-            if let cat = rewardsCatalog.first(where: { $0.id == purchase.rewardRef.documentID }) {
+            if let cat = (rewardsCatalog + store.customRewards).first(where: { $0.id == purchase.rewardRef.documentID }) {
                 return Reward(id: cat.id, title: cat.title, cost: cat.peanuts, isActive: true)
             }
             return nil
@@ -119,16 +111,6 @@ struct BasketCardiPad: View {
                         Text("Reward")
                             .foregroundColor(.white)
                     )
-            }
-            if purchase.quantity > 1 {
-                Text("\(purchase.quantity)×")
-                    .font(.custom("Inter-Medium", size: 20))
-                    .foregroundColor(.white)
-                    .padding(.vertical, 2)
-                    .padding(.horizontal, 8)
-                    .background(Color.black.opacity(0.18))
-                    .cornerRadius(12)
-                    .padding([.top, .trailing], 12)
             }
         }
         .frame(height: 90)

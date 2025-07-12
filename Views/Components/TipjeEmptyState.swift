@@ -20,7 +20,7 @@ struct TipjeEmptyState: View {
                         .padding(.top, topPadding)
                     if let title = title {
                         Text(title)
-                            .font(.custom("Inter-Medium", size: isIPhone ? 17 : 24))
+                            .font(.custom("Inter-Regular_Medium", size: isIPhone ? 17 : 24))
                             .foregroundColor(Color(hex: "#8E9293"))
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
@@ -46,7 +46,7 @@ struct TipjeEmptyState: View {
                         .padding(.top, topPadding)
                     if let title = title {
                         Text(title)
-                            .font(.custom("Inter-Medium", size: isIPhone ? 17 : 24))
+                            .font(.custom("Inter-Regular_Medium", size: isIPhone ? 17 : 24))
                             .foregroundColor(Color(hex: "#8E9293"))
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
@@ -59,6 +59,76 @@ struct TipjeEmptyState: View {
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
                             .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.top, 8)
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+}
+
+struct TipjeEmptyStateiPhone: View {
+    let imageName: String
+    var title: String? = nil
+    var subtitle: String? = nil
+    var imageHeight: CGFloat = 250
+    var topPadding: CGFloat = -40
+    var centered: Bool = true
+    var body: some View {
+        Group {
+            if centered {
+                VStack(spacing: 0) {
+                    Image(imageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: imageHeight)
+                        .padding(.top, topPadding)
+                    if let title = title {
+                        Text(title)
+                            .font(.custom("Inter-Regular_Medium", size: 17))
+                            .foregroundColor(Color(hex: "#8E9293"))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: 320)
+                    }
+                    if let subtitle = subtitle {
+                        Text(subtitle)
+                            .font(.custom("Inter-Regular", size: 17))
+                            .foregroundColor(Color(hex: "#8E9293").opacity(0.9))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: 320)
+                    }
+                }
+                .padding(.top, 8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack(spacing: 24) {
+                    Image(imageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: imageHeight)
+                        .padding(.top, topPadding)
+                    if let title = title {
+                        Text(title)
+                            .font(.custom("Inter-Regular_Medium", size: 17))
+                            .foregroundColor(Color(hex: "#8E9293"))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: 320)
+                    }
+                    if let subtitle = subtitle {
+                        Text(subtitle)
+                            .font(.custom("Inter-Regular", size: 17))
+                            .foregroundColor(Color(hex: "#8E9293").opacity(0.9))
+                            .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: 320)
                     }
                 }
                 .padding(.top, 8)

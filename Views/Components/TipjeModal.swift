@@ -10,8 +10,38 @@ struct TipjeModal: View {
     var textColor: Color = Color(hex: "8E9293")
     var closeIcon: String = "icon_close"
     var closeVariant: ButtonRegularVariant = .light
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     var body: some View {
+        Group {
+            if horizontalSizeClass == .compact {
+                // iPhone: Use default iOS modal style, no custom background/corner/shadow
+                VStack(spacing: 0) {
+                    HStack {
+                        Spacer()
+                        ButtonRegular(iconName: closeIcon, variant: closeVariant) { onClose() }
+                            .padding(.top, 24)
+                            .padding(.trailing, horizontalSizeClass == .compact ? 24 : 40)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .topTrailing)
+                    if !imageName.isEmpty {
+                        Image(imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: imageHeight)
+                            .padding(.top, 0)
+                    }
+                    Text(message)
+                        .font(font)
+                        .foregroundColor(textColor)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(60)
+                }
+                .padding(.horizontal, 0)
+                .frame(maxWidth: maxWidth)
+            } else {
+                // iPad: Keep custom background, corner radius, and shadow
         ZStack {
             Color.white.ignoresSafeArea()
         VStack(spacing: 0) {
@@ -19,27 +49,30 @@ struct TipjeModal: View {
                 Spacer()
                 ButtonRegular(iconName: closeIcon, variant: closeVariant) { onClose() }
                     .padding(.top, 24)
-                    .padding(.trailing, 0)
+                    .padding(.trailing, horizontalSizeClass == .compact ? 24 : 40)
             }
             .frame(maxWidth: .infinity, alignment: .topTrailing)
+                        if !imageName.isEmpty {
             Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(height: imageHeight)
                 .padding(.top, 0)
+                        }
             Text(message)
                 .font(font)
                 .foregroundColor(textColor)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 16)
-                .padding(.bottom, 24)
+                            .padding(60)
         }
-        .padding(.horizontal, 32)
+                    .padding(.horizontal, 0)
         .frame(maxWidth: maxWidth)
             .background(Color.white)
             .cornerRadius(32)
             .shadow(color: Color.black.opacity(0.08), radius: 24, x: 0, y: 8)
+                }
+            }
         }
     }
 }

@@ -1,10 +1,41 @@
-# Changelog (2024-06-XX)
+# Changelog (2024-07)
 
-- Home banner now shows large balance number and 'peanuts earned' label, not BalanceChip.
-- RuleKidCard now visually detaches and fades only the right side (peanut badge and dash) to 50% opacity when completed, matching the 'used ticket' look.
-- Debug print statements added to HomeView for balance and rule completion state.
-- No checkmark or full-card fade for completed rules.
-- All changes match the product spec and user feedback as of this update.
+- ChoreAdultCard and RewardAdultCard now have the same tap area separation as RuleAdultCard: left (text) area expands/collapses, right (icon/peanut) area archives/adds/removes, in both Admin and Catalog modals.
+- RuleKidCard and ChoreKidCard now use the native iOS checkmark.circle.fill SF Symbol for completed state, sized 24x24pt on iPhone and 36x36pt on iPad, with color #799B44 (matching the toast), always at full opacity.
+- The debug "Expire Trial" button has been removed from Settings.
+- All tap/expand/archive logic for Rules, Chores, and Rewards is now consistent and spec-compliant across Admin and Catalog modals.
+
+---
+
+# Onboarding & Paywall Flow Update (2024-07)
+
+**Important:**
+- On every app launch, the root view must check authentication and onboarding state. If the user is not authenticated, all onboarding state flags (userId, didLogin, hasActiveSubscription, etc.) must be reset, and the onboarding flow must be shown. This ensures onboarding is always shown after logout, account deletion, or app relaunch.
+- All Firestore and onboarding state calls must be guarded to ensure userId (and kidId, if relevant) are never empty. If an ID is empty, the function should return early and log a warning. This prevents 'Document path cannot be empty' errors and ensures robust onboarding navigation.
+- After creating a kid profile, the user must immediately be routed to PIN setup (PinSetupView).
+- After setting a PIN, the user must be routed to card setup (AdminView) and must add at least one rule, one chore, and one reward.
+- Only after all three tabs have at least one card, the success modal is shown and the admin page is locked with the PIN.
+- Only then does the user enter the main app.
+- Skipping any of these steps is not allowed. The onboarding state machine and navigation must enforce this sequence strictly.
+- **New:** After registration, users receive a 7-day free trial with full access. The paywall (subscription screen) is only shown after the 7-day trial expires and the user is not subscribed.
+
+**Recent Changes:**
+- The onboarding flow is now managed by a single, centralized onboarding state machine (`OnboardingStateManager`).
+- **Order of onboarding steps is now strictly enforced:**
+    1. Intro slides
+    2. Login/Registration (LoginView)
+    3. 7-day Free Trial (full access, no paywall)
+    4. Subscription Paywall (SubscriptionView, only after trial expires)
+    5. Kids Profile (KidsProfileView)
+    6. PIN Setup (PinSetupView)
+    7. Card Setup (AdminView)
+    8. Main App/Home
+- After the intro slides, the user must log in or register. Only after successful authentication does the 7-day trial start. Only after the trial expires and if the user is not subscribed, the paywall is shown. Only after a successful subscription does the user proceed to kids profile, PIN, and card setup.
+- Each onboarding step is only shown if needed, based on flags: `needsKidsProfile`, `needsPinSetup`, `needsCardsSetup`, and `onboardingComplete`.
+- The paywall (subscription screen) is shown only after the 7-day trial expires and if required by the product spec.
+- Once a step is completed, it is never shown again for that user (even after logout/login), unless the Firestore user profile is deleted.
+- All onboarding navigation and state is managed centrally; no ad-hoc checks or navigation logic are allowed elsewhere in the app.
+- This approach ensures the onboarding experience is robust, user-friendly, and always matches the product spec.
 
 ---
 
@@ -316,3 +347,94 @@ struct ShopViewiPad: View { ... }
 **Onboarding already follows this pattern. All other areas must be updated to match.**
 
 ---
+
+# Subscription Screen (2024-06)
+
+## Device-Specific Layout & Struct Policy
+- The subscription screen uses a main `SubscriptionView` entry point that switches between iPhone and iPad layouts using `@Environment(\.horizontalSizeClass)`.
+- Two separate SwiftUI view structs are defined:
+  - `SubscriptionViewiPhone` for compact size class (iPhone)
+  - `SubscriptionViewiPad` for regular size class (iPad)
+- All device-specific layout, font, and spacing logic is handled in the appropriate struct, with no inline size class checks in the body. This matches the mandatory device-specific struct policy for all main app views.
+
+## Layout & UI Logic
+- **Banner:**
+  - Large colored background with mascot illustration (`il_admin`), scaled and offset per device.
+- **Headline:**
+  - Motivational headline at the top (e.g., "Raise Confident Kids. Build a Calm, Connected Home.")
+  - Font size and padding are larger on iPad.
+- **Feature List:**
+  - Bullet list of app features (e.g., Mindful Parenting, Evidence-Based, etc.), styled and spaced per device.
+- **Plan Cards:**
+  - Two selectable cards: Monthly and Yearly.
+  - Each card shows the plan name and a placeholder for the localized price (future: replace with actual price from StoreKit).
+  - Selection is managed with a local `@State` property (`selectedPlan`).
+  - Tapping a card updates the selection.
+  - iPhone: Plan cards are stacked vertically with spacing.
+  - iPad: Plan cards are arranged horizontally with spacing.
+- **Start Trial Button:**
+  - Large, primary button labeled "Start your free trial".
+  - Calls the `onPlanSelected` closure with the selected plan when tapped.
+- **Legal/Disclaimer Text:**
+  - Below the button, a disclaimer explains the 7-day free trial, auto-renewal, and cancellation policy.
+  - Styled with smaller font and reduced opacity.
+
+## Logic & Flow
+- The user selects a plan (monthly or yearly) by tapping a card.
+- Tapping the "Start your free trial" button triggers the provided `onPlanSelected` closure with the current selection.
+- The actual purchase logic and StoreKit integration are handled outside this view (not shown here).
+- The plan card price currently displays a placeholder ("Localized price"); this should be replaced with the actual localized price when StoreKit products are loaded.
+
+## Previews
+- The file includes SwiftUI previews for both iPhone and iPad devices, ensuring layout correctness across device types.
+
+## Policy Compliance
+- This implementation fully complies with the device-specific struct policy and layout standards described above.
+- All future changes to the subscription screen must maintain this separation and update this documentation accordingly.
+
+---
+
+# Custom Rules, Chores, and Rewards Creation (2024-07)
+
+## Overview
+Parents can now create custom Rules, Chores, and Rewards directly from the respective catalog modals. This feature is available for all three item types and follows a unified, robust, and visually consistent flow.
+
+## Frontend (FE)
+- Each catalog modal (Rules, Chores, Rewards) has a “Create” button at the top.
+- Tapping the button shows an editable card at the top for a new custom item.
+- The editable card uses a `TextField` for the title with a placeholder (e.g., "Enter your new family rule 🏡"), styled to match the card border color, and wraps to 2 lines.
+- The peanut value/cost is entered in a numeric `TextField` (1-9).
+- Save/Cancel buttons are shown above the list, full width, matching card width.
+- Only one editable card can be shown at a time.
+- After saving, the new item appears at the top of the list and can be selected like any other item.
+- Card color is assigned from the palette and is consistent across Admin, Home, and Shop.
+- All text and placeholder logic is visually consistent and responsive.
+
+## Backend (BE)
+- When a new custom item is saved, it is written to Firestore under:
+  - Rules: `/users/{userId}/customRules/{customRuleId}`
+  - Chores: `/users/{userId}/customChores/{customChoreId}`
+  - Rewards: `/users/{userId}/customRewards/{customRewardId}`
+- When the user saves their selection, any selected custom items are also added to the kid’s collection:
+  - Rules: `/users/{userId}/kids/{kidId}/rules`
+  - Chores: `/users/{userId}/kids/{kidId}/chores`
+  - Rewards: `/users/{userId}/kids/{kidId}/rewards`
+- All custom items are fetched and shown in the catalog modal, and are available for selection and completion in both Admin and Home/Shop.
+
+## Other
+- All UI/UX, color, and data flow logic is robust and matches the product spec.
+- Placeholder and input logic is visually polished and user-friendly.
+- This is now the standard for all three item types in Tipje.
+
+## Custom Chores
+- Parents can create custom chores in addition to the curated catalog.
+- "Create Chore" button appears at the top of the catalog modal.
+- Tapping it shows an editable card at the top (border-only, TextField for title, numeric TextField for peanuts 1-9, no stepper).
+- Save/Cancel buttons are full width, matching the card width.
+- Custom chores are stored in Firestore under `/users/{userId}/customChores/{customChoreId}`.
+- Custom chores appear at the top of the list, visually distinct from curated ones.
+- Long-press on a custom card brings up a context menu for edit/delete.
+- Color rotates from the palette; validation ensures title and price are valid.
+- Only one editable card is shown at a time.
+- Custom chores are available for selection and saving to the kid’s chores collection, and show up in Admin and Home.
+- Placeholder text for custom chore input is styled to match the card border color and wraps to 2 lines.

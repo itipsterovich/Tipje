@@ -3,7 +3,7 @@ import Combine
 import SwiftUI
 
 @MainActor
-class Store: ObservableObject {
+class TipjeStore: ObservableObject {
     @Published var userId: String = ""
     @Published var selectedKid: Kid? = nil
     @Published var kids: [Kid] = []
@@ -16,6 +16,9 @@ class Store: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @AppStorage("activeKidId") var activeKidId: String?
+    @Published var customRules: [CatalogRule] = []
+    @Published var customChores: [CatalogChore] = []
+    @Published var customRewards: [CatalogReward] = []
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -99,6 +102,28 @@ class Store: ObservableObject {
         FirestoreManager.shared.fetchKid(userId: userId, kidId: kid.id) { fetchedKid in
             balance = fetchedKid?.balance ?? 0
             group.leave()
+        }
+        // Fetch custom rules, chores, rewards for catalog-driven display
+        group.enter()
+        FirestoreManager.shared.fetchCustomRules(userId: userId) { fetched in
+            Task { @MainActor in
+                self.customRules = fetched
+                group.leave()
+            }
+        }
+        group.enter()
+        FirestoreManager.shared.fetchCustomChores(userId: userId) { fetched in
+            Task { @MainActor in
+                self.customChores = fetched
+                group.leave()
+            }
+        }
+        group.enter()
+        FirestoreManager.shared.fetchCustomRewards(userId: userId) { fetched in
+            Task { @MainActor in
+                self.customRewards = fetched
+                group.leave()
+            }
         }
         group.notify(queue: .main) { [weak self] in
             print("[Store] fetchAllDataForSelectedKid complete. Rules: \(rules.map { $0.title }), Chores: \(chores.map { $0.title }), Rewards: \(rewards.map { $0.title })")
