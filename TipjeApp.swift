@@ -10,6 +10,7 @@ struct TipjeApp: App {
     @StateObject var onboardingState = OnboardingStateManager.shared
     let store = TipjeStore()
     @State private var isAppReady: Bool = false
+    @StateObject var localizationManager = LocalizationManager.shared
     
     init() {
         FirebaseApp.configure()
@@ -60,6 +61,8 @@ struct TipjeApp: App {
                     }
                 }
             }
+            .id(localizationManager.currentLanguage)
+            .environmentObject(localizationManager)
             .onAppear {
                 Task {
                     // Simulate async setup (replace with your real checks)

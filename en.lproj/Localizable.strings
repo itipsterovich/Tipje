@@ -34,6 +34,33 @@
 "onboarding_child_name_2" = "Child's name 2";
 "onboarding_next" = "Next";
 
+// Onboarding iPhone
+"onboarding_title_iphone" = "Raise confident kids, connect as a family";
+"onboarding_subtitle_iphone" = "Tipje helps you build habits, stay connected, and enjoy parenting.";
+
+// Onboarding iPad
+"onboarding_title_ipad" = "Raise Confident Kids. Build a Calm, Connected Home.";
+"onboarding_subtitle_ipad" = "Set it once with Tipje—no more repeating. Kids stay on track and actually enjoy it.";
+
+// Feature Bullets
+"onboarding_bullet_mindful" = "Mindful Parenting";
+"onboarding_bullet_evidence" = "Evidence-Based";
+"onboarding_bullet_values" = "Focus on Values";
+"onboarding_bullet_age" = "Perfect for age 5+";
+
+// Onboarding Screen 2
+"onboarding2_title" = "Fun Tasks & Real Rewards";
+"onboarding2_subtitle" = "Kids build good habits, earn peanuts, and unlock real-life treats chosen by you.";
+
+// Onboarding Screen 3
+"onboarding3_title" = "Set Rules That Match Your Family's Values";
+"onboarding3_subtitle" = "Choose from a curated collection of mindful rules—designed to guide your family with clarity and kindness.";
+
+// Language Selector
+"Select Language" = "Select Language";
+"English" = "English";
+"Nederlands" = "Dutch";
+
 /* PIN & Errors */
 "pin_invalid" = "Please enter a valid 4-digit PIN.";
 "pin_success" = "PIN changed successfully.";
@@ -54,7 +81,7 @@
 "pinsetup_save_fail" = "Failed to save PIN. Please try again.";
 
 /* Login */
-"login_title" = "Build your mindful family home with a 7-day free trial";
+"login_title" = "Get started";
 "login_google" = "Sign in with Google";
 "login_or" = "OR";
 "login_email" = "Email";
@@ -64,4 +91,191 @@
 "login_signin" = "Sign In";
 "login_have_account" = "Have an account?";
 "login_no_account" = "Don't have an account?";
-"login_passwords_no_match" = "Passwords do not match"; 
+"login_passwords_no_match" = "Passwords do not match";
+
+// Login Page
+"login_free_trial" = "Free trial. No pressure. Just clarity.";
+"login_apple" = "Sign in with Apple";
+"login_start_free_trial" = "Start your free trial"; 
+
+// Empty States & Modals
+"empty_home_tasks" = "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜";
+"modal_task_done_today" = "You've done this today and got your peanuts!\nLet's make sure it's really done. 💪";
+"empty_admin_rules" = "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!";
+"empty_admin_chores" = "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.";
+"empty_admin_rewards" = "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.";
+"empty_shop_ready" = "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn.";
+"empty_shop_basket" = "No rewards in basket yet. Add some rewards to your basket to get started!";
+"modal_not_enough_peanuts" = "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟";
+"modal_added_to_basket" = "Nice pick! 🎁\nYour reward is in the basket, waiting for you.";
+"modal_earned_treat" = "Woohoo! You earned it! 🍦\nEnjoy your treat—you deserve it!"; 
+
+// Home Page
+"toast_task_completed" = "Great job! Task completed";
+"toast_task_undone" = "Task marked as not done";
+"home_peanuts_earned" = "peanuts earned";
+"home_title_mindful_weekday" = "%1$@'s Mindful %2$@";
+"home_tab_rules" = "Family Rules";
+"home_tab_chores" = "Chores"; 
+
+// Admin Section
+"admin_title" = "Parent Control Center";
+"admin_tab_rules" = "Rules";
+"admin_tab_chores" = "Chores";
+"admin_tab_shop" = "Shop";
+"catalog_chores_title" = "Chore Catalog";
+"catalog_rules_title" = "Rule Catalog";
+"catalog_rewards_title" = "Reward Catalog";
+"save" = "Save";
+"cancel" = "Cancel";
+"create_chore" = "Create Chore";
+"create_rule" = "Create Rule";
+"create_reward" = "Create Reward";
+"placeholder_new_chore" = "Enter your new family chore 🧹";
+"placeholder_new_rule" = "Enter your new family rule 🏡";
+"placeholder_new_reward" = "Enter your new family reward 🎁";
+"placeholder_1_9" = "1-9";
+"admin_all_set_modal" = "🎉 All set! Tasks are live at home. 🔒 Admin is now PIN-locked.";
+"admin_no_kid_title" = "No Kid Selected";
+"admin_no_kid_message" = "Please add and select a kid before adding rules, chores, or rewards."; 
+
+// Shop Section
+"shop_title" = "Reward Shop";
+"shop_tab_rewards" = "Rewards";
+"shop_tab_basket" = "Basket";
+"shop_toast_added_basket" = "Yay! Added to your Basket"; 
+
+// Settings Section
+"settings_title_family" = "Family Settings";
+"settings_signin_method" = "Sign-in Method";
+"settings_kids_profiles" = "Kids Profiles";
+"settings_edit_profiles" = "Edit Profiles";
+"settings_delete_account" = "Delete Account";
+"settings_delete_account_confirm" = "Are you sure you want to permanently delete your account and all data? This cannot be undone.";
+"delete" = "Delete";
+"settings_plan" = "Plan";
+"settings_tipje_yearly" = "Tipje Yearly";
+"settings_tipje_monthly" = "Tipje Monthly";
+"settings_status" = "Status";
+"settings_subscribed" = "Subscribed";
+"settings_next_billing_date" = "Next Billing Date";
+"settings_manage_subscription" = "Manage Subscription";
+"settings_profile_name" = "Profile Name";
+"settings_profile_name_index" = "Profile Name";
+"settings_current_password" = "Current Password";
+"settings_new_password" = "New Password";
+"settings_change" = "Change";
+"settings_fill_all_fields" = "Please fill in all fields."; 
+
+// Catalog Content - Rules
+"catalog_rule_1" = "Take off shoes at the door 👟 so our home stays clean and cozy";
+"catalog_rule_2" = "Always ask before going out 🚶‍♂️ so we know you're safe and okay";
+"catalog_rule_3" = "Bring your smartwatch outside ⌚ so we can reach you anytime";
+"catalog_rule_4" = "Speak kindly to others 🧡 because your words can bring comfort";
+"catalog_rule_5" = "Knock before entering a room 🚪 so others feel safe and respected";
+"catalog_rule_6" = "Use a soft voice at home 🏡 so everyone feels peaceful and calm";
+"catalog_rule_7" = "Say I'm sorry when you hurt 💗 it helps hearts feel safe again";
+"catalog_rule_8" = "Respect quiet time 😴 it shows you care about others' rest";
+"catalog_rule_9" = "Say please and thank you 🙏 it makes others feel appreciated";
+"catalog_rule_10" = "Tell the truth gently 🫶 so we can trust and feel close to you";
+"catalog_rule_11" = "Hold hands near roads 🚸 so we can stay together and feel safe";
+"catalog_rule_12" = "Wait your turn to speak 🗣️ so everyone feels heard and valued";
+"catalog_rule_13" = "Put toys away after playing 🧸 it keeps your space tidy and clear";
+"catalog_rule_14" = "Use words when you're upset 😠 so people understand your feelings";
+"catalog_rule_15" = "Say hello with kindness 🙋 it makes others feel welcome and seen";
+"catalog_rule_16" = "Close doors softly 🚪 it helps our home feel quiet and peaceful";
+"catalog_rule_17" = "Keep hands to yourself ✋ it helps others feel calm and safe";
+"catalog_rule_18" = "Share toys and space 🤝 so everyone can enjoy playing together";
+"catalog_rule_19" = "Put clothes in the basket 🧺 so they're ready to be cleaned soon";
+"catalog_rule_20" = "Say goodbye when leaving 👋 it helps others feel loved and seen";
+"catalog_rule_21" = "Eat slowly and mindfully 🍽️ so your body can feel full and calm";
+"catalog_rule_22" = "Say excuse me when you interrupt 🙇 it shows you care and respect";
+"catalog_rule_23" = "Take a deep breath when upset 🌬️ to help your feelings calm down";
+"catalog_rule_24" = "Be gentle with animals 🐾 so they feel safe and loved with you";
+"catalog_rule_25" = "Keep your backpack tidy 🎒 so you can find your things easily";
+"catalog_rule_26" = "Tell us when something feels wrong 🚨 so we can help you right away";
+
+// Catalog Content - Chores
+"catalog_chore_1" = "Put away your toys after playtime 🧸 to keep your space peaceful";
+"catalog_chore_2" = "Make your bed every morning 🛏️ it helps the room feel refreshed";
+"catalog_chore_3" = "Bring your dish to the sink 🍽️ so cleanup is quick and easy";
+"catalog_chore_4" = "Wipe down the table after meals 🧼 to keep it ready and clean";
+"catalog_chore_5" = "Hang your towel after bathing 🚿 so it dries and stays fresh";
+"catalog_chore_6" = "Put your dirty clothes in the basket 🧺 so they can be washed";
+"catalog_chore_7" = "Line up your shoes neatly 👟 so the hallway looks tidy and safe";
+"catalog_chore_8" = "Match up clean socks in pairs 🧦 it helps getting dressed go smooth";
+"catalog_chore_9" = "Pick up crumbs and small trash 🍪 to help keep the floor clean";
+"catalog_chore_10" = "Water a plant gently with help 🌿 they need care to grow strong";
+"catalog_chore_11" = "Fold clean towels or clothes 🧻 it makes shelves look tidy and soft";
+"catalog_chore_12" = "Pack your backpack for school 🎒 so you're ready in the morning";
+"catalog_chore_13" = "Dust the shelves with a soft cloth 🧽 so your room stays fresh";
+
+// Catalog Content - Rewards
+"catalog_reward_1" = "Extra scoop of your favorite ice cream 🍦";
+"catalog_reward_2" = "Small bag of crunchy chips or popcorn 🍿";
+"catalog_reward_3" = "Pastry or cookie from the bakery 🍪";
+"catalog_reward_4" = "Hot chocolate with whipped cream ☕";
+"catalog_reward_5" = "Surprise sticker or novelty eraser 🎟️";
+"catalog_reward_6" = "Pick a dance song and blast it at home 💃";
+"catalog_reward_7" = "Chips with guac or melted cheese dip 🥑";
+"catalog_reward_8" = "Smoothie or slushy from a shop 🥤";
+"catalog_reward_9" = "Colorful juice box and sweet snack combo 🧃";
+"catalog_reward_10" = "Choose any breakfast meal this weekend 🥞";
+"catalog_reward_11" = "Add fairy lights or wall stickers to your room ✨";
+"catalog_reward_12" = "Choose the movie for family movie night 🎬";
+"catalog_reward_13" = "Stay up 20 extra minutes past bedtime 🕰️";
+"catalog_reward_14" = "30 minutes extra screen time 📱";
+"catalog_reward_15" = "Pick a snack and show for solo chill time 🍿";
+"catalog_reward_16" = "Decorate cupcakes with icing and sprinkles 🧁";
+"catalog_reward_17" = "Buy a favorite treat from the grocery store 🛒";
+"catalog_reward_18" = "Grab a small dessert at the bakery or cafe 🍰";
+"catalog_reward_19" = "Magazine or comic from a newsstand 📖";
+"catalog_reward_20" = "Try a new drink at a café or bubble tea bar 🧋";
+"catalog_reward_21" = "Pick a mystery surprise from a grab bag 🎁";
+"catalog_reward_22" = "Choose new stickers or a tiny collectible 🎨";
+"catalog_reward_23" = "Pick out a small toy or Hot Wheels car 🚗";
+"catalog_reward_24" = "Buy a novelty pen, squishy or trinket ✍️";
+"catalog_reward_25" = "Frozen yogurt with toppings of your choice 🍨";
+"catalog_reward_26" = "Special bakery donut or cake pop 🍩";
+"catalog_reward_27" = "Sticker book or activity pad with theme 🖍️";
+"catalog_reward_28" = "Mini Lego set, fidget toy or pop-it 🧱";
+"catalog_reward_29" = "Small plush or toy figure you love 🧸";
+"catalog_reward_30" = "New book from the bookstore 📚"; 
+
+// Toast Messages
+"toast_removed_hub" = "Removed from your Hub";
+"toast_added_hub" = "Added to your Hub";
+
+// Modal Messages
+"modal_task_already_completed" = "You've already marked this task as completed for today and spent your peanuts. Make sure it's done.";
+"confetti_well_deserved" = "Well deserved! Have fun enjoying your treat";
+
+// Empty State Messages
+"empty_check_back_peanuts" = "Check back soon to start earning peanuts! 🥜";
+
+// PIN Lock Messages
+"pin_enter_pin" = "Enter PIN";
+"pin_unlock_admin" = "Enter your 4-digit PIN to unlock Admin";
+"pin_unlock_parent_control" = "Enter your 4-digit PIN to unlock Parent Control Center";
+
+// Kids Profile Messages
+"kids_profile_title" = "Who's Joining Tipje?";
+"kids_profile_subtitle" = "Add your child (or two) to begin your mindful journey.";
+
+// Subscription Messages
+"subscription_load_error" = "Failed to load products. Please check your connection and try again.";
+"subscription_retry" = "Retry";
+"subscription_trial_ended" = "Your free trial has ended";
+"subscription_subscribe" = "Subscribe";
+"subscription_and" = "and";
+"subscription_monthly" = "Tipje Monthly";
+"subscription_monthly_desc" = "Pay monthly. Cancel anytime";
+"subscription_yearly" = "Tipje Yearly";
+"subscription_yearly_desc" = "Best value. Save 20%";
+"subscription_not_available" = "Not available";
+
+// Other UI Elements
+"paywall_unlock_features" = "Unlock all features";
+"basket_reward" = "Reward";
+"error_login" = "Log In";
+"main_switched_kid" = "You've switched to %@"; 

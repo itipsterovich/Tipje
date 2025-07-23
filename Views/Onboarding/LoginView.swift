@@ -1,6 +1,57 @@
 import SwiftUI
 import FirebaseAuth
 
+struct CustomInputFieldiPhone: View {
+    var placeholder: String
+    @Binding var text: String
+    var isSecure: Bool = false
+    var keyboardType: UIKeyboardType = .default
+    var maxLength: Int? = nil
+    var isDisabled: Bool = false
+    var showActualPassword: Bool = false
+    @FocusState private var isFocused: Bool
+    
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            Group {
+                if isSecure {
+                    if showActualPassword {
+                        TextField(placeholder, text: $text)
+                            .keyboardType(keyboardType)
+                            .focused($isFocused)
+                            .disabled(isDisabled)
+                    } else {
+                        SecureField(placeholder, text: $text)
+                            .keyboardType(keyboardType)
+                            .focused($isFocused)
+                            .disabled(isDisabled)
+                    }
+                } else {
+                    TextField(placeholder, text: $text)
+                        .keyboardType(keyboardType)
+                        .focused($isFocused)
+                        .disabled(isDisabled)
+                }
+            }
+            .onChange(of: text) { newValue in
+                if let maxLength = maxLength, newValue.count > maxLength {
+                    text = String(newValue.prefix(maxLength))
+                }
+            }
+            .font(.custom("Inter-Regular_Medium", size: 20))
+            .padding(.horizontal, 16)
+            .frame(height: 48)
+            .background(Color(hex: "#F7FBFF"))
+            .foregroundColor(Color(hex: "#799B44"))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isFocused ? Color(hex: "#799B44") : Color(hex: "#D4D7E3"), lineWidth: 1.5)
+            )
+            .cornerRadius(12)
+        }
+    }
+}
+
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
@@ -72,11 +123,11 @@ struct LoginView: View {
                 ZStack {
                     VStack(spacing: 0) {
                         VStack(spacing: 16) {
-                            Text("Get Started")
+                            LocalizedText("login_title")
                                 .font(.custom("Inter-Regular_SemiBold", size: 32))
                                 .foregroundColor(Color(hex: "#494646"))
                                 .multilineTextAlignment(.center)
-                            Text("Free trial. No pressure. Just clarity.")
+                            LocalizedText("login_free_trial")
                                 .font(.custom("Inter-Regular", size: 18))
                                 .foregroundColor(Color(hex: "#494646").opacity(0.7))
                                 .multilineTextAlignment(.center)
@@ -124,11 +175,11 @@ struct LoginView: View {
                                             Image("GoogleLogo")
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(width: 24, height: 24)
+                                                .frame(width: 20, height: 20)
                                             Spacer()
                                         }
-                                        Text("Sign in with Google")
-                                            .font(.custom("Inter-Regular_Medium", size: 24))
+                                        LocalizedText("login_google")
+                                            .font(.custom("Inter-Regular_Medium", size: 20))
                                             .foregroundColor(Color(hex: "#799B44"))
                                             .frame(maxWidth: .infinity, alignment: .center)
                                     }
@@ -177,12 +228,12 @@ struct LoginView: View {
                                             Image("AppleLogo")
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .frame(width: 24, height: 24)
+                                                .frame(width: 20, height: 20)
                                                 .foregroundColor(.white)
                                             Spacer()
                                         }
-                                        Text("Sign in with Apple")
-                                            .font(.custom("Inter-Regular_Medium", size: 24))
+                                        LocalizedText("login_apple")
+                                            .font(.custom("Inter-Regular_Medium", size: 20))
                                             .foregroundColor(.white)
                                             .frame(maxWidth: .infinity, alignment: .center)
                                     }
@@ -198,7 +249,7 @@ struct LoginView: View {
                                 Rectangle()
                                     .frame(height: 1)
                                     .foregroundColor(Color(hex: "#D4D7E3"))
-                                Text("login_or")
+                                LocalizedText("login_or")
                                     .font(.custom("Inter-Regular", size: 14))
                                     .foregroundColor(Color(hex: "#8897AD"))
                                 Rectangle()
@@ -206,9 +257,9 @@ struct LoginView: View {
                                     .foregroundColor(Color(hex: "#D4D7E3"))
                             }
                             if isSignUp {
-                                CustomInputField(placeholder: String(localized: "login_email"), text: $email)
-                                CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
-                                CustomInputField(placeholder: String(localized: "login_repeat_password"), text: $repeatPassword, isSecure: true)
+                                CustomInputFieldiPhone(placeholder: NSLocalizedString("login_email", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $email)
+                                CustomInputFieldiPhone(placeholder: NSLocalizedString("login_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $password, isSecure: true)
+                                CustomInputFieldiPhone(placeholder: NSLocalizedString("login_repeat_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $repeatPassword, isSecure: true)
                                 if let error = localErrorMessage ?? authManager.errorMessage {
                                     Text(error)
                                         .foregroundColor(.red)
@@ -244,29 +295,29 @@ struct LoginView: View {
                                         }
                                     }
                                 } label: {
-                                    Text("Start your free trial")
-                                        .font(.custom("Inter-Regular_Medium", size: 24))
+                                    LocalizedText("login_start_free_trial")
+                                        .font(.custom("Inter-Regular_Medium", size: 20))
                                         .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity, minHeight: 56)
+                                        .frame(maxWidth: .infinity, minHeight: 48)
                                         .background(Color(hex: "#799B44"))
                                         .cornerRadius(28)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 HStack(spacing: 4) {
-                                    Text("login_have_account")
+                                    LocalizedText("login_have_account")
                                         .foregroundColor(Color(hex: "#8897AD"))
                                     Button {
                                         isSignUp = false
                                     } label: {
-                                        Text("login_signin")
+                                        LocalizedText("login_signin")
                                             .foregroundColor(Color(hex: "#799B44"))
                                             .underline()
                                     }
                                 }
-                                .font(.custom("Inter-Regular", size: 18))
+                                .font(.custom("Inter-Regular", size: 16))
                             } else {
-                                CustomInputField(placeholder: String(localized: "login_email"), text: $email)
-                                CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
+                                CustomInputFieldiPhone(placeholder: NSLocalizedString("login_email", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $email)
+                                CustomInputFieldiPhone(placeholder: NSLocalizedString("login_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $password, isSecure: true)
                                 if let error = localErrorMessage ?? authManager.errorMessage {
                                     Text(error)
                                         .foregroundColor(.red)
@@ -295,26 +346,26 @@ struct LoginView: View {
                                         }
                                     }
                                 } label: {
-                                    Text("login_signin")
-                                        .font(.custom("Inter-Regular_Medium", size: 24))
+                                    LocalizedText("login_signin")
+                                        .font(.custom("Inter-Regular_Medium", size: 20))
                                         .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity, minHeight: 56)
+                                        .frame(maxWidth: .infinity, minHeight: 48)
                                         .background(Color(hex: "#799B44"))
                                         .cornerRadius(28)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 HStack(spacing: 4) {
-                                    Text("login_no_account")
+                                    LocalizedText("login_no_account")
                                         .foregroundColor(Color(hex: "#8897AD"))
                                     Button {
                                         isSignUp = true
                                     } label: {
-                                        Text("login_signup")
+                                        LocalizedText("login_signup")
                                             .foregroundColor(Color(hex: "#799B44"))
                                             .underline()
                                     }
                                 }
-                                .font(.custom("Inter-Regular", size: 18))
+                                .font(.custom("Inter-Regular", size: 16))
                             }
                         }
                         .padding(.horizontal, 24)
@@ -337,12 +388,12 @@ struct LoginView: View {
                         .foregroundColor(.white)
                     Spacer()
                     VStack(spacing: 14) {
-                        Text("Get Started")
+                        LocalizedText("login_title")
                             .font(.custom("Inter-Regular_SemiBold", size: 34))
                             .foregroundColor(Color(hex: "#494646"))
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity)
-                        Text("Free trial. No pressure. Just clarity.")
+                        LocalizedText("login_free_trial")
                             .font(.custom("Inter-Regular", size: 18))
                             .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             .multilineTextAlignment(.center)
@@ -393,7 +444,7 @@ struct LoginView: View {
                                             .frame(width: 24, height: 24)
                                         Spacer()
                                     }
-                                    Text("Sign in with Google")
+                                    LocalizedText("login_google")
                                         .font(.custom("Inter-Regular_Medium", size: 24))
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .frame(maxWidth: .infinity, alignment: .center)
@@ -447,7 +498,7 @@ struct LoginView: View {
                                             .foregroundColor(.white)
                                         Spacer()
                                     }
-                                    Text("Sign in with Apple")
+                                    LocalizedText("login_apple")
                                         .font(.custom("Inter-Regular_Medium", size: 24))
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity, alignment: .center)
@@ -464,7 +515,7 @@ struct LoginView: View {
                             Rectangle()
                                 .frame(height: 1)
                                 .foregroundColor(Color(hex: "#D4D7E3"))
-                            Text("login_or")
+                            LocalizedText("login_or")
                                 .font(.custom("Inter-Regular", size: 14))
                                 .foregroundColor(Color(hex: "#8897AD"))
                             Rectangle()
@@ -472,9 +523,9 @@ struct LoginView: View {
                                 .foregroundColor(Color(hex: "#D4D7E3"))
                         }
                         if isSignUp {
-                            CustomInputField(placeholder: String(localized: "login_email"), text: $email)
-                            CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
-                            CustomInputField(placeholder: String(localized: "login_repeat_password"), text: $repeatPassword, isSecure: true)
+                            CustomInputField(placeholder: NSLocalizedString("login_email", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $email)
+                            CustomInputField(placeholder: NSLocalizedString("login_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $password, isSecure: true)
+                            CustomInputField(placeholder: NSLocalizedString("login_repeat_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $repeatPassword, isSecure: true)
                             if let error = localErrorMessage ?? authManager.errorMessage {
                                 Text(error)
                                     .foregroundColor(.red)
@@ -510,7 +561,7 @@ struct LoginView: View {
                                     }
                                 }
                             } label: {
-                                Text("Start your free trial")
+                                LocalizedText("login_start_free_trial")
                                     .font(.custom("Inter-Regular_Medium", size: 24))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, minHeight: 56)
@@ -519,20 +570,20 @@ struct LoginView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             HStack(spacing: 4) {
-                                Text("login_have_account")
+                                LocalizedText("login_have_account")
                                     .foregroundColor(Color(hex: "#8897AD"))
                                 Button {
                                     isSignUp = false
                                 } label: {
-                                    Text("login_signin")
+                                    LocalizedText("login_signin")
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .underline()
                                 }
                             }
                             .font(.custom("Inter-Regular", size: 18))
                         } else {
-                            CustomInputField(placeholder: String(localized: "login_email"), text: $email)
-                            CustomInputField(placeholder: String(localized: "login_password"), text: $password, isSecure: true)
+                            CustomInputField(placeholder: NSLocalizedString("login_email", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $email)
+                            CustomInputField(placeholder: NSLocalizedString("login_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $password, isSecure: true)
                             if let error = localErrorMessage ?? authManager.errorMessage {
                                 Text(error)
                                     .foregroundColor(.red)
@@ -561,7 +612,7 @@ struct LoginView: View {
                                     }
                                 }
                             } label: {
-                                Text("login_signin")
+                                LocalizedText("login_signin")
                                     .font(.custom("Inter-Regular_Medium", size: 24))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity, minHeight: 56)
@@ -570,12 +621,12 @@ struct LoginView: View {
                             }
                             .buttonStyle(PlainButtonStyle())
                             HStack(spacing: 4) {
-                                Text("login_no_account")
+                                LocalizedText("login_no_account")
                                     .foregroundColor(Color(hex: "#8897AD"))
                                 Button {
                                     isSignUp = true
                                 } label: {
-                                    Text("login_signup")
+                                    LocalizedText("login_signup")
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .underline()
                                 }

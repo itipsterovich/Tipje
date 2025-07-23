@@ -24,10 +24,54 @@
 "settings_delete_kid_success" = "Kind succesvol verwijderd.";
 "settings_delete_kid_fail" = "Kind verwijderen mislukt.";
 
+// Settings Section
+"settings_title_family" = "Gezinsinstellingen";
+"settings_signin_method" = "Aanmeldmethode";
+"settings_kids_profiles" = "Kinderprofielen";
+"settings_edit_profiles" = "Profielen bewerken";
+"settings_delete_account" = "Account verwijderen";
+"settings_delete_account_confirm" = "Weet je zeker dat je je account en alle gegevens permanent wilt verwijderen? Dit kan niet ongedaan worden gemaakt.";
+"delete" = "Verwijderen";
+"settings_plan" = "Abonnement";
+"settings_tipje_yearly" = "Tipje Jaarlijks";
+"settings_tipje_monthly" = "Tipje Maandelijks";
+"settings_status" = "Status";
+"settings_subscribed" = "Geabonneerd";
+"settings_next_billing_date" = "Volgende factuurdatum";
+"settings_manage_subscription" = "Abonnement beheren";
+"settings_profile_name" = "Profielnaam";
+"settings_profile_name_index" = "Profielnaam";
+"settings_current_password" = "Huidig wachtwoord";
+"settings_new_password" = "Nieuw wachtwoord";
+"settings_change" = "Wijzigen";
+"settings_fill_all_fields" = "Vul alle velden in.";
+
 /* Onboarding */
 "onboarding.headline" = "Zelfverzekerde kinderen opvoeden, verbinden als gezin";
 "onboarding.subtitle" = "Tipje helpt je gewoontes op te bouwen, verbonden te blijven en meer van het ouderschap te genieten.";
 "onboarding.subtitle.extended" = "Tipje helpt je gewoontes op te bouwen, verbonden te blijven en meer van het ouderschap te genieten.";
+
+// Onboarding iPhone
+"onboarding_title_iphone" = "Laat kinderen zelfverzekerd opgroeien, verbind als gezin";
+"onboarding_subtitle_iphone" = "Tipje helpt je gewoontes opbouwen, verbonden blijven en opvoeden leuk maken.";
+
+// Onboarding iPad
+"onboarding_title_ipad" = "Laat kinderen zelfverzekerd opgroeien. Creëer een rustig, verbonden thuis.";
+"onboarding_subtitle_ipad" = "Stel het één keer in met Tipje—nooit meer herhalen. Kinderen blijven op schema en vinden het leuk.";
+
+// Feature Bullets
+"onboarding_bullet_mindful" = "Mindful opvoeden";
+"onboarding_bullet_evidence" = "Wetenschappelijk onderbouwd";
+"onboarding_bullet_values" = "Focus op waarden";
+"onboarding_bullet_age" = "Perfect voor 5 jaar en ouder";
+
+// Onboarding Screen 2
+"onboarding2_title" = "Leuke taken & echte beloningen";
+"onboarding2_subtitle" = "Kinderen bouwen goede gewoontes op, verdienen pinda’s en ontgrendelen echte traktaties die jij kiest.";
+
+// Onboarding Screen 3
+"onboarding3_title" = "Stel regels in die passen bij jullie gezin";
+"onboarding3_subtitle" = "Kies uit een samengestelde collectie mindful regels—ontworpen om je gezin met duidelijkheid en vriendelijkheid te begeleiden.";
 
 /* PIN & Errors */
 "pin_invalid" = "Voer een geldige 4-cijferige PIN in.";
@@ -49,7 +93,7 @@
 "pinsetup_save_fail" = "PIN opslaan mislukt. Probeer het opnieuw.";
 
 /* Login */
-"login_title" = "Bouw je mindful gezinshuis met een gratis proefperiode van 7 dagen";
+"login_title" = "Aan de slag";
 "login_google" = "Inloggen met Google";
 "login_or" = "OF";
 "login_email" = "E-mail";
@@ -60,3 +104,173 @@
 "login_have_account" = "Heb je al een account?";
 "login_no_account" = "Nog geen account?";
 "login_passwords_no_match" = "Wachtwoorden komen niet overeen"; 
+
+// Login Page
+"login_free_trial" = "Gratis proefperiode. Geen verplichtingen. Gewoon duidelijkheid.";
+"login_apple" = "Inloggen met Apple";
+"login_start_free_trial" = "Begin je gratis proefperiode";
+
+// Language Selector
+"Select Language" = "Selecteer taal";
+"English" = "Engels";
+"Nederlands" = "Nederlands"; 
+
+// Empty States & Modals
+"empty_home_tasks" = "Je taken verschijnen hier zodra een volwassene ze heeft ingesteld.\nKom snel terug om pinda’s te verdienen! 🥜";
+"modal_task_done_today" = "Je hebt dit vandaag al gedaan en je pinda’s gekregen!\nControleer of het echt klaar is. 💪";
+"empty_admin_rules" = "Begin met het kiezen van gezinsregels die bij jullie waarden passen.\nVul alle tabbladen in—regels, taken en beloningen werken samen!";
+"empty_admin_chores" = "Kies dagelijkse taken die helpen goede gewoontes op te bouwen.\nTik op ➕ om te kiezen uit onze samengestelde catalogus.";
+"empty_admin_rewards" = "Voeg echte beloningen toe waar je kinderen enthousiast van worden.\nTik op ➕ om te kiezen uit onze selectie.";
+"empty_shop_ready" = "Je beloningswinkel wordt klaargemaakt!\nVraag je ouder om leuke dingen toe te voegen die je kunt verdienen.";
+"empty_shop_basket" = "Nog geen beloningen in je mandje. Voeg beloningen toe om te beginnen!";
+"modal_not_enough_peanuts" = "Nog niet genoeg pinda’s!\nMaak eerst nog wat taken af. 🌟";
+"modal_added_to_basket" = "Goede keuze! 🎁\nJe beloning staat in het mandje en wacht op je.";
+"modal_earned_treat" = "Hoera! Je hebt het verdiend! 🍦\nGeniet van je traktatie—je hebt het verdiend!"; 
+
+// Home Page
+"toast_task_completed" = "Goed gedaan! Taak voltooid";
+"toast_task_undone" = "Taak gemarkeerd als niet gedaan";
+"home_peanuts_earned" = "verdiende pinda's";
+"home_title_mindful_weekday" = "Aandachtige %2$@ van %1$@";
+"home_tab_rules" = "Gezinsregels";
+"home_tab_chores" = "Taken"; 
+
+// Admin Section
+"admin_title" = "Ouder Controlecentrum";
+"admin_tab_rules" = "Regels";
+"admin_tab_chores" = "Taken";
+"admin_tab_shop" = "Winkel";
+"catalog_chores_title" = "Taken Catalogus";
+"catalog_rules_title" = "Regel Catalogus";
+"catalog_rewards_title" = "Beloningen Catalogus";
+"save" = "Opslaan";
+"cancel" = "Annuleren";
+"create_chore" = "Nieuwe Taak";
+"create_rule" = "Nieuwe Regel";
+"create_reward" = "Nieuwe Beloning";
+"placeholder_new_chore" = "Voer je nieuwe gezinstaak in 🧹";
+"placeholder_new_rule" = "Voer je nieuwe gezinsregel in 🏡";
+"placeholder_new_reward" = "Voer je nieuwe gezinsbeloning in 🎁";
+"placeholder_1_9" = "1-9";
+"admin_all_set_modal" = "🎉 Alles klaar! Taken zijn nu live thuis. 🔒 Admin is nu met een pincode beveiligd.";
+"admin_no_kid_title" = "Geen kind geselecteerd";
+"admin_no_kid_message" = "Voeg een kind toe en selecteer het voordat je regels, taken of beloningen toevoegt."; 
+
+// Shop Section
+"shop_title" = "Beloningswinkel";
+"shop_tab_rewards" = "Beloningen";
+"shop_tab_basket" = "Mandje";
+"shop_toast_added_basket" = "Yes! Toegevoegd aan je mandje"; 
+
+// Catalog Content - Rules
+"catalog_rule_1" = "Doe je schoenen uit bij de deur 👟 zodat ons huis schoon en gezellig blijft";
+"catalog_rule_2" = "Vraag altijd eerst voordat je weggaat 🚶‍♂️ zodat we weten dat je veilig en goed bent";
+"catalog_rule_3" = "Neem je smartwatch mee naar buiten ⌚ zodat we je altijd kunnen bereiken";
+"catalog_rule_4" = "Spreek vriendelijk tegen anderen 🧡 omdat je woorden troost kunnen brengen";
+"catalog_rule_5" = "Klop voordat je een kamer binnenkomt 🚪 zodat anderen zich veilig en gerespecteerd voelen";
+"catalog_rule_6" = "Gebruik een zachte stem thuis 🏡 zodat iedereen zich vredig en kalm voelt";
+"catalog_rule_7" = "Zeg sorry als je pijn doet 💗 het helpt harten zich weer veilig te voelen";
+"catalog_rule_8" = "Respecteer rusttijd 😴 het laat zien dat je om andermans rust geeft";
+"catalog_rule_9" = "Zeg alsjeblieft en dank je wel 🙏 het laat anderen zich gewaardeerd voelen";
+"catalog_rule_10" = "Vertel de waarheid voorzichtig 🫶 zodat we kunnen vertrouwen en dichtbij je voelen";
+"catalog_rule_11" = "Houd handen vast bij wegen 🚸 zodat we samen kunnen blijven en ons veilig voelen";
+"catalog_rule_12" = "Wacht je beurt om te spreken 🗣️ zodat iedereen zich gehoord en gewaardeerd voelt";
+"catalog_rule_13" = "Ruim speelgoed op na het spelen 🧸 het houdt je ruimte netjes en opgeruimd";
+"catalog_rule_14" = "Gebruik woorden als je boos bent 😠 zodat mensen je gevoelens begrijpen";
+"catalog_rule_15" = "Zeg hallo met vriendelijkheid 🙋 het laat anderen zich welkom en gezien voelen";
+"catalog_rule_16" = "Doe deuren zachtjes dicht 🚪 het helpt ons huis rustig en vredig te voelen";
+"catalog_rule_17" = "Houd je handen bij jezelf ✋ het helpt anderen zich kalm en veilig te voelen";
+"catalog_rule_18" = "Deel speelgoed en ruimte 🤝 zodat iedereen samen kan genieten van spelen";
+"catalog_rule_19" = "Doe kleren in de mand 🧺 zodat ze klaar zijn om snel gewassen te worden";
+"catalog_rule_20" = "Zeg gedag als je weggaat 👋 het helpt anderen zich geliefd en gezien te voelen";
+"catalog_rule_21" = "Eet langzaam en bewust 🍽️ zodat je lichaam zich vol en kalm kan voelen";
+"catalog_rule_22" = "Zeg pardon als je onderbreekt 🙇 het laat zien dat je geeft om en respect hebt";
+"catalog_rule_23" = "Adem diep in als je boos bent 🌬️ om je gevoelens te helpen kalmeren";
+"catalog_rule_24" = "Wees voorzichtig met dieren 🐾 zodat ze zich veilig en geliefd bij je voelen";
+"catalog_rule_25" = "Houd je rugzak netjes 🎒 zodat je je spullen gemakkelijk kunt vinden";
+"catalog_rule_26" = "Vertel het ons als iets niet goed voelt 🚨 zodat we je meteen kunnen helpen";
+
+// Catalog Content - Chores
+"catalog_chore_1" = "Ruim je speelgoed op na het spelen 🧸 om je ruimte vredig te houden";
+"catalog_chore_2" = "Maak elke ochtend je bed op 🛏️ het helpt de kamer verfrist te voelen";
+"catalog_chore_3" = "Breng je bord naar de gootsteen 🍽️ zodat opruimen snel en gemakkelijk gaat";
+"catalog_chore_4" = "Veeg de tafel af na maaltijden 🧼 om het klaar en schoon te houden";
+"catalog_chore_5" = "Hang je handdoek op na het douchen 🚿 zodat het droogt en fris blijft";
+"catalog_chore_6" = "Doe je vuile kleren in de mand 🧺 zodat ze gewassen kunnen worden";
+"catalog_chore_7" = "Zet je schoenen netjes in een rij 👟 zodat de gang er opgeruimd en veilig uitziet";
+"catalog_chore_8" = "Koppel schone sokken in paren 🧦 het helpt aankleden soepel te laten gaan";
+"catalog_chore_9" = "Raap kruimels en kleine rommel op 🍪 om de vloer schoon te houden";
+"catalog_chore_10" = "Geef een plant voorzichtig water met hulp 🌿 ze hebben zorg nodig om sterk te groeien";
+"catalog_chore_11" = "Vouw schone handdoeken of kleren op 🧻 het maakt planken er netjes en zacht uitzien";
+"catalog_chore_12" = "Pak je rugzak in voor school 🎒 zodat je 's ochtends klaar bent";
+"catalog_chore_13" = "Stof de planken af met een zachte doek 🧽 zodat je kamer fris blijft";
+
+// Catalog Content - Rewards
+"catalog_reward_1" = "Extra schep van je favoriete ijsje 🍦";
+"catalog_reward_2" = "Kleine zak knapperige chips of popcorn 🍿";
+"catalog_reward_3" = "Gebakje of koekje van de bakker 🍪";
+"catalog_reward_4" = "Warme chocolademelk met slagroom ☕";
+"catalog_reward_5" = "Verrassingssticker of nieuwigheid gum 🎟️";
+"catalog_reward_6" = "Kies een danslied en zet het hard aan thuis 💃";
+"catalog_reward_7" = "Chips met guacamole of gesmolten kaas dip 🥑";
+"catalog_reward_8" = "Smoothie of slushy van een winkel 🥤";
+"catalog_reward_9" = "Kleurrijke sapbox en zoete snack combo 🧃";
+"catalog_reward_10" = "Kies elke ontbijtmaaltijd dit weekend 🥞";
+"catalog_reward_11" = "Voeg feeënlichtjes of muurstickers toe aan je kamer ✨";
+"catalog_reward_12" = "Kies de film voor familiefilmavond 🎬";
+"catalog_reward_13" = "Blijf 20 minuten extra op na bedtijd 🕰️";
+"catalog_reward_14" = "30 minuten extra schermtijd 📱";
+"catalog_reward_15" = "Kies een snack en show voor solo chill tijd 🍿";
+"catalog_reward_16" = "Versier cupcakes met glazuur en hagelslag 🧁";
+"catalog_reward_17" = "Koop een favoriete traktatie van de supermarkt 🛒";
+"catalog_reward_18" = "Pak een klein dessert bij de bakker of café 🍰";
+"catalog_reward_19" = "Tijdschrift of strip van een kiosk 📖";
+"catalog_reward_20" = "Probeer een nieuwe drank bij een café of bubble tea bar 🧋";
+"catalog_reward_21" = "Kies een mysterie verrassing uit een grabbelton 🎁";
+"catalog_reward_22" = "Kies nieuwe stickers of een klein verzamelobject 🎨";
+"catalog_reward_23" = "Kies een klein speeltje of Hot Wheels auto 🚗";
+"catalog_reward_24" = "Koop een nieuwigheid pen, squishy of prullaria ✍️";
+"catalog_reward_25" = "Frozen yoghurt met toppings naar keuze 🍨";
+"catalog_reward_26" = "Speciale bakkerij donut of cake pop 🍩";
+"catalog_reward_27" = "Stickerboek of activiteitenblok met thema 🖍️";
+"catalog_reward_28" = "Mini Lego set, fidget speeltje of pop-it 🧱";
+"catalog_reward_29" = "Kleine knuffel of speelgoedfiguur die je leuk vindt 🧸";
+"catalog_reward_30" = "Nieuw boek van de boekwinkel 📚"; 
+
+// Toast Messages
+"toast_removed_hub" = "Verwijderd uit je Hub";
+"toast_added_hub" = "Toegevoegd aan je Hub";
+
+// Modal Messages
+"modal_task_already_completed" = "Je hebt deze taak al als voltooid gemarkeerd voor vandaag en je pinda's uitgegeven. Zorg ervoor dat het gedaan is.";
+"confetti_well_deserved" = "Goed verdiend! Veel plezier met je traktatie";
+
+// Empty State Messages
+"empty_check_back_peanuts" = "Kom binnenkort terug om pinda's te verdienen! 🥜";
+
+// PIN Lock Messages
+"pin_enter_pin" = "Voer PIN in";
+"pin_unlock_admin" = "Voer je 4-cijferige PIN in om Admin te ontgrendelen";
+"pin_unlock_parent_control" = "Voer je 4-cijferige PIN in om het Ouder Controlecentrum te ontgrendelen";
+
+// Kids Profile Messages
+"kids_profile_title" = "Wie doet er mee met Tipje?";
+"kids_profile_subtitle" = "Voeg je kind (of twee) toe om je bewuste reis te beginnen.";
+
+// Subscription Messages
+"subscription_load_error" = "Producten laden mislukt. Controleer je verbinding en probeer opnieuw.";
+"subscription_retry" = "Opnieuw proberen";
+"subscription_trial_ended" = "Je gratis proefperiode is afgelopen";
+"subscription_subscribe" = "Abonneren";
+"subscription_and" = "en";
+"subscription_monthly" = "Tipje Maandelijks";
+"subscription_monthly_desc" = "Maandelijks betalen. Altijd opzegbaar";
+"subscription_yearly" = "Tipje Jaarlijks";
+"subscription_yearly_desc" = "Beste waarde. Bespaar 20%";
+"subscription_not_available" = "Niet beschikbaar";
+
+// Other UI Elements
+"paywall_unlock_features" = "Ontgrendel alle functies";
+"basket_reward" = "Beloning";
+"error_login" = "Inloggen";
+"main_switched_kid" = "Je bent overgeschakeld naar %@"; 

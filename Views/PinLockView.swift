@@ -64,13 +64,13 @@ struct PinLockViewiPhone: View {
             VStack {
                 Spacer(minLength: 0)
                 VStack(spacing: 0) {
-                    Text("Enter PIN")
+                    Text(NSLocalizedString("pin_enter_pin", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 28))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
                     Spacer().frame(height: 12)
-                    Text("Enter your 4-digit PIN to unlock Admin")
+                    Text(NSLocalizedString("pin_unlock_admin", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_Medium", size: 16))
                         .foregroundColor(.white)
                         .opacity(0.8)
@@ -153,13 +153,13 @@ struct PinLockViewiPad: View {
             VStack {
                 Spacer(minLength: 0)
                 VStack(spacing: 0) {
-                    Text("Enter PIN")
+                    Text(NSLocalizedString("pin_enter_pin", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 48))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
                     Spacer().frame(height: 12)
-                    Text("Enter your 4-digit PIN to unlock Parent Control Center")
+                    Text(NSLocalizedString("pin_unlock_parent_control", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_Medium", size: 24))
                         .foregroundColor(.white)
                         .opacity(0.8)

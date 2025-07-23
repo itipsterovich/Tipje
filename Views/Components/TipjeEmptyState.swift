@@ -143,7 +143,7 @@ struct TipjeEmptyState_Previews: PreviewProvider {
     static var previews: some View {
         TipjeEmptyState(
             imageName: "mascot_ticket",
-            subtitle: "Check back soon to start earning peanuts! 🥜"
+            subtitle: NSLocalizedString("empty_check_back_peanuts", tableName: nil, bundle: Bundle.main, value: "", comment: "")
         )
     }
 }

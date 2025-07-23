@@ -82,7 +82,7 @@ struct TipjeModal_Previews: PreviewProvider {
     static var previews: some View {
         TipjeModal(
             imageName: "il_used",
-            message: "You've already marked this task as completed for today and spent your peanuts. Make sure it's done.",
+            message: NSLocalizedString("modal_task_already_completed", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
             onClose: {}
         )
     }

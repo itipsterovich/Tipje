@@ -228,4 +228,56 @@ let rewardsCatalog: [CatalogReward] = [
     CatalogReward(id: "reward28", title: "Mini Lego set, fidget toy or pop-it 🧱", peanuts: 50, color: cardPalette[6]),
     CatalogReward(id: "reward29", title: "Small plush or toy figure you love 🧸", peanuts: 50, color: cardPalette[0]),
     CatalogReward(id: "reward30", title: "New book from the bookstore 📚", peanuts: 80, color: cardPalette[1]),
-] 
+]
+
+// MARK: - Localized Catalog Functions
+func getLocalizedRulesCatalog() -> [CatalogRule] {
+    let languageCode = LocalizationManager.shared.currentLanguage
+    return rulesCatalog.map { rule in
+        let localizedTitle = NSLocalizedString("catalog_rule_\(rule.id.replacingOccurrences(of: "rule", with: ""))", 
+                                             tableName: nil, 
+                                             bundle: Bundle.main, 
+                                             value: rule.title, 
+                                             comment: "")
+        return CatalogRule(id: rule.id, 
+                          title: localizedTitle, 
+                          peanuts: rule.peanuts, 
+                          color: rule.color, 
+                          colorHex: rule.colorHex, 
+                          isCustom: rule.isCustom)
+    }
+}
+
+func getLocalizedChoresCatalog() -> [CatalogChore] {
+    let languageCode = LocalizationManager.shared.currentLanguage
+    return choresCatalog.map { chore in
+        let localizedTitle = NSLocalizedString("catalog_chore_\(chore.id.replacingOccurrences(of: "chore", with: ""))", 
+                                             tableName: nil, 
+                                             bundle: Bundle.main, 
+                                             value: chore.title, 
+                                             comment: "")
+        return CatalogChore(id: chore.id, 
+                           title: localizedTitle, 
+                           peanuts: chore.peanuts, 
+                           color: chore.color, 
+                           colorHex: chore.colorHex, 
+                           isCustom: chore.isCustom)
+    }
+}
+
+func getLocalizedRewardsCatalog() -> [CatalogReward] {
+    let languageCode = LocalizationManager.shared.currentLanguage
+    return rewardsCatalog.map { reward in
+        let localizedTitle = NSLocalizedString("catalog_reward_\(reward.id.replacingOccurrences(of: "reward", with: ""))", 
+                                             tableName: nil, 
+                                             bundle: Bundle.main, 
+                                             value: reward.title, 
+                                             comment: "")
+        return CatalogReward(id: reward.id, 
+                            title: localizedTitle, 
+                            peanuts: reward.peanuts, 
+                            color: reward.color, 
+                            colorHex: reward.colorHex, 
+                            isCustom: reward.isCustom)
+    }
+} 

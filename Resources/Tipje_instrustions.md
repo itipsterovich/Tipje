@@ -1,3 +1,52 @@
+# Latest Updates & Best Practices (2024-07)
+
+## 1. Custom Rules, Chores, and Rewards
+- Parents can now create custom rules, chores, and rewards from the catalog modals.
+- Custom items use the same color palette and assignment logic as curated items.
+- After saving, custom items are immediately available in Admin, Home, and Shop, and are always kept in sync.
+- The Save button for custom items is **disabled** unless the title is non-empty and the peanut value/cost is valid (1–9).
+- The text input for custom item titles uses a multi-line `TextField` that wraps to fit the card/container, preventing endless single-line overflow.
+
+## 2. Empty State Consistency
+- All empty states (Home, Admin, Shop) use the same mascot (`mascot_ticket` or `mascot_empty` as appropriate), with consistent image height and `topPadding: 0` on iPad.
+- The mascot and text are always vertically centered in the content area, not anchored to the top.
+- Horizontal padding for empty state text is always `.padding(.horizontal, 24)` on iPad, matching Home and Admin.
+
+## 3. Color Consistency
+- All color assignments for rules, chores, and rewards (curated and custom) use the same palette and lookup logic:
+  ```swift
+  (catalog + custom).first { $0.id == item.id }?.color ?? fallback
+  ```
+- No index-based color assignment is used anywhere in the app.
+
+## 4. Loading State Best Practice
+- The custom `TipjeLoadingView` (with animated dots) is shown:
+  - On app launch, until Firebase/Auth and onboarding state are ready.
+  - After login, during any async onboarding or user state refresh.
+  - During any async operation (login, registration, purchase, etc.) where a delay is possible.
+- Use a local `@State var isLoading = false` and show `TipjeLoadingView` as a full-screen overlay when true.
+
+## 5. Onboarding & Paywall Flow
+- The app is free to download (“Get” button in App Store).
+- New users receive a 7-day free trial with full access—no payment or subscription required to start.
+- After the trial, users are shown a paywall and can choose between monthly or yearly auto-renewable subscriptions.
+- No user is charged or auto-subscribed during the trial; billing only begins after explicit plan selection.
+
+## 6. Device-Specific Layout Policy
+- All main app views (Admin, Home, Shop, Main, etc.) have separate SwiftUI view structs for iPhone and iPad.
+- The main entry point switches between these based on `horizontalSizeClass`.
+- No inline size class checks in the body; all device-specific logic is handled in the appropriate struct.
+
+## 7. Error State UI
+- All error and empty states use the shared `ErrorStateView` component for consistency.
+- Always provide a clear action for the user to recover (e.g., log in, retry, go to onboarding).
+
+## 8. Git/Release Best Practice
+- Always merge feature branches (e.g., `Develop`) into `main` before archiving or releasing.
+- Confirm that all changes are present in `main` before submitting to the App Store.
+
+---
+
 # Changelog (2024-07)
 
 - ChoreAdultCard and RewardAdultCard now have the same tap area separation as RuleAdultCard: left (text) area expands/collapses, right (icon/peanut) area archives/adds/removes, in both Admin and Catalog modals.
@@ -438,3 +487,11 @@ Parents can now create custom Rules, Chores, and Rewards directly from the respe
 - Only one editable card is shown at a time.
 - Custom chores are available for selection and saving to the kid’s chores collection, and show up in Admin and Home.
 - Placeholder text for custom chore input is styled to match the card border color and wraps to 2 lines.
+
+## Onboarding & Login Localization (2024-07)
+
+- All user-facing text in onboarding and login screens uses the `LocalizedText("key")` SwiftUI view, which observes the current language and always fetches the correct translation from the active bundle. This enables true runtime language switching.
+- For all text field placeholders (e.g., email, password), use `NSLocalizedString("key", tableName: nil, bundle: Bundle.main, value: "", comment: "")` to ensure the placeholder updates instantly when the language changes.
+- The language selector (globe button) is shown only on the first onboarding screen. When the user selects a language, the entire onboarding and login UI updates immediately to the chosen language, without restarting the app.
+- All localization keys for onboarding and login are present in both `en.lproj/Localizable.strings` and `nl.lproj/Localizable.strings`.
+- This approach ensures a seamless, user-friendly multilingual onboarding experience and is the standard for all future onboarding and login UI in Tipje.

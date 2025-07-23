@@ -97,7 +97,10 @@ struct SettingsView: View {
     @State private var activeAlert: SettingsAlertType?
     @State private var showDeleteAccountModal = false
     @State private var showDeleteAccountAlert = false
-    let languages = ["en": "English", "nl": "Nederlands"]
+    let languages = [
+        "en": NSLocalizedString("English", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
+        "nl": NSLocalizedString("Nederlands", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+    ]
 
     private func updateEmailFromAuth() {
         if let userEmail = authManager.firebaseUser?.email, userEmail != email {
@@ -318,50 +321,56 @@ struct SettingsViewiPhone: View {
     // Extracted Login Methods section
     private var loginMethodsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Sign-in Method")
-                .font(.custom("Inter-Regular_Medium", size: 17))
-                .foregroundColor(Color(hex: "#799B44"))
-                .padding(.top, 0)
-                .padding(.bottom, 8)
-            if isGoogleLinked {
-                HStack {
+            // Sign-in method table row
+            HStack {
+                Text(NSLocalizedString("settings_signin_method", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
+                    .font(.custom("Inter-Regular_Medium", size: 17))
+                    .foregroundColor(Color(hex: "#799B44"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if isGoogleLinked {
+                    HStack(spacing: 8) {
                         Image("GoogleLogo").resizable().frame(width: 24, height: 24)
                         Text("Google")
                             .font(.custom("Inter-Regular", size: 17))
-                            .foregroundColor(Color(hex: "#799B44"))
-                        Spacer()
-                }
-            } else if let provider = authManager.firebaseUser?.providerData.first(where: { $0.providerID == "apple.com" }) {
-                HStack {
-                    Image(systemName: "applelogo").resizable().frame(width: 24, height: 24)
-                    Text("Apple")
-                        .font(.custom("Inter-Regular", size: 17))
-                        .foregroundColor(Color(hex: "#799B44"))
-                    Spacer()
-                }
-            } else if isEmailLinked {
-                HStack {
-                        Text("Email/Password")
-                            .font(.custom("Inter-Regular", size: 17))
-                            .foregroundColor(Color(hex: "#799B44"))
-                    Spacer()
-                        ButtonTextiPhone(title: "Change Password", variant: .secondary) {
-                            print("[Settings] Change Password button tapped, presenting modal")
-                            showChangePasswordModal = true
-                        }
-                        .frame(maxWidth: .infinity)
-                        .font(.custom("Inter-Regular_Medium", size: 17))
+                            .foregroundColor(Color(hex: "#7FAD98"))
                     }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                } else if let provider = authManager.firebaseUser?.providerData.first(where: { $0.providerID == "apple.com" }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "applelogo").resizable().frame(width: 24, height: 24)
+                        Text("Apple")
+                            .font(.custom("Inter-Regular", size: 17))
+                            .foregroundColor(Color(hex: "#7FAD98"))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                } else if isEmailLinked {
+                    Text("Email/Password")
+                        .font(.custom("Inter-Regular", size: 17))
+                        .foregroundColor(Color(hex: "#7FAD98"))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
+            }
+            .frame(maxWidth: .infinity)
+            
+            // Change password button below the table (only for email/password)
+            if isEmailLinked {
+                ButtonTextiPhone(title: NSLocalizedString("settings_change_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
+                    print("[Settings] Change Password button tapped, presenting modal")
+                    showChangePasswordModal = true
+                }, fullWidth: true)
+                .font(.custom("Inter-Regular_Medium", size: 17))
+            }
+            
             // --- Kids Profiles Section ---
-            Text("Kids Profiles")
+            Text(NSLocalizedString("settings_kids_profiles", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                 .font(.custom("Inter-Regular_Medium", size: 17))
                 .foregroundColor(Color(hex: "#799B44"))
                 .padding(.top, 14)
                 .padding(.bottom, 14)
             ForEach(Array(store.kids.enumerated()), id: \.element.id) { index, kid in
                 HStack {
-                    Text(store.kids.count == 2 ? "Profile Name \(index + 1)" : "Profile Name")
+                    Text(store.kids.count == 2 ? NSLocalizedString("settings_profile_name_index", tableName: nil, bundle: Bundle.main, value: "", comment: "") + " \(index + 1)" : NSLocalizedString("settings_profile_name", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular", size: 17))
                         .foregroundColor(Color(hex: "#799B44"))
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -372,22 +381,22 @@ struct SettingsViewiPhone: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            ButtonTextiPhone(title: "Edit Profiles", variant: .secondary) {
+            ButtonTextiPhone(title: NSLocalizedString("settings_edit_profiles", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
                 print("[Settings] Edit Profiles button tapped")
                 showEditKidsModal = true
-            }
+            }, fullWidth: true)
             .frame(maxWidth: .infinity)
-            ButtonTextiPhone(title: "Delete Account", variant: .secondary) {
+            ButtonTextiPhone(title: NSLocalizedString("settings_delete_account", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
                 showDeleteAccountAlert = true
-            }
+            }, fullWidth: true)
             .frame(maxWidth: .infinity)
             .padding(.top, 12)
             .foregroundColor(.red)
             .alert(isPresented: $showDeleteAccountAlert) {
                 Alert(
-                    title: Text("Delete Account"),
-                    message: Text("Are you sure you want to permanently delete your account and all data? This cannot be undone."),
-                    primaryButton: .destructive(Text("Delete")) {
+                    title: Text(NSLocalizedString("settings_delete_account", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                    message: Text(NSLocalizedString("settings_delete_account_confirm", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                    primaryButton: .destructive(Text(NSLocalizedString("delete", tableName: nil, bundle: Bundle.main, value: "", comment: ""))) {
                         guard let userId = authManager.firebaseUser?.uid else { return }
                         FirestoreManager.shared.cascadeDeleteUser(userId: userId) { _ in
                             authManager.deleteCurrentUser { _, _ in
@@ -405,29 +414,29 @@ struct SettingsViewiPhone: View {
     private var planStatusTable: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Plan")
+                Text(NSLocalizedString("settings_plan", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular", size: 17))
                     .foregroundColor(Color(hex: "#799B44"))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(subscriptionType == "Yearly" ? "Tipje Yearly" : "Tipje Monthly")
+                Text(subscriptionType == "Yearly" ? NSLocalizedString("settings_tipje_yearly", tableName: nil, bundle: Bundle.main, value: "", comment: "") : NSLocalizedString("settings_tipje_monthly", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular_SemiBold", size: 17))
                     .foregroundColor(Color(hex: "#7FAD98"))
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .frame(maxWidth: .infinity)
             HStack {
-                Text("Status")
+                Text(NSLocalizedString("settings_status", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular", size: 17))
                     .foregroundColor(Color(hex: "#799B44"))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Subscribed")
+                Text(NSLocalizedString("settings_subscribed", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular", size: 17))
                     .foregroundColor(Color(hex: "#7FAD98"))
                     .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .frame(maxWidth: .infinity)
             HStack {
-                Text("Next Billing Date")
+                Text(NSLocalizedString("settings_next_billing_date", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular", size: 17))
                     .foregroundColor(Color(hex: "#799B44"))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -438,18 +447,16 @@ struct SettingsViewiPhone: View {
             }
             .frame(maxWidth: .infinity)
             VStack(alignment: .leading, spacing: 12) {
-                ButtonTextiPhone(title: "Manage Subscription", variant: .secondary) {
+                ButtonTextiPhone(title: NSLocalizedString("settings_manage_subscription", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
                     if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
                         UIApplication.shared.open(url)
                     }
-                }
-                .frame(maxWidth: .infinity)
+                }, fullWidth: true)
                 VStack(alignment: .center) {
-                    ButtonTextiPhone(title: String(localized: "settings_logout"), variant: .primary) {
+                    ButtonTextiPhone(title: NSLocalizedString("settings_logout", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: {
                         print("[Settings] Logout button action triggered")
                         authManager.signOut()
-                    }
-                    .frame(maxWidth: .infinity)
+                    }, fullWidth: true)
                     .font(.custom("Inter-Regular_Medium", size: 17))
                 }
                 .frame(maxWidth: .infinity)
@@ -468,16 +475,32 @@ struct SettingsViewiPhone: View {
                 containerOffsetY: -36,
                 content: {
                     VStack(alignment: .leading, spacing: 14) {
-                        PageTitle("Family Settings")
+                        PageTitle(NSLocalizedString("settings_title_family", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .padding(.top, 14)
                             .padding(.bottom, 0)
+                        
                         Group {
                             SettingsSection(title: nil, trailingIcon: nil, onTrailingIconTap: nil, content: {
-                                loginMethodsSection
+                                VStack(alignment: .leading, spacing: 8) {
+                                    // Language row
+                                    HStack {
+                                        let languageText = NSLocalizedString("settings_language", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                                        Text(languageText)
+                                            .font(.custom("Inter-Regular_Medium", size: 17))
+                                            .foregroundColor(Color(hex: "#799B44"))
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        LanguageSelector(selectedLanguage: $selectedLanguage, context: .settings)
+                                            .frame(maxWidth: .infinity, alignment: .trailing)
+                                    }
+                                    
+                                    // Sign-in method row
+                                    loginMethodsSection
+                                }
                             })
                         }
                         .background(Color(hex: "#EAF3EA").opacity(0.5))
                         .cornerRadius(24)
+                        
                         planStatusTable
                     }
                     .ignoresSafeArea(.container, edges: .horizontal)
@@ -558,88 +581,95 @@ struct SettingsViewiPad: View {
     let isEmailLinked: Bool
 
     private var loginMethodsSectioniPad: some View {
-                            VStack(alignment: .leading, spacing: 8) {
-            Text("Sign-in Method")
-                                    .font(.custom("Inter-Regular_Medium", size: 24))
-                                    .foregroundColor(Color(hex: "#799B44"))
-                                    .padding(.top, 0)
-                                    .padding(.bottom, 8)
-                                if isGoogleLinked {
-                HStack {
-                                            Image("GoogleLogo").resizable().frame(width: 24, height: 24)
-                                            Text("Google")
-                                                .font(.custom("Inter-Regular", size: 24))
-                                                .foregroundColor(Color(hex: "#799B44"))
-                    Spacer()
+        VStack(alignment: .leading, spacing: 8) {
+            // Sign-in method table row
+            HStack {
+                Text(NSLocalizedString("settings_signin_method", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
+                    .font(.custom("Inter-Regular_Medium", size: 24))
+                    .foregroundColor(Color(hex: "#799B44"))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if isGoogleLinked {
+                    HStack(spacing: 8) {
+                        Image("GoogleLogo").resizable().frame(width: 24, height: 24)
+                        Text("Google")
+                            .font(.custom("Inter-Regular", size: 24))
+                            .foregroundColor(Color(hex: "#7FAD98"))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                } else if let provider = authManager.firebaseUser?.providerData.first(where: { $0.providerID == "apple.com" }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "applelogo").resizable().frame(width: 24, height: 24)
+                        Text("Apple")
+                            .font(.custom("Inter-Regular", size: 24))
+                            .foregroundColor(Color(hex: "#7FAD98"))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                } else if isEmailLinked {
+                    Text("Email/Password")
+                        .font(.custom("Inter-Regular", size: 24))
+                        .foregroundColor(Color(hex: "#7FAD98"))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-            } else if let provider = authManager.firebaseUser?.providerData.first(where: { $0.providerID == "apple.com" }) {
+            }
+            .frame(maxWidth: .infinity)
+            
+            // Change password button below the table (only for email/password)
+            if isEmailLinked {
+                ButtonText(title: NSLocalizedString("settings_change_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
+                    print("[Settings] Change Password button tapped, presenting modal")
+                    showChangePasswordModal = true
+                }, fontSize: 24, fullWidth: true)
+                .frame(maxWidth: .infinity)
+                .font(.custom("Inter-Regular_Medium", size: 24))
+            }
+            
+            // --- Kids Profiles Section ---
+            Text(NSLocalizedString("settings_kids_profiles", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
+                .font(.custom("Inter-Regular_Medium", size: 24))
+                .foregroundColor(Color(hex: "#799B44"))
+                .padding(.top, 14)
+                .padding(.bottom, 14)
+            ForEach(Array(store.kids.enumerated()), id: \.element.id) { index, kid in
                 HStack {
-                    Image(systemName: "applelogo").resizable().frame(width: 24, height: 24)
-                    Text("Apple")
+                    Text(store.kids.count == 2 ? NSLocalizedString("settings_profile_name_index", tableName: nil, bundle: Bundle.main, value: "", comment: "") + " \(index + 1)" : NSLocalizedString("settings_profile_name", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular", size: 24))
                         .foregroundColor(Color(hex: "#799B44"))
-                    Spacer()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(kid.name)
+                        .font(.custom("Inter-Regular", size: 24))
+                        .foregroundColor(Color(hex: "#7FAD98"))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                                } else if isEmailLinked {
-                HStack {
-                                            Text("Email/Password")
-                                                .font(.custom("Inter-Regular", size: 24))
-                                                .foregroundColor(Color(hex: "#799B44"))
-                    Spacer()
-                                            ButtonText(title: "Change Password", variant: .secondary) {
-                                                print("[Settings] Change Password button tapped, presenting modal")
-                                                showChangePasswordModal = true
-                                            }
-                                                    .frame(maxWidth: .infinity)
-                                                    .font(.custom("Inter-Regular_Medium", size: 24))
-                                        }
-                                    }
-            // --- Kids Profiles Section ---
-                                Text("Kids Profiles")
-                                    .font(.custom("Inter-Regular_Medium", size: 24))
-                                    .foregroundColor(Color(hex: "#799B44"))
-                                    .padding(.top, 14)
-                                    .padding(.bottom, 14)
-                                ForEach(Array(store.kids.enumerated()), id: \.element.id) { index, kid in
-                                    HStack {
-                                        Text(store.kids.count == 2 ? "Profile Name \(index + 1)" : "Profile Name")
-                                            .font(.custom("Inter-Regular", size: 24))
-                                            .foregroundColor(Color(hex: "#799B44"))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        Text(kid.name)
-                                            .font(.custom("Inter-Regular", size: 24))
-                                            .foregroundColor(Color(hex: "#7FAD98"))
-                                            .frame(maxWidth: .infinity, alignment: .trailing)
-                                    }
-                                    .frame(maxWidth: .infinity)
-                                }
-                                ButtonText(title: "Edit Profiles", variant: .secondary) {
-                                    print("[Settings] Edit Profiles button tapped")
-                                    showEditKidsModal = true
-                                }
-                                .frame(maxWidth: .infinity, minHeight: 44)
-                                .font(.custom("Inter-Regular_Medium", size: 24))
-                                ButtonText(title: "Delete Account", variant: .secondary) {
-                                    showDeleteAccountAlert = true
-                                }
-                                .padding(.top, 12)
-                                .foregroundColor(.red)
-                                .alert(isPresented: $showDeleteAccountAlert) {
-                                    Alert(
-                                        title: Text("Delete Account"),
-                                        message: Text("Are you sure you want to permanently delete your account and all data? This cannot be undone."),
-                                        primaryButton: .destructive(Text("Delete")) {
-                                            guard let userId = authManager.firebaseUser?.uid else { return }
-                                            FirestoreManager.shared.cascadeDeleteUser(userId: userId) { _ in
-                                                authManager.deleteCurrentUser { _, _ in
-                                                    authManager.signOut()
-                                                }
-                                            }
-                                        },
-                                        secondaryButton: .cancel()
-                                    )
-                                }
+                .frame(maxWidth: .infinity)
+            }
+            ButtonText(title: NSLocalizedString("settings_edit_profiles", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
+                print("[Settings] Edit Profiles button tapped")
+                showEditKidsModal = true
+            }, fontSize: 24, fullWidth: true)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .font(.custom("Inter-Regular_Medium", size: 24))
+            ButtonText(title: NSLocalizedString("settings_delete_account", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
+                showDeleteAccountAlert = true
+            }, fontSize: 24, fullWidth: true)
+            .padding(.top, 12)
+            .foregroundColor(.red)
+            .alert(isPresented: $showDeleteAccountAlert) {
+                Alert(
+                    title: Text(NSLocalizedString("settings_delete_account", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                    message: Text(NSLocalizedString("settings_delete_account_confirm", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                    primaryButton: .destructive(Text(NSLocalizedString("delete", tableName: nil, bundle: Bundle.main, value: "", comment: ""))) {
+                        guard let userId = authManager.firebaseUser?.uid else { return }
+                        FirestoreManager.shared.cascadeDeleteUser(userId: userId) { _ in
+                            authManager.deleteCurrentUser { _, _ in
+                                authManager.signOut()
                             }
+                        }
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+        }
     }
 
     var body: some View {
@@ -649,13 +679,27 @@ struct SettingsViewiPad: View {
             containerOffsetY: -36,
             content: {
                 VStack(alignment: .leading, spacing: 14) {
-                    PageTitle("Family Settings")
+                    PageTitle(NSLocalizedString("settings_title_family", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .padding(.top, 14)
                         .padding(.bottom, 0)
                         .padding(.horizontal, 24)
+                    
                     Group {
                         SettingsSection(title: nil, trailingIcon: nil, onTrailingIconTap: nil, content: {
-                            loginMethodsSectioniPad
+                            VStack(alignment: .leading, spacing: 8) {
+                                // Language row
+                                HStack {
+                                    Text(NSLocalizedString("settings_language", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
+                                        .font(.custom("Inter-Regular_Medium", size: 24))
+                                        .foregroundColor(Color(hex: "#799B44"))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    LanguageSelector(selectedLanguage: $selectedLanguage, context: .settings)
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                }
+                                
+                                // Sign-in method row
+                                loginMethodsSectioniPad
+                            }
                         }, customTitle: { AnyView(EmptyView()) })
                     }
                     .background(Color(hex: "#EAF3EA").opacity(0.5))
@@ -666,11 +710,11 @@ struct SettingsViewiPad: View {
                     
                     VStack(alignment: .leading, spacing: 14) {
                         HStack {
-                            Text("Plan")
+                            Text(NSLocalizedString("settings_plan", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular", size: 24))
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text(subscriptionType == "Yearly" ? "Tipje Yearly" : "Tipje Monthly")
+                            Text(subscriptionType == "Yearly" ? NSLocalizedString("settings_tipje_yearly", tableName: nil, bundle: Bundle.main, value: "", comment: "") : NSLocalizedString("settings_tipje_monthly", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular_SemiBold", size: 24))
                                 .foregroundColor(Color(hex: "#7FAD98"))
                                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -678,11 +722,11 @@ struct SettingsViewiPad: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 48)
                         HStack {
-                            Text("Status")
+                            Text(NSLocalizedString("settings_status", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular", size: 24))
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                            Text("Subscribed")
+                            Text(NSLocalizedString("settings_subscribed", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular", size: 24))
                                 .foregroundColor(Color(hex: "#7FAD98"))
                                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -690,7 +734,7 @@ struct SettingsViewiPad: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 48)
                         HStack {
-                            Text("Next Billing Date")
+                            Text(NSLocalizedString("settings_next_billing_date", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular", size: 24))
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -703,18 +747,18 @@ struct SettingsViewiPad: View {
                         .padding(.horizontal, 48)
                         .padding(.bottom, 24)
                         VStack(alignment: .leading, spacing: 24) {
-                            ButtonText(title: "Manage Subscription", variant: .secondary) {
+                            ButtonText(title: NSLocalizedString("settings_manage_subscription", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: {
                                 if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
                                     UIApplication.shared.open(url)
                                 }
-                            }
+                            }, fontSize: 24, fullWidth: true)
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .padding(.horizontal, 24)
                             .font(.custom("Inter-Regular_Medium", size: 24))
-                            ButtonText(title: String(localized: "settings_logout"), variant: .primary) {
+                            ButtonText(title: NSLocalizedString("settings_logout", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: {
                                 print("[Settings] Logout button action triggered")
                                 authManager.signOut()
-                            }
+                            }, fontSize: 24, fullWidth: true)
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .padding(.horizontal, 24)
                             .font(.custom("Inter-Regular_Medium", size: 24))
@@ -907,9 +951,9 @@ struct ChangePasswordModal_iPhone: View {
             Text("Change Password")
                 .font(.custom("Inter-Regular_SemiBold", size: 24))
                 .foregroundColor(Color(hex: "#494646"))
-            CustomInputField(placeholder: "Current Password", text: $currentPassword, isSecure: true)
+            CustomInputField(placeholder: NSLocalizedString("settings_current_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $currentPassword, isSecure: true)
                 .frame(maxWidth: .infinity)
-            CustomInputField(placeholder: "New Password", text: $newPassword, isSecure: true)
+            CustomInputField(placeholder: NSLocalizedString("settings_new_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $newPassword, isSecure: true)
                 .frame(maxWidth: .infinity)
             if let error = errorMessage {
                 Text(error)
@@ -917,9 +961,9 @@ struct ChangePasswordModal_iPhone: View {
                     .font(.caption)
             }
             HStack(spacing: 12) {
-                ButtonTextiPhone(title: "Change", variant: .primary) {
+                ButtonTextiPhone(title: NSLocalizedString("settings_change", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary) {
                     guard !currentPassword.isEmpty, !newPassword.isEmpty else {
-                        errorMessage = "Please fill in all fields."
+                        errorMessage = NSLocalizedString("settings_fill_all_fields", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         return
                     }
                     isLoading = true
@@ -928,7 +972,7 @@ struct ChangePasswordModal_iPhone: View {
                 }
                 .disabled(isLoading)
                 .frame(maxWidth: .infinity)
-                ButtonTextiPhone(title: "Cancel", variant: .secondary) {
+                ButtonTextiPhone(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary) {
                     onCancel()
                 }
                 .frame(maxWidth: .infinity)
@@ -955,9 +999,9 @@ struct ChangePasswordModal_iPad: View {
             Text("Change Password")
                 .font(.custom("Inter-Regular_Medium", size: 32))
                 .foregroundColor(Color(hex: "#494646"))
-            CustomInputField(placeholder: "Current Password", text: $currentPassword, isSecure: true)
+            CustomInputField(placeholder: NSLocalizedString("settings_current_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $currentPassword, isSecure: true)
                 .frame(maxWidth: .infinity)
-            CustomInputField(placeholder: "New Password", text: $newPassword, isSecure: true)
+            CustomInputField(placeholder: NSLocalizedString("settings_new_password", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: $newPassword, isSecure: true)
                 .frame(maxWidth: .infinity)
             if let error = errorMessage {
                 Text(error)
@@ -965,9 +1009,9 @@ struct ChangePasswordModal_iPad: View {
                     .font(.caption)
             }
             HStack(spacing: 12) {
-                ButtonText(title: "Change", variant: .primary, action: {
+                ButtonText(title: NSLocalizedString("settings_change", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: {
                     guard !currentPassword.isEmpty, !newPassword.isEmpty else {
-                        errorMessage = "Please fill in all fields."
+                        errorMessage = NSLocalizedString("settings_fill_all_fields", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         return
                     }
                     isLoading = true
@@ -976,7 +1020,7 @@ struct ChangePasswordModal_iPad: View {
                 })
                 .disabled(isLoading)
                 .frame(maxWidth: .infinity)
-                ButtonText(title: "Cancel", variant: .secondary, action: onCancel)
+                ButtonText(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: onCancel)
                 .frame(maxWidth: .infinity)
             }
         }

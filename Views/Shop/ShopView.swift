@@ -24,13 +24,18 @@ enum ShopModal: Identifiable {
 }
 
 struct ShopView: View {
+    @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var body: some View {
-        if horizontalSizeClass == .compact {
-            ShopViewiPhone()
-        } else {
-            ShopViewiPad()
+        Group {
+            if horizontalSizeClass == .compact {
+                ShopViewiPhone()
+            } else {
+                ShopViewiPad()
+            }
         }
+        .id(localizationManager.currentLanguage)
     }
 }
 
@@ -39,6 +44,7 @@ struct ShopView: View {
 // =======================
 struct ShopViewiPhone: View {
     @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
     @State private var activeModal: ShopModal? = nil
@@ -56,7 +62,7 @@ struct ShopViewiPhone: View {
     }
 
     private func rewardCard(for reward: Reward) -> some View {
-        let catalogReward = (rewardsCatalog + store.customRewards).first(where: { $0.id == reward.id })
+        let catalogReward = (getLocalizedRewardsCatalog() + store.customRewards).first(where: { $0.id == reward.id })
         let title = catalogReward?.title ?? reward.title
         let peanuts = catalogReward?.peanuts ?? reward.cost
         let canBuy = store.balance >= peanuts
@@ -69,7 +75,7 @@ struct ShopViewiPhone: View {
                     store.purchaseReward(reward)
                     showConfetti = true
                     SoundPlayer.shared.playSound(named: "reward.aiff")
-                    toastMessage = "Yay! Added to your Basket"
+                    toastMessage = NSLocalizedString("shop_toast_added_basket", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "cart.fill"
                     toastIconColor = Color(hex: "#799B44")
                     withAnimation { showToast = true }
@@ -94,7 +100,7 @@ struct ShopViewiPhone: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 300)
                         .frame(maxWidth: .infinity, alignment: .top)
-                        .offset(y: 0)
+                        .offset(y: -10)
                     VStack(spacing: 0) {
                         Spacer()
                         Text("\(store.balance)")
@@ -106,12 +112,12 @@ struct ShopViewiPhone: View {
                                 .resizable()
                                 .frame(width: 20, height: 20)
                                 .foregroundColor(.white)
-                            Text("peanuts earned")
-                                .font(.custom("Inter-Regular_Medium", size: 22))
+                            Text(NSLocalizedString("home_peanuts_earned", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
+                                .font(.custom("Inter-Regular_Medium", size: 20))
                                 .foregroundColor(.white)
                                 .shadow(radius: 2)
                         }
-                        .padding(.top, -8)
+                        .padding(.top, -12)
                         Spacer()
                     }
                     .padding(.top, 36)
@@ -120,18 +126,23 @@ struct ShopViewiPhone: View {
             },
             content: {
                 VStack(spacing: 16) {
-                    PageTitle("Reward Shop")
+                    PageTitle(NSLocalizedString("shop_title", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .padding(.top, 14)
                     SubTabBar(
                         tabs: ShopTab.allCases,
                         selectedTab: $selectedTab,
-                        title: { $0.rawValue }
+                        title: { tab in
+                            switch tab {
+                            case .rewards: return NSLocalizedString("shop_tab_rewards", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                            case .basket: return NSLocalizedString("shop_tab_basket", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                            }
+                        }
                     )
                     if selectedTab == .rewards {
                         if availableRewards.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn.",
+                                subtitle: NSLocalizedString("empty_shop_ready", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 250
                             )
                         } else {
@@ -149,7 +160,7 @@ struct ShopViewiPhone: View {
                         if basketEntries.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!",
+                                subtitle: NSLocalizedString("empty_shop_basket", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 250
                             )
                         } else {
@@ -185,25 +196,25 @@ struct ShopViewiPhone: View {
             case .notEnoughPeanuts:
                 TipjeModal(
                     imageName: "mascot_no",
-                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    message: NSLocalizedString("modal_not_enough_peanuts", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil }
                 )
             case .notEnoughPeanutsForReward:
                 TipjeModal(
                     imageName: "mascot_no",
-                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    message: NSLocalizedString("modal_not_enough_peanuts", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil }
                 )
             case .addedToBasket:
                 TipjeModal(
                     imageName: "mascot_atb",
-                    message: "Nice pick! 🎁\nYour reward is in the basket, waiting for you.",
+                    message: NSLocalizedString("modal_added_to_basket", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil }
                 )
             case .confettiOverlay:
                 TipjeModal(
                     imageName: "mascot_yam",
-                    message: "Woohoo! You earned it! 🍦\nEnjoy your treat—you deserve it!",
+                    message: NSLocalizedString("modal_earned_treat", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil },
                     font: .custom("Inter-Medium", size: 22)
                 )
@@ -231,6 +242,7 @@ struct ShopViewiPhone: View {
 // =======================
 struct ShopViewiPad: View {
     @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedTab: ShopTab = .rewards
     @State private var showConfetti = false
@@ -249,7 +261,7 @@ struct ShopViewiPad: View {
     }
 
     private func rewardCard(for reward: Reward) -> some View {
-        let catalogReward = (rewardsCatalog + store.customRewards).first(where: { $0.id == reward.id })
+        let catalogReward = (getLocalizedRewardsCatalog() + store.customRewards).first(where: { $0.id == reward.id })
         let title = catalogReward?.title ?? reward.title
         let peanuts = catalogReward?.peanuts ?? reward.cost
         let canBuy = store.balance >= peanuts
@@ -262,7 +274,7 @@ struct ShopViewiPad: View {
                     store.purchaseReward(reward)
                     showConfetti = true
                     SoundPlayer.shared.playSound(named: "reward.aiff")
-                    toastMessage = "Yay! Added to your Basket"
+                    toastMessage = NSLocalizedString("shop_toast_added_basket", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "cart.fill"
                     toastIconColor = Color(hex: "#799B44")
                     withAnimation { showToast = true }
@@ -299,7 +311,7 @@ struct ShopViewiPad: View {
                                 .resizable()
                                 .frame(width: 24, height: 24)
                                 .foregroundColor(.white)
-                            Text("peanuts earned")
+                            Text(NSLocalizedString("home_peanuts_earned", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular_Medium", size: 24))
                                 .foregroundColor(.white)
                                 .shadow(radius: 2)
@@ -313,18 +325,23 @@ struct ShopViewiPad: View {
             },
             content: {
                 VStack(spacing: 16) {
-                    PageTitle("Reward Shop")
+                    PageTitle(NSLocalizedString("shop_title", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .padding(.top, 24)
                     SubTabBar(
                         tabs: ShopTab.allCases,
                         selectedTab: $selectedTab,
-                        title: { $0.rawValue }
+                        title: { tab in
+                            switch tab {
+                            case .rewards: return NSLocalizedString("shop_tab_rewards", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                            case .basket: return NSLocalizedString("shop_tab_basket", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                            }
+                        }
                     )
                     if selectedTab == .rewards {
                         if availableRewards.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "Your reward shop is getting ready!\nAsk your grown-up to add fun things you can earn.",
+                                subtitle: NSLocalizedString("empty_shop_ready", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 400,
                                 topPadding: -200
                             )
@@ -342,7 +359,7 @@ struct ShopViewiPad: View {
                         if basketEntries.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_empty",
-                                subtitle: "No rewards in basket yet. Add some rewards to your basket to get started!",
+                                subtitle: NSLocalizedString("empty_shop_basket", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 600,
                                 topPadding: 0
                             )
@@ -379,25 +396,25 @@ struct ShopViewiPad: View {
             case .notEnoughPeanuts:
                 TipjeModal(
                     imageName: "mascot_no",
-                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    message: NSLocalizedString("modal_not_enough_peanuts", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil }
                 )
             case .notEnoughPeanutsForReward:
                 TipjeModal(
                     imageName: "mascot_no",
-                    message: "Not enough peanuts yet!\nLet's finish a few more chores first. 🌟",
+                    message: NSLocalizedString("modal_not_enough_peanuts", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil }
                 )
             case .addedToBasket:
                 TipjeModal(
                     imageName: "mascot_atb",
-                    message: "Nice pick! 🎁\nYour reward is in the basket, waiting for you.",
+                    message: NSLocalizedString("modal_added_to_basket", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil }
                 )
             case .confettiOverlay:
                 TipjeModal(
                     imageName: "mascot_yam",
-                    message: "Woohoo! You earned it! 🍦\nEnjoy your treat—you deserve it!",
+                    message: NSLocalizedString("modal_earned_treat", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     onClose: { activeModal = nil },
                     font: .custom("Inter-Medium", size: 22)
                 )

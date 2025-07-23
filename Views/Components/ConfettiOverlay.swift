@@ -13,7 +13,7 @@ struct ConfettiOverlay: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(height: min(UIScreen.main.bounds.height * 0.45, 500) * 1.75)
                     .padding(.top, -100)
-                Text("Well deserved! Have fun enjoying your treat")
+                Text(NSLocalizedString("confetti_well_deserved", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular_Medium", size: 24))
                     .foregroundColor(Color(hex: "#8E9293"))
                 Button("OK") { isPresented = false }

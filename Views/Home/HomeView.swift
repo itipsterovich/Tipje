@@ -1,20 +1,29 @@
 import SwiftUI
 
-let rulesCatalogIds = rulesCatalog.map { $0.id }
-let choresCatalogIds = choresCatalog.map { $0.id }
+let rulesCatalogIds = getLocalizedRulesCatalog().map { $0.id }
+let choresCatalogIds = getLocalizedChoresCatalog().map { $0.id }
 
 /// Main switcher: delegates to iPhone/iPad sub-structs based on horizontalSizeClass.
 struct HomeView: View {
     @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var kidName: String { store.selectedKid?.name ?? "" }
-    var weekday: String { DateFormatter().weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1] }
+    var weekday: String { 
+        let formatter = DateFormatter()
+        let languageCode = LocalizationManager.shared.currentLanguage
+        formatter.locale = Locale(identifier: languageCode)
+        return formatter.weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1]
+    }
     var body: some View {
-        if horizontalSizeClass == .compact {
-            HomeViewiPhone().environmentObject(store)
-        } else {
-            HomeViewiPad().environmentObject(store)
+        Group {
+            if horizontalSizeClass == .compact {
+                HomeViewiPhone().environmentObject(store)
+            } else {
+                HomeViewiPad().environmentObject(store)
+            }
         }
+        .id(localizationManager.currentLanguage)
     }
 }
 
@@ -23,84 +32,153 @@ struct HomeView: View {
 // =======================
 struct HomeViewiPhone: View {
     @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var selectedTab: TaskKind = .rule
     @State private var showUsedModal: Bool = false
     @State private var showToast = false
     @State private var toastMessage = ""
     @State private var toastIcon: String? = nil
     @State private var toastIconColor: Color = Color(hex: "#799B44")
+    @State private var expandedRuleIds: Set<String> = []
+    @State private var expandedChoreIds: Set<String> = []
     private var filteredRules: [Rule] { store.rules.filter { $0.isActive } }
     private var filteredChores: [Chore] { store.chores.filter { $0.isActive } }
     var kidName: String { store.selectedKid?.name ?? "" }
-    var weekday: String { DateFormatter().weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1] }
-    @ViewBuilder
-    private func rulesList() -> some View {
-        ForEach(Array(store.rules.filter { $0.isActive }.enumerated()), id: \.element.id) { index, rule in
-            let catalogRule = (rulesCatalog + store.customRules).first(where: { $0.id == rule.id })
-            let cardColor = catalogRule?.color ?? Color(.systemGray5)
-            let completedToday = rule.completions.contains { Calendar.current.isDateInToday($0) }
-            RuleKidCard(
-                rule: rule,
-                isCompleted: completedToday,
-                cardColor: cardColor,
-                onTap: {
-                    if !completedToday {
-                        store.completeRule(rule)
-                        toastMessage = "Great job! Task completed"
-                        toastIcon = "checkmark.circle.fill"
-                        toastIconColor = Color(hex: "#799B44")
-                        withAnimation { showToast = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                    } else {
-                        if store.balance < rule.peanutValue {
-                            showUsedModal = true
-                        } else {
-                            store.uncompleteRule(rule)
-                            toastMessage = "Task marked as not done"
-                            toastIcon = "xmark.circle.fill"
-                            toastIconColor = Color(hex: "#DC5754")
-                            withAnimation { showToast = true }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                        }
-                    }
-                }
-            )
-        }
+    var weekday: String { 
+        let formatter = DateFormatter()
+        let languageCode = LocalizationManager.shared.currentLanguage
+        formatter.locale = Locale(identifier: languageCode)
+        return formatter.weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1]
     }
     @ViewBuilder
+    private func rulesList() -> some View {
+        ForEach(activeRules, id: \.id) { rule in
+            ruleCard(for: rule)
+        }
+    }
+    
+    private var activeRules: [Rule] {
+        store.rules.filter { $0.isActive }
+    }
+    
+    @ViewBuilder
+    private func ruleCard(for rule: Rule) -> some View {
+        let catalogRule = (getLocalizedRulesCatalog() + store.customRules).first(where: { $0.id == rule.id })
+        let cardColor = catalogRule?.color ?? Color(.systemGray5)
+        let title = catalogRule?.title ?? rule.title
+        let peanuts = catalogRule?.peanuts ?? rule.peanutValue
+        let completedToday = rule.completions.contains { Calendar.current.isDateInToday($0) }
+        let isExpanded = expandedRuleIds.contains(rule.id)
+        
+        RuleKidCard(
+            rule: Rule(id: rule.id, title: title, peanutValue: peanuts, isActive: rule.isActive, completions: rule.completions),
+            isCompleted: completedToday,
+            cardColor: cardColor,
+            onTap: {
+                handleRuleTap(rule: rule, completedToday: completedToday, peanuts: peanuts)
+            },
+            expanded: isExpanded,
+            onExpand: {
+                handleRuleExpand(ruleId: rule.id)
+            }
+        )
+    }
+    
+    private func handleRuleTap(rule: Rule, completedToday: Bool, peanuts: Int) {
+        if !completedToday {
+            store.completeRule(rule)
+            toastMessage = NSLocalizedString("toast_task_completed", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+            toastIcon = "checkmark.circle.fill"
+            toastIconColor = Color(hex: "#799B44")
+            withAnimation { showToast = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+        } else {
+            if store.balance < peanuts {
+                showUsedModal = true
+            } else {
+                store.uncompleteRule(rule)
+                toastMessage = NSLocalizedString("toast_task_undone", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                toastIcon = "xmark.circle.fill"
+                toastIconColor = Color(hex: "#DC5754")
+                withAnimation { showToast = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+            }
+        }
+    }
+    
+    private func handleRuleExpand(ruleId: String) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            if expandedRuleIds.contains(ruleId) {
+                expandedRuleIds.remove(ruleId)
+            } else {
+                expandedRuleIds.insert(ruleId)
+            }
+        }
+    }
+    
+    @ViewBuilder
     private func choresList() -> some View {
-        ForEach(Array(filteredChores.enumerated()), id: \.element.id) { index, chore in
-            let catalogChore = (choresCatalog + store.customChores).first(where: { $0.id == chore.id })
-            let cardColor = catalogChore?.color ?? Color(.systemGray5)
-            let title = catalogChore?.title ?? chore.title
-            let peanuts = catalogChore?.peanuts ?? chore.peanutValue
-            let completedToday = chore.completions.contains { Calendar.current.isDateInToday($0) }
-            ChoreKidCard(
-                chore: Chore(id: chore.id, title: title, peanutValue: peanuts, isActive: chore.isActive, completions: chore.completions),
-                isCompleted: completedToday,
-                cardColor: cardColor,
-                onTap: {
-                    if !completedToday {
-                        store.completeChore(chore)
-                        toastMessage = "Great job! Task completed"
-                        toastIcon = "checkmark.circle.fill"
-                        toastIconColor = Color(hex: "#799B44")
-                        withAnimation { showToast = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                    } else {
-                        if store.balance < peanuts {
-                            showUsedModal = true
-                        } else {
-                            store.uncompleteChore(chore)
-                            toastMessage = "Task marked as not done"
-                            toastIcon = "xmark.circle.fill"
-                            toastIconColor = Color(hex: "#DC5754")
-                            withAnimation { showToast = true }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                        }
-                    }
-                }
-            )
+        ForEach(activeChores, id: \.id) { chore in
+            choreCard(for: chore)
+        }
+    }
+    
+    private var activeChores: [Chore] {
+        store.chores.filter { $0.isActive }
+    }
+    
+    @ViewBuilder
+    private func choreCard(for chore: Chore) -> some View {
+        let catalogChore = (getLocalizedChoresCatalog() + store.customChores).first(where: { $0.id == chore.id })
+        let cardColor = catalogChore?.color ?? Color(.systemGray5)
+        let title = catalogChore?.title ?? chore.title
+        let peanuts = catalogChore?.peanuts ?? chore.peanutValue
+        let completedToday = chore.completions.contains { Calendar.current.isDateInToday($0) }
+        let isExpanded = expandedChoreIds.contains(chore.id)
+        
+        ChoreKidCard(
+            chore: Chore(id: chore.id, title: title, peanutValue: peanuts, isActive: chore.isActive, completions: chore.completions),
+            isCompleted: completedToday,
+            cardColor: cardColor,
+            onTap: {
+                handleChoreTap(chore: chore, completedToday: completedToday, peanuts: peanuts)
+            },
+            expanded: isExpanded,
+            onExpand: {
+                handleChoreExpand(choreId: chore.id)
+            }
+        )
+    }
+    
+    private func handleChoreTap(chore: Chore, completedToday: Bool, peanuts: Int) {
+        if !completedToday {
+            store.completeChore(chore)
+            toastMessage = NSLocalizedString("toast_task_completed", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+            toastIcon = "checkmark.circle.fill"
+            toastIconColor = Color(hex: "#799B44")
+            withAnimation { showToast = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+        } else {
+            if store.balance < peanuts {
+                showUsedModal = true
+            } else {
+                store.uncompleteChore(chore)
+                toastMessage = NSLocalizedString("toast_task_undone", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                toastIcon = "xmark.circle.fill"
+                toastIconColor = Color(hex: "#DC5754")
+                withAnimation { showToast = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+            }
+        }
+    }
+    
+    private func handleChoreExpand(choreId: String) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            if expandedChoreIds.contains(choreId) {
+                expandedChoreIds.remove(choreId)
+            } else {
+                expandedChoreIds.insert(choreId)
+            }
         }
     }
     @ViewBuilder
@@ -115,7 +193,7 @@ struct HomeViewiPhone: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 300)
                         .frame(maxWidth: .infinity, alignment: .top)
-                        .offset(y: 0)
+                        .offset(y: -10)
                     VStack(spacing: 0) {
                         Spacer()
                         Text("\(store.balance)")
@@ -127,12 +205,12 @@ struct HomeViewiPhone: View {
                                 .resizable()
                                 .frame(width: 20, height: 20)
                                 .foregroundColor(.white)
-                            Text("peanuts earned")
-                                .font(.custom("Inter", size: 22).weight(.medium))
+                            Text(NSLocalizedString("home_peanuts_earned", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
+                                .font(.custom("Inter", size: 18).weight(.medium))
                                 .foregroundColor(.white)
                                 .shadow(radius: 2)
                         }
-                        .padding(.top, -8)
+                        .padding(.top, -12)
                         Spacer()
                     }
                     .padding(.top, 36)
@@ -141,18 +219,18 @@ struct HomeViewiPhone: View {
             },
             content: {
                 VStack(spacing: 16) {
-                    PageTitle("\(kidName)'s Mindful \(weekday)")
+                    PageTitle(String(format: NSLocalizedString("home_title_mindful_weekday", tableName: nil, bundle: Bundle.main, value: "", comment: ""), kidName, weekday))
                         .padding(.top, 14)
                     SubTabBar(
                         tabs: [TaskKind.rule, TaskKind.chore],
                         selectedTab: $selectedTab,
-                        title: { $0 == .rule ? "Family Rules" : "Chores" }
+                        title: { $0 == .rule ? NSLocalizedString("home_tab_rules", tableName: nil, bundle: Bundle.main, value: "", comment: "") : NSLocalizedString("home_tab_chores", tableName: nil, bundle: Bundle.main, value: "", comment: "") }
                     )
                     if selectedTab == .rule {
-                        if filteredRules.isEmpty {
+                        if activeRules.isEmpty {
                             TipjeEmptyStateiPhone(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                subtitle: NSLocalizedString("empty_home_tasks", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 300
                             )
                         } else {
@@ -168,7 +246,7 @@ struct HomeViewiPhone: View {
                         if filteredChores.isEmpty {
                             TipjeEmptyStateiPhone(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                subtitle: NSLocalizedString("empty_home_tasks", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 300
                             )
                         } else {
@@ -190,7 +268,7 @@ struct HomeViewiPhone: View {
         .sheet(isPresented: $showUsedModal) {
             TipjeModal(
                 imageName: "il_used",
-                message: "You've done this today and got your peanuts!\nLet's make sure it's really done. 💪",
+                message: NSLocalizedString("modal_task_done_today", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                 onClose: { showUsedModal = false }
             )
         }
@@ -218,6 +296,7 @@ struct HomeViewiPhone: View {
 // =======================
 struct HomeViewiPad: View {
     @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedTab: TaskKind = .rule
     @State private var showUsedModal: Bool = false
@@ -225,78 +304,138 @@ struct HomeViewiPad: View {
     @State private var toastMessage = ""
     @State private var toastIcon: String? = nil
     @State private var toastIconColor: Color = Color(hex: "#799B44")
+    @State private var expandedRuleIds: Set<String> = []
+    @State private var expandedChoreIds: Set<String> = []
     private var filteredRules: [Rule] { store.rules.filter { $0.isActive } }
     private var filteredChores: [Chore] { store.chores.filter { $0.isActive } }
     var kidName: String { store.selectedKid?.name ?? "" }
-    var weekday: String { DateFormatter().weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1] }
-    @ViewBuilder
-    private func rulesListPad() -> some View {
-        ForEach(Array(filteredRules.enumerated()), id: \.element.id) { index, rule in
-            let catalogRule = (rulesCatalog + store.customRules).first(where: { $0.id == rule.id })
-            let cardColor = catalogRule?.color ?? Color(.systemGray5)
-            let completedToday = rule.completions.contains { Calendar.current.isDateInToday($0) }
-            RuleKidCard(
-                rule: rule,
-                isCompleted: completedToday,
-                cardColor: cardColor,
-                onTap: {
-                    if !completedToday {
-                        store.completeRule(rule)
-                        toastMessage = "Great job! Task completed"
-                        toastIcon = "checkmark.circle.fill"
-                        toastIconColor = Color(hex: "#799B44")
-                        withAnimation { showToast = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                    } else {
-                        if store.balance < rule.peanutValue {
-                            showUsedModal = true
-                        } else {
-                            store.uncompleteRule(rule)
-                            toastMessage = "Task marked as not done"
-                            toastIcon = "xmark.circle.fill"
-                            toastIconColor = Color(hex: "#DC5754")
-                            withAnimation { showToast = true }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                        }
-                    }
-                }
-            )
-        }
+    var weekday: String { 
+        let formatter = DateFormatter()
+        let languageCode = LocalizationManager.shared.currentLanguage
+        formatter.locale = Locale(identifier: languageCode)
+        return formatter.weekdaySymbols[Calendar.current.component(.weekday, from: Date()) - 1]
     }
     @ViewBuilder
+    private func rulesListPad() -> some View {
+        ForEach(activeRules, id: \.id) { rule in
+            ruleCardPad(for: rule)
+        }
+    }
+    
+    @ViewBuilder
+    private func ruleCardPad(for rule: Rule) -> some View {
+        let catalogRule = (getLocalizedRulesCatalog() + store.customRules).first(where: { $0.id == rule.id })
+        let cardColor = catalogRule?.color ?? Color(.systemGray5)
+        let title = catalogRule?.title ?? rule.title
+        let peanuts = catalogRule?.peanuts ?? rule.peanutValue
+        let completedToday = rule.completions.contains { Calendar.current.isDateInToday($0) }
+        let isExpanded = expandedRuleIds.contains(rule.id)
+        
+        RuleKidCard(
+            rule: Rule(id: rule.id, title: title, peanutValue: peanuts, isActive: rule.isActive, completions: rule.completions),
+            isCompleted: completedToday,
+            cardColor: cardColor,
+            onTap: {
+                handleRuleTapPad(rule: rule, completedToday: completedToday, peanuts: peanuts)
+            },
+            expanded: isExpanded,
+            onExpand: {
+                handleRuleExpandPad(ruleId: rule.id)
+            }
+        )
+    }
+    
+    private func handleRuleTapPad(rule: Rule, completedToday: Bool, peanuts: Int) {
+        if !completedToday {
+            store.completeRule(rule)
+            toastMessage = NSLocalizedString("toast_task_completed", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+            toastIcon = "checkmark.circle.fill"
+            toastIconColor = Color(hex: "#799B44")
+            withAnimation { showToast = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+        } else {
+            if store.balance < peanuts {
+                showUsedModal = true
+            } else {
+                store.uncompleteRule(rule)
+                toastMessage = NSLocalizedString("toast_task_undone", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                toastIcon = "xmark.circle.fill"
+                toastIconColor = Color(hex: "#DC5754")
+                withAnimation { showToast = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+            }
+        }
+    }
+    
+    private func handleRuleExpandPad(ruleId: String) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            if expandedRuleIds.contains(ruleId) {
+                expandedRuleIds.remove(ruleId)
+            } else {
+                expandedRuleIds.insert(ruleId)
+            }
+        }
+    }
+    
+    @ViewBuilder
     private func choresListPad() -> some View {
-        ForEach(Array(filteredChores.enumerated()), id: \.element.id) { index, chore in
-            let catalogChore = (choresCatalog + store.customChores).first(where: { $0.id == chore.id })
-            let cardColor = catalogChore?.color ?? Color(.systemGray5)
-            let title = catalogChore?.title ?? chore.title
-            let peanuts = catalogChore?.peanuts ?? chore.peanutValue
-            let completedToday = chore.completions.contains { Calendar.current.isDateInToday($0) }
-            ChoreKidCard(
-                chore: Chore(id: chore.id, title: title, peanutValue: peanuts, isActive: chore.isActive, completions: chore.completions),
-                isCompleted: completedToday,
-                cardColor: cardColor,
-                onTap: {
-                    if !completedToday {
-                        store.completeChore(chore)
-                        toastMessage = "Great job! Task completed"
-                        toastIcon = "checkmark.circle.fill"
-                        toastIconColor = Color(hex: "#799B44")
-                        withAnimation { showToast = true }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                    } else {
-                        if store.balance < peanuts {
-                            showUsedModal = true
-                        } else {
-                            store.uncompleteChore(chore)
-                            toastMessage = "Task marked as not done"
-                            toastIcon = "xmark.circle.fill"
-                            toastIconColor = Color(hex: "#DC5754")
-                            withAnimation { showToast = true }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
-                        }
-                    }
-                }
-            )
+        ForEach(activeChores, id: \.id) { chore in
+            choreCardPad(for: chore)
+        }
+    }
+    
+    @ViewBuilder
+    private func choreCardPad(for chore: Chore) -> some View {
+        let catalogChore = (getLocalizedChoresCatalog() + store.customChores).first(where: { $0.id == chore.id })
+        let cardColor = catalogChore?.color ?? Color(.systemGray5)
+        let title = catalogChore?.title ?? chore.title
+        let peanuts = catalogChore?.peanuts ?? chore.peanutValue
+        let completedToday = chore.completions.contains { Calendar.current.isDateInToday($0) }
+        let isExpanded = expandedChoreIds.contains(chore.id)
+        
+        ChoreKidCard(
+            chore: Chore(id: chore.id, title: title, peanutValue: peanuts, isActive: chore.isActive, completions: chore.completions),
+            isCompleted: completedToday,
+            cardColor: cardColor,
+            onTap: {
+                handleChoreTapPad(chore: chore, completedToday: completedToday, peanuts: peanuts)
+            },
+            expanded: isExpanded,
+            onExpand: {
+                handleChoreExpandPad(choreId: chore.id)
+            }
+        )
+    }
+    
+    private func handleChoreTapPad(chore: Chore, completedToday: Bool, peanuts: Int) {
+        if !completedToday {
+            store.completeChore(chore)
+            toastMessage = NSLocalizedString("toast_task_completed", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+            toastIcon = "checkmark.circle.fill"
+            toastIconColor = Color(hex: "#799B44")
+            withAnimation { showToast = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+        } else {
+            if store.balance < peanuts {
+                showUsedModal = true
+            } else {
+                store.uncompleteChore(chore)
+                toastMessage = NSLocalizedString("toast_task_undone", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                toastIcon = "xmark.circle.fill"
+                toastIconColor = Color(hex: "#DC5754")
+                withAnimation { showToast = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
+            }
+        }
+    }
+    
+    private func handleChoreExpandPad(choreId: String) {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            if expandedChoreIds.contains(choreId) {
+                expandedChoreIds.remove(choreId)
+            } else {
+                expandedChoreIds.insert(choreId)
+            }
         }
     }
     @ViewBuilder
@@ -323,7 +462,7 @@ struct HomeViewiPad: View {
                                 .resizable()
                                 .frame(width: 24, height: 24)
                                 .foregroundColor(.white)
-                            Text("peanuts earned")
+                            Text(NSLocalizedString("home_peanuts_earned", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter", size: 24).weight(.medium))
                                 .foregroundColor(.white)
                                 .shadow(radius: 2)
@@ -337,18 +476,18 @@ struct HomeViewiPad: View {
             },
             content: {
                 VStack(spacing: 16) {
-                    PageTitle("\(kidName)'s Mindful \(weekday)")
+                    PageTitle(String(format: NSLocalizedString("home_title_mindful_weekday", tableName: nil, bundle: Bundle.main, value: "", comment: ""), kidName, weekday))
                         .padding(.top, 24)
                     SubTabBar(
                         tabs: [TaskKind.rule, TaskKind.chore],
                         selectedTab: $selectedTab,
-                        title: { $0 == .rule ? "Family Rules" : "Chores" }
+                        title: { $0 == .rule ? NSLocalizedString("home_tab_rules", tableName: nil, bundle: Bundle.main, value: "", comment: "") : NSLocalizedString("home_tab_chores", tableName: nil, bundle: Bundle.main, value: "", comment: "") }
                     )
                     if selectedTab == .rule {
-                        if filteredRules.isEmpty {
+                        if activeRules.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                subtitle: NSLocalizedString("empty_home_tasks", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 400,
                                 topPadding: 0
                             )
@@ -362,10 +501,10 @@ struct HomeViewiPad: View {
                             }
                         }
                     } else {
-                        if filteredChores.isEmpty {
+                        if activeChores.isEmpty {
                             TipjeEmptyState(
                                 imageName: "mascot_ticket",
-                                subtitle: "Your tasks will show up here once a grown-up sets them.\nCheck back soon to start earning peanuts! 🥜",
+                                subtitle: NSLocalizedString("empty_home_tasks", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                                 imageHeight: 400,
                                 topPadding: 0
                             )
@@ -389,7 +528,7 @@ struct HomeViewiPad: View {
         .sheet(isPresented: $showUsedModal) {
             TipjeModal(
                 imageName: "il_used",
-                message: "You've done this today and got your peanuts!\nLet's make sure it's really done. 💪",
+                message: NSLocalizedString("modal_task_done_today", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                 onClose: { showUsedModal = false }
             )
         }
@@ -406,6 +545,8 @@ struct HomeViewiPad: View {
             print("[HomeViewiPad] Appeared. UserId: \(store.userId), Balance: \(store.balance), Kids: \(store.kids.map { $0.name })")
         }
     }
+    private var activeRules: [Rule] { filteredRules }
+    private var activeChores: [Chore] { filteredChores }
     var body: some View {
         mainContent()
     }

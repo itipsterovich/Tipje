@@ -47,7 +47,7 @@ struct BasketCardiPhone: View {
                     .fill(Color(.systemGray5))
                     .frame(height: 90)
                     .overlay(
-                        Text("Reward")
+                        Text(NSLocalizedString("basket_reward", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .foregroundColor(.white)
                     )
             }
@@ -108,7 +108,7 @@ struct BasketCardiPad: View {
                     .fill(Color(.systemGray5))
                     .frame(height: 90)
                     .overlay(
-                        Text("Reward")
+                        Text(NSLocalizedString("basket_reward", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .foregroundColor(.white)
                     )
             }
