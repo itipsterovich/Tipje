@@ -43,7 +43,7 @@ struct ErrorStateView_Previews: PreviewProvider {
         ErrorStateView(
             headline: "Welcome back!",
             bodyText: "It looks like you were logged out. Please log in again to continue your journey with Tipje.",
-            buttonTitle: "Log In",
+            buttonTitle: NSLocalizedString("error_login", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
             onButtonTap: {},
             imageName: "mascot_empty_chores"
         )

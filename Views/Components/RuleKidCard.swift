@@ -6,12 +6,14 @@ struct RuleKidCard: View {
     var isCompleted: Bool
     var cardColor: Color = Color(.systemGray5)
     var onTap: (() -> Void)? = nil
+    var expanded: Bool = false
+    var onExpand: (() -> Void)? = nil
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     var body: some View {
         if horizontalSizeClass == .compact {
-            RuleKidCardiPhone(rule: rule, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap)
+            RuleKidCardiPhone(rule: rule, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap, expanded: expanded, onExpand: onExpand)
         } else {
-            RuleKidCardiPad(rule: rule, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap)
+            RuleKidCardiPad(rule: rule, isCompleted: isCompleted, cardColor: cardColor, onTap: onTap, expanded: expanded, onExpand: onExpand)
         }
     }
 }
@@ -24,6 +26,8 @@ struct RuleKidCardiPhone: View {
     var isCompleted: Bool
     var cardColor: Color = Color(.systemGray5)
     var onTap: (() -> Void)? = nil
+    var expanded: Bool = false
+    var onExpand: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
         let baseColor = cardColor
@@ -32,19 +36,25 @@ struct RuleKidCardiPhone: View {
                 baseColor
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 Text(rule.title)
-                    .lineLimit(2)
+                    .lineLimit(expanded ? nil : 2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 14)
                     .padding(.trailing, 14)
                     .padding(.vertical, 14)
                     .foregroundColor(.white)
                     .font(.custom("Inter-Medium", size: 17))
-                    .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 70, maxHeight: 70, alignment: .leading)
-            if isCompleted {
-                Spacer().frame(width: 8)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 70, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onExpand?()
+                }
             }
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
@@ -81,28 +91,22 @@ struct RuleKidCardiPhone: View {
                 }
             }
             .frame(width: 100, height: 70)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onTap?()
+                }
+            }
         }
         .frame(height: 70)
+        .frame(maxWidth: .infinity)
         .scaleEffect(isTapped ? 1.08 : 1.0)
         .rotationEffect(.degrees(isTapped ? 2 : 0))
         .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
-        .onTapGesture {
-            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
-                isTapped = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                isTapped = false
-                onTap?()
-            }
-        }
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear {
-                        print("[DEBUG] RuleKidCardiPhone size: \(geo.size.width)")
-                    }
-            }
-        )
     }
 }
 
@@ -114,6 +118,8 @@ struct RuleKidCardiPad: View {
     var isCompleted: Bool
     var cardColor: Color = Color(.systemGray5)
     var onTap: (() -> Void)? = nil
+    var expanded: Bool = false
+    var onExpand: (() -> Void)? = nil
     @State private var isTapped: Bool = false
     var body: some View {
         let baseColor = cardColor
@@ -122,19 +128,25 @@ struct RuleKidCardiPad: View {
                 baseColor
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                 Text(rule.title)
-                    .lineLimit(2)
+                    .lineLimit(expanded ? nil : 2)
                     .multilineTextAlignment(.leading)
                     .padding(.leading, 24)
                     .padding(.trailing, 24)
                     .padding(.vertical, 14)
                     .foregroundColor(.white)
                     .font(.custom("Inter-Medium", size: 24))
-                    .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .leading)
-            if isCompleted {
-                Spacer().frame(width: 8)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 90, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onExpand?()
+                }
             }
             Path { path in
                 path.move(to: CGPoint(x: 0.75, y: 0))
@@ -171,20 +183,22 @@ struct RuleKidCardiPad: View {
                 }
             }
             .frame(width: 128, height: 90)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
+                    isTapped = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                    isTapped = false
+                    onTap?()
+                }
+            }
         }
         .frame(height: 90)
+        .frame(maxWidth: .infinity)
         .scaleEffect(isTapped ? 1.08 : 1.0)
         .rotationEffect(.degrees(isTapped ? 2 : 0))
         .animation(.interpolatingSpring(stiffness: 700, damping: 14), value: isTapped)
-        .onTapGesture {
-            withAnimation(.interpolatingSpring(stiffness: 700, damping: 14)) {
-                isTapped = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                isTapped = false
-                onTap?()
-            }
-        }
         .background(
             GeometryReader { geo in
                 Color.clear

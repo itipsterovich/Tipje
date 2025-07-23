@@ -5,7 +5,7 @@ struct PaywallModal: View {
         ScrollView {
         VStack(spacing: 24) {
             // TODO: Add illustration
-            Text("Unlock all features")
+            Text(NSLocalizedString("paywall_unlock_features", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                 .font(.custom("Inter", size: 24).weight(.medium))
             // TODO: Add feature bullets
             // TODO: Add price toggle and subscribe/restore buttons

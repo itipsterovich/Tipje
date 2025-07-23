@@ -7,6 +7,7 @@ struct CatalogRulesModal: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var selected: Set<String>
     @State private var showToast = false
     @State private var toastMessage = ""
@@ -17,7 +18,9 @@ struct CatalogRulesModal: View {
     @State private var isCreatingCustomRule = false
     @State private var newCustomRule: CatalogRule? = nil
     @State private var editingCustomRuleId: String? = nil
-    let catalog = rulesCatalog // This is [CatalogRule]
+    var catalog: [CatalogRule] {
+        getLocalizedRulesCatalog()
+    }
     // Remove local colorPalette and colorHex arrays
     // Use tipjeColorPalette for all color assignments
     // Remove all colorIndex state and logic
@@ -34,7 +37,7 @@ struct CatalogRulesModal: View {
             containerOffsetY: -36,
             content: {
                 VStack(spacing: 0) {
-                    PageTitle("Rule Catalog") {
+                    PageTitle(NSLocalizedString("catalog_rules_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")) {
                         ButtonRegular(iconName: "icon_close", variant: .light) {
                             saveAndClose()
                         }
@@ -49,13 +52,13 @@ struct CatalogRulesModal: View {
                             if isCreatingCustomRule || editingCustomRuleId != nil {
                                 HStack(spacing: 14) {
                                     if horizontalSizeClass == .compact {
-                                        ButtonTextiPhone(title: "Save", variant: .primary, action: { saveCustomRule() }, fullWidth: true)
+                                        ButtonTextiPhone(title: NSLocalizedString("save", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: { saveCustomRule() }, fullWidth: true)
                                             .disabled(!canSaveCustomRule)
-                                        ButtonTextiPhone(title: "Cancel", variant: .secondary, action: { cancelCustomRule() }, fullWidth: true)
+                                        ButtonTextiPhone(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: { cancelCustomRule() }, fullWidth: true)
                                     } else {
-                                        ButtonText(title: "Save", variant: .primary, action: { saveCustomRule() }, fontSize: 24, fullWidth: true)
+                                        ButtonText(title: NSLocalizedString("save", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: { saveCustomRule() }, fontSize: 24, fullWidth: true)
                                             .disabled(!canSaveCustomRule)
-                                        ButtonText(title: "Cancel", variant: .secondary, action: { cancelCustomRule() }, fontSize: 24, fullWidth: true)
+                                        ButtonText(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: { cancelCustomRule() }, fontSize: 24, fullWidth: true)
                                     }
                                 }
                             } else {
@@ -66,7 +69,7 @@ struct CatalogRulesModal: View {
                                             Image("icon_plus")
                                                 .resizable()
                                                 .frame(width: 20, height: 20)
-                                            Text("Create Rule")
+                                            Text(NSLocalizedString("create_rule", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                                 .font(.custom("Inter-Regular_Medium", size: 17))
                                         }
                                         .foregroundColor(Color(hex: "#799B44"))
@@ -80,7 +83,7 @@ struct CatalogRulesModal: View {
                                             Image("icon_plus")
                                                 .resizable()
                                                 .frame(width: 24, height: 24)
-                                            Text("Create Rule")
+                                            Text(NSLocalizedString("create_rule", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                                 .font(.custom("Inter-Regular_Medium", size: 24))
                                         }
                                         .foregroundColor(Color(hex: "#799B44"))
@@ -99,6 +102,7 @@ struct CatalogRulesModal: View {
                                     color: custom.color,
                                     isEditing: true
                                 )
+                                .id(localizationManager.currentLanguage)
                             } else if let editingId = editingCustomRuleId, let item = customRules.first(where: { $0.id == editingId }) {
                                 EditableCustomRuleCard(
                                     rule: item,
@@ -107,6 +111,7 @@ struct CatalogRulesModal: View {
                                     color: item.color,
                                     isEditing: true
                                 )
+                                .id(localizationManager.currentLanguage)
                             }
                             // Custom rules (saved)
                             ForEach(customRules) { item in
@@ -119,12 +124,12 @@ struct CatalogRulesModal: View {
                                         onArchive: {
                                             if selected.contains(item.id) {
                                                 selected.remove(item.id)
-                                                toastMessage = "Removed from your Hub"
+                                                toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                                                 toastIcon = "minus.circle.fill"
                                                 toastIconColor = Color(hex: "#BBB595")
                                             } else {
                                                 selected.insert(item.id)
-                                                toastMessage = "Added to your Hub"
+                                                toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                                                 toastIcon = "checkmark.circle.fill"
                                                 toastIconColor = Color(hex: "#799B44")
                                             }
@@ -161,6 +166,7 @@ struct CatalogRulesModal: View {
                 }
             }
         )
+        .id(localizationManager.currentLanguage)
         .onAppear(perform: fetchCustomRules)
         .overlay(
             Group {
@@ -182,12 +188,12 @@ struct CatalogRulesModal: View {
             onArchive: {
                 if isSelected {
                     selected.remove(item.id)
-                    toastMessage = "Removed from your Hub"
+                    toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "minus.circle.fill"
                     toastIconColor = Color(hex: "#BBB595")
                 } else {
                     selected.insert(item.id)
-                    toastMessage = "Added to your Hub"
+                    toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "checkmark.circle.fill"
                     toastIconColor = Color(hex: "#799B44")
                 }
@@ -297,7 +303,7 @@ struct EditableCustomRuleCard: View {
                 RoundedRectangle(cornerRadius: horizontalSizeClass == .compact ? 14 : 20, style: .continuous)
                     .strokeBorder(color, lineWidth: 2)
                 if (titleText.isEmpty && rule.title.isEmpty) {
-                    Text("Enter your new family rule 🏡")
+                    Text(NSLocalizedString("placeholder_new_rule", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .foregroundColor(color)
                         .font(.custom("Inter-Medium", size: horizontalSizeClass == .compact ? 17 : 24))
                         .padding(.leading, horizontalSizeClass == .compact ? 14 : 24)
@@ -340,7 +346,7 @@ struct EditableCustomRuleCard: View {
                     .background(Color.white.cornerRadius(horizontalSizeClass == .compact ? 14 : 20))
                 HStack(spacing: 0) {
                     Spacer().frame(width: horizontalSizeClass == .compact ? 10 : 24)
-                    TextField("1-9", text: Binding(
+                    TextField(NSLocalizedString("placeholder_1_9", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: Binding(
                         get: {
                             peanutsText.isEmpty ? String(rule.peanuts) : peanutsText
                         },

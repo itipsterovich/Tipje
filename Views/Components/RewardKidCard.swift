@@ -73,18 +73,18 @@ struct RewardKidCardiPhone: View {
                             .buttonStyle(PlainButtonStyle())
                         }
                     } else {
-                        Text("\(reward.cost)")
-                            .foregroundColor(.white)
-                            .font(.custom("Inter-Medium", size: 17))
-                            .frame(width: 20, alignment: .trailing)
-                        Spacer().frame(width: 4)
-                        Image("icon_peanut")
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(.white)
-                        Spacer().frame(width: 12)
-                        Spacer().frame(width: 14)
+                        HStack(spacing: 4) {
+                            Text("\(reward.cost)")
+                                .foregroundColor(.white)
+                                .font(.custom("Inter-Medium", size: 17))
+                                .frame(width: 20, alignment: .trailing)
+                            Image("icon_peanut")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(.white)
+                        }
                     }
+                    Spacer().frame(width: 10)
                 }
                 .frame(height: 70)
             }

@@ -123,6 +123,8 @@
 				Components/ErrorStateView.swift,
 				Components/IconButton.swift,
 				Components/IconRoundButton.swift,
+				Components/LanguageSelector.swift,
+				Components/LocalizedText.swift,
 				Components/MainTabBar.swift,
 				Components/MascotModal.swift,
 				Components/PageTitle.swift,

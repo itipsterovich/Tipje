@@ -22,13 +22,18 @@ struct MainView: View {
             Group {
                 switch selectedTab {
                 case .home:
-                    HomeView().environmentObject(store)
+                    HomeView()
+                        .environmentObject(store)
+                        .environmentObject(LocalizationManager.shared)
                 case .shop:
-                    ShopView().environmentObject(store)
+                    ShopView()
+                        .environmentObject(store)
+                        .environmentObject(LocalizationManager.shared)
                 case .admin:
                     if !adminOnboardingComplete || skipPinAfterSetup {
                         AdminView()
                             .environmentObject(store)
+                            .environmentObject(LocalizationManager.shared)
                             .onAppear {
                                 print("[DEBUG] MainView: Switching to admin tab. adminOnboardingComplete=\(adminOnboardingComplete), skipPinAfterSetup=\(skipPinAfterSetup), isAdminUnlocked=\(isAdminUnlocked), store.userId=\(store.userId)")
                                 print("[DEBUG] MainView: AdminView appeared. skipPinAfterSetup=\(skipPinAfterSetup)")
@@ -37,7 +42,9 @@ struct MainView: View {
                                 }
                             }
                     } else if isAdminUnlocked {
-                        AdminView().environmentObject(store)
+                        AdminView()
+                            .environmentObject(store)
+                            .environmentObject(LocalizationManager.shared)
                             .onAppear {
                                 print("[DEBUG] MainView: Admin unlocked, showing AdminView.")
                             }
@@ -99,7 +106,7 @@ struct MainView: View {
                                 .frame(width: 80, height: 80)
                                 .clipShape(Circle())
                                 .shadow(radius: 8)
-                            Text("You've switched to \(kid.name)")
+                            Text(String(format: NSLocalizedString("main_switched_kid", tableName: nil, bundle: Bundle.main, value: "", comment: ""), kid.name))
                                 .font(.title2)
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .padding(.top, 8)

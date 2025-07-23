@@ -6,6 +6,7 @@ struct CatalogChoresModal: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var selected: Set<String>
     @State private var showToast = false
     @State private var toastMessage = ""
@@ -18,7 +19,9 @@ struct CatalogChoresModal: View {
     @State private var editingCustomChoreId: String? = nil
     // Remove local colorPalette and colorHex arrays
     // Use tipjeColorPalette for all color assignments
-    let catalog = choresCatalog
+    var catalog: [CatalogChore] {
+        getLocalizedChoresCatalog()
+    }
     init(onSave: @escaping ([String], [CatalogChore]) -> Void, initiallySelected: [String]) {
         self.onSave = onSave
         self.initiallySelected = initiallySelected
@@ -31,7 +34,7 @@ struct CatalogChoresModal: View {
             containerOffsetY: -36,
             content: {
                 VStack(spacing: 0) {
-                    PageTitle("Chore Catalog") {
+                    PageTitle(NSLocalizedString("catalog_chores_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")) {
                         ButtonRegular(iconName: "icon_close", variant: .light) { save() }
                         .accessibilityIdentifier("saveChoresButton")
                     }
@@ -43,13 +46,13 @@ struct CatalogChoresModal: View {
                             if isCreatingCustomChore || editingCustomChoreId != nil {
                                 HStack(spacing: 14) {
                                     if horizontalSizeClass == .compact {
-                                        ButtonTextiPhone(title: "Save", variant: .primary, action: { saveCustomChore() }, fullWidth: true)
+                                        ButtonTextiPhone(title: NSLocalizedString("save", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: { saveCustomChore() }, fullWidth: true)
                                             .disabled(!canSaveCustomChore)
-                                        ButtonTextiPhone(title: "Cancel", variant: .secondary, action: { cancelCustomChore() }, fullWidth: true)
+                                        ButtonTextiPhone(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: { cancelCustomChore() }, fullWidth: true)
                                     } else {
-                                        ButtonText(title: "Save", variant: .primary, action: { saveCustomChore() }, fontSize: 24, fullWidth: true)
+                                        ButtonText(title: NSLocalizedString("save", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: { saveCustomChore() }, fontSize: 24, fullWidth: true)
                                             .disabled(!canSaveCustomChore)
-                                        ButtonText(title: "Cancel", variant: .secondary, action: { cancelCustomChore() }, fontSize: 24, fullWidth: true)
+                                        ButtonText(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: { cancelCustomChore() }, fontSize: 24, fullWidth: true)
                                     }
                                 }
                             }
@@ -58,7 +61,7 @@ struct CatalogChoresModal: View {
                                     Button(action: { startCreatingCustomChore() }) {
                                         HStack(spacing: 8) {
                                             Image("icon_plus").resizable().frame(width: 20, height: 20)
-                                            Text("Create Chore").font(.custom("Inter-Regular_Medium", size: 17))
+                                            Text(NSLocalizedString("create_chore", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                         }
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -69,7 +72,7 @@ struct CatalogChoresModal: View {
                                     Button(action: { startCreatingCustomChore() }) {
                                         HStack(spacing: 12) {
                                             Image("icon_plus").resizable().frame(width: 24, height: 24)
-                                            Text("Create Chore").font(.custom("Inter-Regular_Medium", size: 24))
+                                            Text(NSLocalizedString("create_chore", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                         }
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .frame(maxWidth: .infinity, minHeight: 56)
@@ -117,6 +120,7 @@ struct CatalogChoresModal: View {
                 }
             }
         )
+        .id(localizationManager.currentLanguage)
         .overlay(
             Group {
                 if showToast {
@@ -137,12 +141,12 @@ struct CatalogChoresModal: View {
             onArchive: {
                 if isSelected {
                     selected.remove(item.id)
-                    toastMessage = "Removed from your Hub"
+                    toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "minus.circle.fill"
                     toastIconColor = Color(hex: "#BBB595")
                 } else {
                     selected.insert(item.id)
-                    toastMessage = "Added to your Hub"
+                    toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "checkmark.circle.fill"
                     toastIconColor = Color(hex: "#799B44")
                 }
@@ -247,7 +251,7 @@ struct EditableCustomChoreCard: View {
                 RoundedRectangle(cornerRadius: horizontalSizeClass == .compact ? 14 : 20, style: .continuous)
                     .strokeBorder(color, lineWidth: 2)
                 if (titleText.isEmpty && chore.title.isEmpty) {
-                    Text("Enter your new family chore 🧹")
+                    Text(NSLocalizedString("placeholder_new_chore", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .foregroundColor(color)
                         .font(.custom("Inter-Medium", size: horizontalSizeClass == .compact ? 17 : 24))
                         .padding(.leading, horizontalSizeClass == .compact ? 14 : 24)
@@ -289,7 +293,7 @@ struct EditableCustomChoreCard: View {
                     .background(Color.white.cornerRadius(horizontalSizeClass == .compact ? 14 : 20))
                 HStack(spacing: 0) {
                     Spacer().frame(width: horizontalSizeClass == .compact ? 10 : 24)
-                    TextField("1-9", text: Binding(
+                    TextField(NSLocalizedString("placeholder_1_9", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: Binding(
                         get: {
                             peanutsText.isEmpty ? String(chore.peanuts) : peanutsText
                         },

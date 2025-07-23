@@ -11,8 +11,11 @@ struct CatalogRewardsModal: View {
     @State private var toastIcon: String? = nil
     @State private var toastIconColor: Color = Color(hex: "#799B44")
     @State private var expandedRewardId: String? = nil
-    let catalog = rewardsCatalog
+    var catalog: [CatalogReward] {
+        getLocalizedRewardsCatalog()
+    }
     @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var customRewards: [CatalogReward] = []
     @State private var isCreatingCustomReward = false
     @State private var newCustomReward: CatalogReward? = nil
@@ -31,7 +34,7 @@ struct CatalogRewardsModal: View {
             containerOffsetY: -36,
             content: {
                 VStack(spacing: 0) {
-                    PageTitle("Reward Catalog") {
+                    PageTitle(NSLocalizedString("catalog_rewards_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")) {
                         ButtonRegular(iconName: "icon_close", variant: .light) { save() }
                         .accessibilityIdentifier("saveRewardsButton")
                     }
@@ -43,13 +46,13 @@ struct CatalogRewardsModal: View {
                             if isCreatingCustomReward || editingCustomRewardId != nil {
                                 HStack(spacing: 14) {
                                     if horizontalSizeClass == .compact {
-                                        ButtonTextiPhone(title: "Save", variant: .primary, action: { saveCustomReward() }, fullWidth: true)
+                                        ButtonTextiPhone(title: NSLocalizedString("save", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: { saveCustomReward() }, fullWidth: true)
                                             .disabled(!canSaveCustomReward)
-                                        ButtonTextiPhone(title: "Cancel", variant: .secondary, action: { cancelCustomReward() }, fullWidth: true)
+                                        ButtonTextiPhone(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: { cancelCustomReward() }, fullWidth: true)
                                     } else {
-                                        ButtonText(title: "Save", variant: .primary, action: { saveCustomReward() }, fontSize: 24, fullWidth: true)
+                                        ButtonText(title: NSLocalizedString("save", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .primary, action: { saveCustomReward() }, fontSize: 24, fullWidth: true)
                                             .disabled(!canSaveCustomReward)
-                                        ButtonText(title: "Cancel", variant: .secondary, action: { cancelCustomReward() }, fontSize: 24, fullWidth: true)
+                                        ButtonText(title: NSLocalizedString("cancel", tableName: nil, bundle: Bundle.main, value: "", comment: ""), variant: .secondary, action: { cancelCustomReward() }, fontSize: 24, fullWidth: true)
                                     }
                                 }
                             }
@@ -58,7 +61,7 @@ struct CatalogRewardsModal: View {
                                     Button(action: { startCreatingCustomReward() }) {
                                         HStack(spacing: 8) {
                                             Image("icon_plus").resizable().frame(width: 20, height: 20)
-                                            Text("Create Reward").font(.custom("Inter-Regular_Medium", size: 17))
+                                            Text(NSLocalizedString("create_reward", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                         }
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -69,7 +72,7 @@ struct CatalogRewardsModal: View {
                                     Button(action: { startCreatingCustomReward() }) {
                                         HStack(spacing: 12) {
                                             Image("icon_plus").resizable().frame(width: 24, height: 24)
-                                            Text("Create Reward").font(.custom("Inter-Regular_Medium", size: 24))
+                                            Text(NSLocalizedString("create_reward", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                         }
                                         .foregroundColor(Color(hex: "#799B44"))
                                         .frame(maxWidth: .infinity, minHeight: 56)
@@ -117,6 +120,7 @@ struct CatalogRewardsModal: View {
                 }
             }
         )
+        .id(localizationManager.currentLanguage)
         .overlay(
             Group {
                 if showToast {
@@ -137,12 +141,12 @@ struct CatalogRewardsModal: View {
             onArchive: {
                 if isSelected {
                     selected.remove(item.id)
-                    toastMessage = "Removed from your Hub"
+                    toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "minus.circle.fill"
                     toastIconColor = Color(hex: "#BBB595")
                 } else {
                     selected.insert(item.id)
-                    toastMessage = "Added to your Hub"
+                    toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     toastIcon = "checkmark.circle.fill"
                     toastIconColor = Color(hex: "#799B44")
                 }
@@ -246,7 +250,7 @@ struct EditableCustomRewardCard: View {
                 RoundedRectangle(cornerRadius: horizontalSizeClass == .compact ? 14 : 20, style: .continuous)
                     .strokeBorder(color, lineWidth: 2)
                 if (titleText.isEmpty && reward.title.isEmpty) {
-                    Text("Enter your new family reward 🎁")
+                    Text(NSLocalizedString("placeholder_new_reward", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .foregroundColor(color)
                         .font(.custom("Inter-Medium", size: horizontalSizeClass == .compact ? 17 : 24))
                         .padding(.leading, horizontalSizeClass == .compact ? 14 : 24)
@@ -288,7 +292,7 @@ struct EditableCustomRewardCard: View {
                     .background(Color.white.cornerRadius(horizontalSizeClass == .compact ? 14 : 20))
                 HStack(spacing: 0) {
                     Spacer().frame(width: horizontalSizeClass == .compact ? 10 : 24)
-                    TextField("1-9", text: Binding(
+                    TextField(NSLocalizedString("placeholder_1_9", tableName: nil, bundle: Bundle.main, value: "", comment: ""), text: Binding(
                         get: {
                             peanutsText.isEmpty ? String(reward.peanuts) : peanutsText
                         },

@@ -73,11 +73,11 @@ struct SubscriptionViewiPhone: View {
                 } else if let error = storeKit.error {
                     // Show error and retry button
                     VStack(spacing: 16) {
-                        Text("Failed to load products. Please check your connection and try again.")
+                        Text(NSLocalizedString("subscription_load_error", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .foregroundColor(.red)
                             .multilineTextAlignment(.center)
                         Button(action: { Task { await storeKit.loadProducts() } }) {
-                            Text("Retry")
+                            Text(NSLocalizedString("subscription_retry", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular_SemiBold", size: 18))
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .padding(.vertical, 10)
@@ -96,7 +96,7 @@ struct SubscriptionViewiPhone: View {
                     VStack {
                         Spacer()
                         VStack(spacing: 14) {
-                            Text("Your free trial has ended")
+                            Text(NSLocalizedString("subscription_trial_ended", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular_SemiBold", size: 24))
                                 .foregroundColor(Color(hex: "#494646"))
                                 .multilineTextAlignment(.center)
@@ -157,7 +157,7 @@ struct SubscriptionViewiPhone: View {
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 16)
                                 } else {
-                                    Text("Subscribe")
+                                    Text(NSLocalizedString("subscription_subscribe", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular_SemiBold", size: 22))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -177,7 +177,7 @@ struct SubscriptionViewiPhone: View {
                                     .font(.custom("Inter-Regular", size: 14))
                                     .underline()
                                     .foregroundColor(Color(hex: "#799B44").opacity(0.8))
-                                Text("and")
+                                Text(NSLocalizedString("subscription_and", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                     .font(.custom("Inter-Regular", size: 14))
                                     .foregroundColor(Color(hex: "#494646").opacity(0.7))
                                 Link("Terms of Service", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
@@ -204,18 +204,18 @@ struct SubscriptionViewiPhone: View {
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 2) {
                     if plan == .monthly {
-                        Text("Tipje Monthly")
+                        Text(NSLocalizedString("subscription_monthly", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular_SemiBold", size: 20))
                             .foregroundColor(Color(hex: "#494646"))
-                        Text("Pay monthly. Cancel anytime")
+                        Text(NSLocalizedString("subscription_monthly_desc", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular", size: 14))
                             .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             .multilineTextAlignment(.leading)
                     } else {
-                        Text("Tipje Yearly")
+                        Text(NSLocalizedString("subscription_yearly", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 20))
                         .foregroundColor(Color(hex: "#494646"))
-                        Text("Best value. Save 20%")
+                        Text(NSLocalizedString("subscription_yearly_desc", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular", size: 14))
                             .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             .multilineTextAlignment(.leading)
@@ -237,7 +237,7 @@ struct SubscriptionViewiPhone: View {
                         .frame(width: 40, height: 40, alignment: .center)
                         .padding(.top, 4)
                 } else {
-                    Text("Not available")
+                    Text(NSLocalizedString("subscription_not_available", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 18))
                         .foregroundColor(.gray)
                         .multilineTextAlignment(.center)
@@ -310,11 +310,11 @@ struct SubscriptionViewiPad: View {
                 } else if let error = storeKit.error {
                     // Show error and retry button
                     VStack(spacing: 16) {
-                        Text("Failed to load products. Please check your connection and try again.")
+                        Text(NSLocalizedString("subscription_load_error", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .foregroundColor(.red)
                             .multilineTextAlignment(.center)
                         Button(action: { Task { await storeKit.loadProducts() } }) {
-                            Text("Retry")
+                            Text(NSLocalizedString("subscription_retry", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular_SemiBold", size: 18))
                                 .foregroundColor(Color(hex: "#799B44"))
                                 .padding(.vertical, 10)
@@ -331,7 +331,7 @@ struct SubscriptionViewiPad: View {
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 } else {
                     VStack(spacing: 16) {
-                        Text("Your free trial has ended")
+                        Text(NSLocalizedString("subscription_trial_ended", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                     .font(.custom("Inter-Regular_SemiBold", size: 36))
                     .foregroundColor(Color(hex: "#494646"))
                     .multilineTextAlignment(.center)
@@ -392,7 +392,7 @@ struct SubscriptionViewiPad: View {
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 16)
                             } else {
-                                Text("Subscribe")
+                                Text(NSLocalizedString("subscription_subscribe", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 22))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -412,7 +412,7 @@ struct SubscriptionViewiPad: View {
                                 .font(.custom("Inter-Regular", size: 16))
                                 .underline()
                                 .foregroundColor(Color(hex: "#799B44").opacity(0.8))
-                            Text("and")
+                            Text(NSLocalizedString("subscription_and", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                                 .font(.custom("Inter-Regular", size: 16))
                                 .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             Link("Terms of Service", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
@@ -441,18 +441,18 @@ struct SubscriptionViewiPad: View {
             HStack(alignment: .center, spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     if plan == .monthly {
-                        Text("Tipje Monthly")
+                        Text(NSLocalizedString("subscription_monthly", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular_SemiBold", size: 20))
                             .foregroundColor(Color(hex: "#494646"))
-                        Text("Pay monthly. Cancel anytime")
+                        Text(NSLocalizedString("subscription_monthly_desc", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular", size: 14))
                             .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             .multilineTextAlignment(.leading)
                     } else {
-                        Text("Tipje Yearly")
+                        Text(NSLocalizedString("subscription_yearly", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 20))
                         .foregroundColor(Color(hex: "#494646"))
-                        Text("Best value. Save 20%")
+                        Text(NSLocalizedString("subscription_yearly_desc", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                             .font(.custom("Inter-Regular", size: 14))
                             .foregroundColor(Color(hex: "#494646").opacity(0.7))
                             .multilineTextAlignment(.leading)
@@ -473,7 +473,7 @@ struct SubscriptionViewiPad: View {
                     ProgressView()
                         .frame(width: 40, height: 40, alignment: .center)
                 } else {
-                    Text("Not available")
+                    Text(NSLocalizedString("subscription_not_available", tableName: nil, bundle: Bundle.main, value: "", comment: ""))
                         .font(.custom("Inter-Regular_SemiBold", size: 18))
                         .foregroundColor(.gray)
                         .frame(minWidth: 80, alignment: .trailing)

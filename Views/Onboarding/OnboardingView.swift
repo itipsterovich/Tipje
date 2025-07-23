@@ -100,22 +100,26 @@ struct OnboardingSlidesAndLoginView: View {
     var onLoginSuccess: (String) -> Void
     @State private var currentPage = 0
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @State private var selectedLanguage = LocalizationManager.shared.currentLanguage
     var body: some View {
-                TabView(selection: $currentPage) {
-                    onboardingScreen1.tag(0)
-                    onboardingScreen2.tag(1)
-                    onboardingScreen3.tag(2)
-            LoginView(onLogin: { uid in
-                onLoginSuccess(uid)
-            }).tag(3)
-                }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
-                .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-                .ignoresSafeArea()
-        .onChange(of: currentPage) { newValue in
-            if newValue > 3 {
-                currentPage = 3 // Snap back if user tries to swipe past
+        ZStack(alignment: .topTrailing) {
+            TabView(selection: $currentPage) {
+                onboardingScreen1.tag(0)
+                onboardingScreen2.tag(1)
+                onboardingScreen3.tag(2)
+                LoginView(onLogin: { uid in
+                    onLoginSuccess(uid)
+                }).tag(3)
             }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+            .ignoresSafeArea()
+            .onChange(of: currentPage) { newValue in
+                if newValue > 3 {
+                    currentPage = 3 // Snap back if user tries to swipe past
+                }
+            }
+            // Remove the old language selector since it's now below the logo
         }
     }
     
@@ -135,13 +139,20 @@ struct OnboardingSlidesAndLoginView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 72)
+                    
+                    // Language selector below logo
+                    LanguageSelector(selectedLanguage: $selectedLanguage, context: .onboarding)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 16)
+                        .accessibilityIdentifier("languageSelector")
+                    
                     Spacer(minLength: 0)
                     Image("on_2")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 300)
                         .padding(.bottom, 0)
-                    Text("Raise confident kids, connect as a family")
+                    LocalizedText("onboarding_title_iphone")
                         .font(.custom("Inter-Regular_SemiBold", size: 32))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
@@ -149,7 +160,7 @@ struct OnboardingSlidesAndLoginView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .lineLimit(nil)
                         .padding(.bottom, 16)
-                    Text("Tipje helps you build habits, stay connected, and enjoy parenting.")
+                    LocalizedText("onboarding_subtitle_iphone")
                         .font(.custom("Inter-Regular_Medium", size: 20))
                         .foregroundColor(.white)
                         .opacity(0.8)
@@ -158,8 +169,7 @@ struct OnboardingSlidesAndLoginView: View {
                         .frame(maxWidth: 500)
                         .fixedSize(horizontal: false, vertical: true)
                         .lineLimit(nil)
-                    Spacer(minLength: 24)
-                    Spacer(minLength: 32)
+                    Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
@@ -179,6 +189,13 @@ struct OnboardingSlidesAndLoginView: View {
                             .scaleEffect(1.0)
                             .frame(height: 144)
                             .padding(.top, 24)
+                        
+                        // Language selector below logo for iPad
+                        LanguageSelector(selectedLanguage: $selectedLanguage, context: .onboarding)
+                            .padding(.horizontal, 48)
+                            .padding(.top, 24)
+                            .accessibilityIdentifier("languageSelector")
+                        
                         Spacer().frame(height: 100)
                         Image("on_2")
                             .resizable()
@@ -188,48 +205,29 @@ struct OnboardingSlidesAndLoginView: View {
                             .padding(.bottom, 16)
                             .allowsHitTesting(false)
                         Spacer().frame(height: 100)
-                        VStack(spacing: 16) {
-                            Text("Raise Confident Kids. Build a Calm, Connected Home.")
-                                .font(.custom("Inter-Regular_SemiBold", size: 46))
-                                .frame(maxWidth: 600)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 24)
-                                .lineLimit(nil)
-                                .fixedSize(horizontal: false, vertical: true)
-                            Text("Set it once with Tipje—no more repeating. Kids stay on track and actually enjoy it.")
-                                .font(.custom("Inter-Regular_Medium", size: 24))
-                                .foregroundColor(.white)
-                                .opacity(0.8)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, 32)
-                                .frame(maxWidth: 600)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .lineLimit(nil)
-                            HStack(spacing: 40) {
-                                VStack(spacing: 4) {
-                                    Text("🧘‍♀️").font(.system(size: 32))
-                                    Text("Mindful Parenting").font(.custom("Inter-Regular", size: 20)).foregroundColor(.white).opacity(0.9)
-                                }
-                                VStack(spacing: 4) {
-                                    Text("🧠").font(.system(size: 32))
-                                    Text("Evidence-Based").font(.custom("Inter-Regular", size: 18)).foregroundColor(.white).opacity(0.9)
-                                }
-                                VStack(spacing: 4) {
-                                    Text("🎯").font(.system(size: 32))
-                                    Text("Focus on Values").font(.custom("Inter-Regular", size: 18)).foregroundColor(.white).opacity(0.9)
-                                }
-                                VStack(spacing: 4) {
-                                    Text("🧒").font(.system(size: 32))
-                                    Text("Perfect for age 5+").font(.custom("Inter-Regular", size: 18)).foregroundColor(.white).opacity(0.9)
-                                }
-                            }
-                            .padding(.top, 40)
-                        }
-                        .padding(.bottom, 80)
+                        LocalizedText("onboarding_title_ipad")
+                            .font(.custom("Inter-Regular_SemiBold", size: 46))
+                            .frame(maxWidth: 600)
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(nil)
+                            .padding(.bottom, 16)
+                        LocalizedText("onboarding_subtitle_ipad")
+                            .font(.custom("Inter-Regular_Medium", size: 24))
+                            .foregroundColor(.white)
+                            .opacity(0.8)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                            .frame(maxWidth: 600)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(nil)
+                        Spacer()
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .padding(.bottom, 80)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
         }
     }
@@ -254,7 +252,7 @@ struct OnboardingSlidesAndLoginView: View {
                         .padding(.bottom, 20)
                         .allowsHitTesting(false)
                         .padding(.top, 0)
-                    Text("Fun Tasks & Real Rewards")
+                    LocalizedText("onboarding2_title")
                         .frame(maxWidth: 700)
                         .font(.custom("Inter-Regular_SemiBold", size: 32))
                         .foregroundColor(.white)
@@ -263,7 +261,7 @@ struct OnboardingSlidesAndLoginView: View {
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer().frame(height: 16)
-                    Text("Kids build good habits, earn peanuts, and unlock real-life treats chosen by you.")
+                    LocalizedText("onboarding2_subtitle")
                         .font(.custom("Inter-Regular_Medium", size: 20))
                         .foregroundColor(.white)
                         .opacity(0.8)
@@ -287,7 +285,7 @@ struct OnboardingSlidesAndLoginView: View {
                         .padding(.bottom, 32)
                         .allowsHitTesting(false)
                         .padding(.top, 60)
-                    Text("Fun Tasks & Real Rewards")
+                    LocalizedText("onboarding2_title")
                         .font(.custom("Inter-Regular_SemiBold", size: 46))
                         .frame(maxWidth: 600)
                         .foregroundColor(.white)
@@ -296,7 +294,7 @@ struct OnboardingSlidesAndLoginView: View {
                         .lineLimit(nil)
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer().frame(height: 16)
-                    Text("Kids build good habits, earn peanuts, and unlock real-life treats chosen by you.")
+                    LocalizedText("onboarding2_subtitle")
                         .font(.custom("Inter-Regular_Medium", size: 24))
                         .foregroundColor(.white)
                         .opacity(0.8)
@@ -342,7 +340,7 @@ struct OnboardingSlidesAndLoginView: View {
                     }
                     VStack(spacing: 0) {
                         Spacer().frame(height: 300)
-                        Text("Set Rules That Match Your Family's Values")
+                        LocalizedText("onboarding3_title")
                             .font(.custom("Inter-Regular_SemiBold", size: 32))
                             .frame(maxWidth: 700)
                             .foregroundColor(.white)
@@ -351,7 +349,7 @@ struct OnboardingSlidesAndLoginView: View {
                             .fixedSize(horizontal: false, vertical: true)
                             .lineLimit(nil)
                             .padding(.bottom, 16)
-                        Text("Choose from a curated collection of mindful rules—designed to guide your family with clarity and kindness.")
+                        LocalizedText("onboarding3_subtitle")
                             .font(.custom("Inter-Regular_Medium", size: 20))
                             .foregroundColor(.white)
                             .opacity(0.8)
@@ -395,7 +393,7 @@ struct OnboardingSlidesAndLoginView: View {
                     // Foreground: text and button
                     VStack(spacing: 0) {
                         Spacer().frame(height: 480)
-                        Text("Set Rules That Match Your Family's Values")
+                        LocalizedText("onboarding3_title")
                             .font(.custom("Inter-Regular_SemiBold", size: 46))
                             .frame(maxWidth: 600)
                             .foregroundColor(.white)
@@ -405,7 +403,7 @@ struct OnboardingSlidesAndLoginView: View {
                             .lineLimit(nil)
                             .padding(.bottom, 16)
                             .padding(.top,32)
-                        Text("Choose from a curated collection of mindful rules—designed to guide your family with clarity and kindness.")
+                        LocalizedText("onboarding3_subtitle")
                             .font(.custom("Inter-Regular_Medium", size: 24))
                             .foregroundColor(.white)
                             .opacity(0.8)

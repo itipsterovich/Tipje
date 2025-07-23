@@ -65,6 +65,7 @@ struct AdminView: View {
 // =======================
 struct AdminViewiPhone: View {
     @EnvironmentObject var store: TipjeStore
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var adminOnboardingComplete: Bool = false
     var adminOnboardingKey: String { "adminOnboardingComplete_\(store.userId)" }
     @State private var selectedTab: AdminTab = .rules
@@ -102,7 +103,7 @@ struct AdminViewiPhone: View {
     // Header view
     var headerView: some View {
         VStack(spacing: 4) {
-            PageTitle("Parent Control Center") {
+            PageTitle(NSLocalizedString("admin_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")) {
                 IconRoundButton(iconName: "icon_plus") {
                     showCatalogueModal = true
                 }
@@ -120,7 +121,13 @@ struct AdminViewiPhone: View {
             SubTabBar(
                 tabs: AdminTab.allCases,
                 selectedTab: $selectedTab,
-                title: { $0.rawValue }
+                title: { tab in
+                    switch tab {
+                    case .rules: return NSLocalizedString("admin_tab_rules", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                    case .chores: return NSLocalizedString("admin_tab_chores", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                    case .shop: return NSLocalizedString("admin_tab_shop", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                    }
+                }
             )
             .padding(.horizontal, 0)
             .padding(.vertical, 8)
@@ -144,20 +151,30 @@ struct AdminViewiPhone: View {
         @Binding var toastIcon: String?
         @Binding var toastIconColor: Color
         @Binding var expandedRuleId: String?
+        
+        // Create localized rule with catalog title
+        private var localizedRule: Rule {
+            var localized = rule
+            if let catalogRule = getLocalizedRulesCatalog().first(where: { $0.id == rule.id }) {
+                localized.title = catalogRule.title
+            }
+            return localized
+        }
+        
         var body: some View {
             RuleAdultCard(
-                rule: rule,
+                rule: localizedRule, // Use localized rule instead of original
                 onArchive: {
                     if rule.isActive {
                         store.archiveRule(rule)
-                        toastMessage = "Removed from your Hub"
+                        toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         toastIcon = "trash.fill"
                         toastIconColor = Color(hex: "#BBB595")
                         withAnimation { showToast = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addRule(rule)
-                        toastMessage = "Added to your Hub"
+                        toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     }
                 },
                 selected: true,
@@ -181,24 +198,34 @@ struct AdminViewiPhone: View {
         @Binding var toastIcon: String?
         @Binding var toastIconColor: Color
         @Binding var expandedChoreId: String?
+        
+        // Create localized chore with catalog title
+        private var localizedChore: Chore {
+            var localized = chore
+            if let catalogChore = getLocalizedChoresCatalog().first(where: { $0.id == chore.id }) {
+                localized.title = catalogChore.title
+            }
+            return localized
+        }
+        
         var body: some View {
             ChoreAdultCard(
-                chore: chore,
+                chore: localizedChore, // Use localized chore instead of original
                 onArchive: {
                     if chore.isActive {
                         store.archiveChore(chore)
-                        toastMessage = "Removed from your Hub"
+                        toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         toastIcon = "trash.fill"
                         toastIconColor = Color(hex: "#BBB595")
                         withAnimation { showToast = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addChore(chore)
-                        toastMessage = "Added to your Hub"
+                        toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     }
                 },
                 selected: true,
-                baseColor: (choresCatalog + store.customChores).first { $0.id == chore.id }?.color ?? Color(.systemGray5),
+                baseColor: (getLocalizedChoresCatalog() + store.customChores).first { $0.id == chore.id }?.color ?? Color(.systemGray5),
                 onTap: {
                     if expandedChoreId == chore.id {
                         expandedChoreId = nil
@@ -218,24 +245,34 @@ struct AdminViewiPhone: View {
         @Binding var toastIcon: String?
         @Binding var toastIconColor: Color
         @Binding var expandedRewardId: String?
+        
+        // Create localized reward with catalog title
+        private var localizedReward: Reward {
+            var localized = reward
+            if let catalogReward = getLocalizedRewardsCatalog().first(where: { $0.id == reward.id }) {
+                localized.title = catalogReward.title
+            }
+            return localized
+        }
+        
         var body: some View {
             RewardAdultCard(
-                reward: reward,
+                reward: localizedReward, // Use localized reward instead of original
                 onArchive: {
                     if reward.isActive {
                         store.archiveReward(reward)
-                        toastMessage = "Removed from your Hub"
+                        toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         toastIcon = "trash.fill"
                         toastIconColor = Color(hex: "#BBB595")
                         withAnimation { showToast = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addReward(reward)
-                        toastMessage = "Added to your Hub"
+                        toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     }
                 },
                 selected: true,
-                baseColor: (rewardsCatalog + store.customRewards).first { $0.id == reward.id }?.color ?? Color(.systemGray5),
+                baseColor: (getLocalizedRewardsCatalog() + store.customRewards).first { $0.id == reward.id }?.color ?? Color(.systemGray5),
                 onTap: {
                     if expandedRewardId == reward.id {
                         expandedRewardId = nil
@@ -253,7 +290,7 @@ struct AdminViewiPhone: View {
             if filteredRules.isEmpty {
                 TipjeEmptyStateiPhone(
                     imageName: "mascot_ticket",
-                    subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
+                    subtitle: NSLocalizedString("empty_admin_rules", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     imageHeight: 300,
                     topPadding: 25,
                     centered: true
@@ -262,7 +299,7 @@ struct AdminViewiPhone: View {
                 ForEach(Array(filteredRules.enumerated()), id: \.element.id) { index, rule in
                     RuleRow(
                         rule: rule,
-                        baseColor: (rulesCatalog + store.customRules).first { $0.id == rule.id }?.color ?? Color(.systemGray5),
+                        baseColor: (getLocalizedRulesCatalog() + store.customRules).first { $0.id == rule.id }?.color ?? Color(.systemGray5),
                         showToast: $showToast,
                         toastMessage: $toastMessage,
                         toastIcon: $toastIcon,
@@ -278,7 +315,7 @@ struct AdminViewiPhone: View {
             if filteredChores.isEmpty {
                 TipjeEmptyStateiPhone(
                     imageName: "mascot_ticket",
-                    subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
+                    subtitle: NSLocalizedString("empty_admin_chores", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     imageHeight: 300,
                     topPadding: 25,
                     centered: true
@@ -293,7 +330,7 @@ struct AdminViewiPhone: View {
             if filteredRewards.isEmpty {
                 TipjeEmptyStateiPhone(
                     imageName: "mascot_ticket",
-                    subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
+                    subtitle: NSLocalizedString("empty_admin_rewards", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                     imageHeight: 300,
                     topPadding: 25,
                     centered: true
@@ -338,17 +375,20 @@ struct AdminViewiPhone: View {
                 onSave: handleRulesSave(_:customRules:),
                 initiallySelected: activeRuleIDs
             )
+            .environmentObject(LocalizationManager.shared)
         case .chores:
             CatalogChoresModal(
                 onSave: handleChoresSave(_:customChores:),
                 initiallySelected: activeChoreIDs
             )
+            .environmentObject(LocalizationManager.shared)
             .accessibilityIdentifier("choresCatalogModal")
         case .shop:
             CatalogRewardsModal(
                 onSave: handleRewardsSave(_:customRewards:),
                 initiallySelected: activeRewardIDs
             )
+            .environmentObject(LocalizationManager.shared)
             .accessibilityIdentifier("rewardsCatalogModal")
         }
     }
@@ -356,13 +396,13 @@ struct AdminViewiPhone: View {
     private func handleRulesSave(_ selectedIds: [String], customRules: [CatalogRule]) {
         guard let kid = store.selectedKid else { showNoKidAlert = true; return }
         // Archive rules that are active and in the catalog but not selected
-        for rule in store.rules.filter({ $0.isActive && (rulesCatalog.map { $0.id } + customRules.map { $0.id }).contains($0.id) }) {
+        for rule in store.rules.filter({ $0.isActive && (getLocalizedRulesCatalog().map { $0.id } + customRules.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(rule.id) {
                 store.archiveRule(rule)
             }
         }
         // Add or reactivate selected rules from the catalog or custom
-        let allCatalogRules = rulesCatalog + customRules
+        let allCatalogRules = getLocalizedRulesCatalog() + customRules
         for id in selectedIds {
             if let rule = store.rules.first(where: { $0.id == id }) {
                 if !rule.isActive {
@@ -395,13 +435,13 @@ struct AdminViewiPhone: View {
     private func handleChoresSave(_ selectedIds: [String], customChores: [CatalogChore]) {
         guard store.selectedKid != nil else { showNoKidAlert = true; return }
         // Archive chores that are active and in the catalog (curated or custom) but not selected
-        for chore in store.chores.filter({ $0.isActive && (choresCatalog.map { $0.id } + customChores.map { $0.id }).contains($0.id) }) {
+        for chore in store.chores.filter({ $0.isActive && (getLocalizedChoresCatalog().map { $0.id } + customChores.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(chore.id) {
                 store.archiveChore(chore)
             }
         }
         // Add or reactivate selected chores from the catalog or custom
-        let allCatalogChores = choresCatalog + customChores
+        let allCatalogChores = getLocalizedChoresCatalog() + customChores
         for id in selectedIds {
             if let chore = store.chores.first(where: { $0.id == id }) {
                 if !chore.isActive {
@@ -425,13 +465,13 @@ struct AdminViewiPhone: View {
     private func handleRewardsSave(_ selectedIds: [String], customRewards: [CatalogReward]) {
         guard let kid = store.selectedKid else { showNoKidAlert = true; return }
         // Archive rewards that are active and in the catalog (curated or custom) but not selected
-        for reward in store.rewards.filter({ $0.isActive && (rewardsCatalog.map { $0.id } + customRewards.map { $0.id }).contains($0.id) }) {
+        for reward in store.rewards.filter({ $0.isActive && (getLocalizedRewardsCatalog().map { $0.id } + customRewards.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(reward.id) {
                 store.archiveReward(reward)
             }
         }
         // Add or reactivate selected rewards from the catalog or custom
-        let allCatalogRewards = rewardsCatalog + customRewards
+        let allCatalogRewards = getLocalizedRewardsCatalog() + customRewards
         for id in selectedIds {
             if let reward = store.rewards.first(where: { $0.id == id }) {
                 if !reward.isActive {
@@ -468,6 +508,7 @@ struct AdminViewiPhone: View {
                 bannerContent: { adminBanner },
                 content: { adminContent }
             )
+            .id(localizationManager.currentLanguage)
             .ignoresSafeArea(.container, edges: .bottom)
         }
         .fullScreenCover(isPresented: $showCatalogueModal) {
@@ -477,7 +518,7 @@ struct AdminViewiPhone: View {
         .sheet(isPresented: $showCongratsModal) {
             TipjeModal(
                 imageName: "on_4",
-                message: "🎉 All set! Tasks are live at home. 🔒 Admin is now PIN-locked.",
+                message: NSLocalizedString("admin_all_set_modal", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                 onClose: {
                     showCongratsModal = false
                     adminOnboardingComplete = true
@@ -504,9 +545,9 @@ struct AdminViewiPhone: View {
         }
         .alert(isPresented: $showNoKidAlert) {
             Alert(
-                title: Text("No Kid Selected"),
-                message: Text("Please add and select a kid before adding rules, chores, or rewards."),
-                dismissButton: .default(Text("OK"))
+                title: Text(NSLocalizedString("admin_no_kid_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                message: Text(NSLocalizedString("admin_no_kid_message", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                dismissButton: .default(Text(NSLocalizedString("ok", tableName: nil, bundle: Bundle.main, value: "", comment: "")))
             )
         }
     }
@@ -527,6 +568,7 @@ struct AdminViewiPhone: View {
 struct AdminViewiPad: View {
     @EnvironmentObject var store: TipjeStore
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var adminOnboardingComplete: Bool = false
     var adminOnboardingKey: String { "adminOnboardingComplete_\(store.userId)" }
     @State private var selectedTab: AdminTab = .rules
@@ -564,7 +606,7 @@ struct AdminViewiPad: View {
     // Header view
     var headerView: some View {
         VStack(spacing: 4) {
-            PageTitle("Parent Control Center") {
+            PageTitle(NSLocalizedString("admin_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")) {
                 IconRoundButton(iconName: "icon_plus") {
                     showCatalogueModal = true
                 }
@@ -575,7 +617,13 @@ struct AdminViewiPad: View {
             SubTabBar(
                 tabs: AdminTab.allCases,
                 selectedTab: $selectedTab,
-                title: { $0.rawValue }
+                title: { tab in
+                    switch tab {
+                    case .rules: return NSLocalizedString("admin_tab_rules", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                    case .chores: return NSLocalizedString("admin_tab_chores", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                    case .shop: return NSLocalizedString("admin_tab_shop", tableName: nil, bundle: Bundle.main, value: "", comment: "")
+                    }
+                }
             )
             .padding(.vertical, 8)
             .padding(.horizontal, 24)
@@ -590,24 +638,34 @@ struct AdminViewiPad: View {
         @Binding var toastIcon: String?
         @Binding var toastIconColor: Color
         @Binding var expandedRuleId: String?
+        
+        // Create localized rule with catalog title
+        private var localizedRule: Rule {
+            var localized = rule
+            if let catalogRule = getLocalizedRulesCatalog().first(where: { $0.id == rule.id }) {
+                localized.title = catalogRule.title
+            }
+            return localized
+        }
+        
         var body: some View {
             RuleAdultCard(
-                rule: rule,
+                rule: localizedRule, // Use localized rule instead of original
                 onArchive: {
                     if rule.isActive {
                         store.archiveRule(rule)
-                        toastMessage = "Removed from your Hub"
+                        toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         toastIcon = "trash.fill"
                         toastIconColor = Color(hex: "#BBB595")
                         withAnimation { showToast = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addRule(rule)
-                        toastMessage = "Added to your Hub"
+                        toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     }
                 },
                 selected: true,
-                baseColor: (rulesCatalog + store.customRules).first { $0.id == rule.id }?.color ?? Color(.systemGray5),
+                baseColor: (getLocalizedRulesCatalog() + store.customRules).first { $0.id == rule.id }?.color ?? Color(.systemGray5),
                 onTap: {
                     if expandedRuleId == rule.id {
                         expandedRuleId = nil
@@ -627,24 +685,34 @@ struct AdminViewiPad: View {
         @Binding var toastIcon: String?
         @Binding var toastIconColor: Color
         @Binding var expandedChoreId: String?
+        
+        // Create localized chore with catalog title
+        private var localizedChore: Chore {
+            var localized = chore
+            if let catalogChore = getLocalizedChoresCatalog().first(where: { $0.id == chore.id }) {
+                localized.title = catalogChore.title
+            }
+            return localized
+        }
+        
         var body: some View {
             ChoreAdultCard(
-                chore: chore,
+                chore: localizedChore, // Use localized chore instead of original
                 onArchive: {
                     if chore.isActive {
                         store.archiveChore(chore)
-                        toastMessage = "Removed from your Hub"
+                        toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         toastIcon = "trash.fill"
                         toastIconColor = Color(hex: "#BBB595")
                         withAnimation { showToast = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addChore(chore)
-                        toastMessage = "Added to your Hub"
+                        toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     }
                 },
                 selected: true,
-                baseColor: (choresCatalog + store.customChores).first { $0.id == chore.id }?.color ?? Color(.systemGray5),
+                baseColor: (getLocalizedChoresCatalog() + store.customChores).first { $0.id == chore.id }?.color ?? Color(.systemGray5),
                 onTap: {
                     if expandedChoreId == chore.id {
                         expandedChoreId = nil
@@ -664,24 +732,34 @@ struct AdminViewiPad: View {
         @Binding var toastIcon: String?
         @Binding var toastIconColor: Color
         @Binding var expandedRewardId: String?
+        
+        // Create localized reward with catalog title
+        private var localizedReward: Reward {
+            var localized = reward
+            if let catalogReward = getLocalizedRewardsCatalog().first(where: { $0.id == reward.id }) {
+                localized.title = catalogReward.title
+            }
+            return localized
+        }
+        
         var body: some View {
             RewardAdultCard(
-                reward: reward,
+                reward: localizedReward, // Use localized reward instead of original
                 onArchive: {
                     if reward.isActive {
                         store.archiveReward(reward)
-                        toastMessage = "Removed from your Hub"
+                        toastMessage = NSLocalizedString("toast_removed_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                         toastIcon = "trash.fill"
                         toastIconColor = Color(hex: "#BBB595")
                         withAnimation { showToast = true }
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { withAnimation { showToast = false } }
                     } else {
                         store.addReward(reward)
-                        toastMessage = "Added to your Hub"
+                        toastMessage = NSLocalizedString("toast_added_hub", tableName: nil, bundle: Bundle.main, value: "", comment: "")
                     }
                 },
                 selected: true,
-                baseColor: (rewardsCatalog + store.customRewards).first { $0.id == reward.id }?.color ?? Color(.systemGray5),
+                baseColor: (getLocalizedRewardsCatalog() + store.customRewards).first { $0.id == reward.id }?.color ?? Color(.systemGray5),
                 onTap: {
                     if expandedRewardId == reward.id {
                         expandedRewardId = nil
@@ -700,7 +778,7 @@ struct AdminViewiPad: View {
                 VStack(spacing: 0) {
                     TipjeEmptyState(
                         imageName: "mascot_ticket",
-                        subtitle: "Start by picking family rules that reflect your values.\nMake sure to fill all tabs—rules, chores, and rewards work together!",
+                        subtitle: NSLocalizedString("empty_admin_rules", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                         imageHeight: 400,
                         topPadding: 0
                     )
@@ -724,7 +802,7 @@ struct AdminViewiPad: View {
                 VStack(spacing: 0) {
                     TipjeEmptyState(
                         imageName: "mascot_ticket",
-                        subtitle: "Choose daily chores that help build good habits.\nTap ➕ to select from our curated catalog.",
+                        subtitle: NSLocalizedString("empty_admin_chores", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                         imageHeight: 400,
                         topPadding: 0
                     )
@@ -748,7 +826,7 @@ struct AdminViewiPad: View {
                 VStack(spacing: 0) {
                     TipjeEmptyState(
                         imageName: "mascot_ticket",
-                        subtitle: "Add real-life rewards your kids will be excited to earn.\nTap ➕ to choose from our handpicked selection.",
+                        subtitle: NSLocalizedString("empty_admin_rewards", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                         imageHeight: 400,
                         topPadding: 0
                     )
@@ -799,17 +877,20 @@ struct AdminViewiPad: View {
                 onSave: { ids, custom in handleRulesSave(ids, customRules: custom) },
                 initiallySelected: activeRuleIDs
             )
+            .environmentObject(LocalizationManager.shared)
         case .chores:
             CatalogChoresModal(
                 onSave: { ids, custom in handleChoresSave(ids, customChores: custom) },
                 initiallySelected: activeChoreIDs
             )
+            .environmentObject(LocalizationManager.shared)
             .accessibilityIdentifier("choresCatalogModal")
         case .shop:
             CatalogRewardsModal(
                 onSave: handleRewardsSave(_:customRewards:),
                 initiallySelected: activeRewardIDs
             )
+            .environmentObject(LocalizationManager.shared)
             .accessibilityIdentifier("rewardsCatalogModal")
         }
     }
@@ -817,13 +898,13 @@ struct AdminViewiPad: View {
     private func handleRulesSave(_ selectedIds: [String], customRules: [CatalogRule]) {
         guard let kid = store.selectedKid else { showNoKidAlert = true; return }
         // Archive rules that are active and in the catalog but not selected
-        for rule in store.rules.filter({ $0.isActive && (rulesCatalog.map { $0.id } + customRules.map { $0.id }).contains($0.id) }) {
+        for rule in store.rules.filter({ $0.isActive && (getLocalizedRulesCatalog().map { $0.id } + customRules.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(rule.id) {
                 store.archiveRule(rule)
             }
         }
         // Add or reactivate selected rules from the catalog or custom
-        let allCatalogRules = rulesCatalog + customRules
+        let allCatalogRules = getLocalizedRulesCatalog() + customRules
         for id in selectedIds {
             if let rule = store.rules.first(where: { $0.id == id }) {
                 if !rule.isActive {
@@ -856,13 +937,13 @@ struct AdminViewiPad: View {
     private func handleChoresSave(_ selectedIds: [String], customChores: [CatalogChore]) {
         guard store.selectedKid != nil else { showNoKidAlert = true; return }
         // Archive chores that are active and in the catalog (curated or custom) but not selected
-        for chore in store.chores.filter({ $0.isActive && (choresCatalog.map { $0.id } + customChores.map { $0.id }).contains($0.id) }) {
+        for chore in store.chores.filter({ $0.isActive && (getLocalizedChoresCatalog().map { $0.id } + customChores.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(chore.id) {
                 store.archiveChore(chore)
             }
         }
         // Add or reactivate selected chores from the catalog or custom
-        let allCatalogChores = choresCatalog + customChores
+        let allCatalogChores = getLocalizedChoresCatalog() + customChores
         for id in selectedIds {
             if let chore = store.chores.first(where: { $0.id == id }) {
                 if !chore.isActive {
@@ -886,13 +967,13 @@ struct AdminViewiPad: View {
     private func handleRewardsSave(_ selectedIds: [String], customRewards: [CatalogReward]) {
         guard let kid = store.selectedKid else { showNoKidAlert = true; return }
         // Archive rewards that are active and in the catalog (curated or custom) but not selected
-        for reward in store.rewards.filter({ $0.isActive && (rewardsCatalog.map { $0.id } + customRewards.map { $0.id }).contains($0.id) }) {
+        for reward in store.rewards.filter({ $0.isActive && (getLocalizedRewardsCatalog().map { $0.id } + customRewards.map { $0.id }).contains($0.id) }) {
             if !selectedIds.contains(reward.id) {
                 store.archiveReward(reward)
             }
         }
         // Add or reactivate selected rewards from the catalog or custom
-        let allCatalogRewards = rewardsCatalog + customRewards
+        let allCatalogRewards = getLocalizedRewardsCatalog() + customRewards
         for id in selectedIds {
             if let reward = store.rewards.first(where: { $0.id == id }) {
                 if !reward.isActive {
@@ -924,6 +1005,7 @@ struct AdminViewiPad: View {
             bannerContent: { adminBanner },
             content: { adminContent }
         )
+        .id(localizationManager.currentLanguage)
         .fullScreenCover(isPresented: $showCatalogueModal) {
             catalogModal()
                 .environmentObject(store)
@@ -931,7 +1013,7 @@ struct AdminViewiPad: View {
         .sheet(isPresented: $showCongratsModal) {
             TipjeModal(
                 imageName: "on_4",
-                message: "🎉 All set! Tasks are live at home. 🔒 Admin is now PIN-locked.",
+                message: NSLocalizedString("admin_all_set_modal", tableName: nil, bundle: Bundle.main, value: "", comment: ""),
                 onClose: {
                     showCongratsModal = false
                     adminOnboardingComplete = true
@@ -958,9 +1040,9 @@ struct AdminViewiPad: View {
         }
         .alert(isPresented: $showNoKidAlert) {
             Alert(
-                title: Text("No Kid Selected"),
-                message: Text("Please add and select a kid before adding rules, chores, or rewards."),
-                dismissButton: .default(Text("OK"))
+                title: Text(NSLocalizedString("admin_no_kid_title", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                message: Text(NSLocalizedString("admin_no_kid_message", tableName: nil, bundle: Bundle.main, value: "", comment: "")),
+                dismissButton: .default(Text(NSLocalizedString("ok", tableName: nil, bundle: Bundle.main, value: "", comment: "")))
             )
         }
     }
