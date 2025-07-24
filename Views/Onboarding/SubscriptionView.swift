@@ -143,8 +143,13 @@ struct SubscriptionViewiPhone: View {
                                             print("[Paywall] Purchase successful and subscription active. Proceeding.")
                                             onPlanSelected(selectedPlan)
                                         } else {
-                                            print("[Paywall] Purchase failed or subscription not active. Not proceeding.")
-                                            purchaseError = storeKit.error ?? "Purchase failed or subscription not active. Please try again."
+                                            // Only show error if it's not a user cancellation
+                                            if let error = storeKit.error, !error.contains("cancelled") {
+                                                print("[Paywall] Purchase failed or subscription not active. Not proceeding.")
+                                                purchaseError = error
+                                            } else {
+                                                print("[Paywall] Purchase cancelled by user.")
+                                            }
                                         }
                                     } else {
                                         isPurchasing = false
@@ -171,6 +176,8 @@ struct SubscriptionViewiPhone: View {
                                 Text(error)
                                     .foregroundColor(.red)
                                     .font(.caption)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 16)
                             }
                             HStack(spacing: 4) {
                                 Link("Privacy Policy", destination: URL(string: "https://www.tipje.tiplyx.com/privacy")!)
@@ -378,8 +385,13 @@ struct SubscriptionViewiPad: View {
                                         print("[Paywall] Purchase successful and subscription active. Proceeding.")
                                         onPlanSelected(selectedPlan)
                                     } else {
-                                        print("[Paywall] Purchase failed or subscription not active. Not proceeding.")
-                                        purchaseError = storeKit.error ?? "Purchase failed or subscription not active. Please try again."
+                                        // Only show error if it's not a user cancellation
+                                        if let error = storeKit.error, !error.contains("cancelled") {
+                                            print("[Paywall] Purchase failed or subscription not active. Not proceeding.")
+                                            purchaseError = error
+                                        } else {
+                                            print("[Paywall] Purchase cancelled by user.")
+                                        }
                                     }
                                 } else {
                                     isPurchasing = false
@@ -406,6 +418,8 @@ struct SubscriptionViewiPad: View {
                             Text(error)
                                 .foregroundColor(.red)
                                 .font(.caption)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 16)
                         }
                         HStack(spacing: 4) {
                             Link("Privacy Policy", destination: URL(string: "https://www.tipje.tiplyx.com/privacy")!)

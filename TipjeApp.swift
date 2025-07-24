@@ -63,6 +63,7 @@ struct TipjeApp: App {
             }
             .id(localizationManager.currentLanguage)
             .environmentObject(localizationManager)
+            .preferredColorScheme(.light) // Force light mode
             .onAppear {
                 Task {
                     // Simulate async setup (replace with your real checks)

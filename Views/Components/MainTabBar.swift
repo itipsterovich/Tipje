@@ -61,9 +61,13 @@ struct MainTabBariPhone: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 40, style: .continuous)
-                .fill(Color.white.opacity(0.85))
-                .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
+            ZStack {
+                VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+                RoundedRectangle(cornerRadius: 40, style: .continuous)
+                    .fill(Color.white.opacity(0.3))
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
+            .shadow(color: Color.black.opacity(0.12), radius: 12, x: 0, y: 4)
         )
         .padding(.horizontal, 24)
     }
@@ -101,9 +105,13 @@ struct MainTabBariPad: View {
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
         .background(
-            RoundedRectangle(cornerRadius: 48, style: .continuous)
-                .fill(Color.white.opacity(0.85))
-                .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 6)
+            ZStack {
+                VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+                RoundedRectangle(cornerRadius: 48, style: .continuous)
+                    .fill(Color.white.opacity(0.3))
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 48, style: .continuous))
+            .shadow(color: Color.black.opacity(0.12), radius: 16, x: 0, y: 6)
         )
         .padding(.horizontal, 48)
     }

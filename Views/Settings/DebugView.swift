@@ -61,6 +61,29 @@ struct DebugView: View {
                             .font(.custom("Inter-Regular_Medium", size: 20))
                     }
                 }
+                SettingsSection(title: "StoreKit Testing") {
+                    VStack(alignment: .trailing, spacing: 16) {
+                        HStack(spacing: 16) {
+                            DebugButton(title: "Force Paywall (Expired Trial)") { 
+                                hasActiveSubscription = false
+                                // Reset to force paywall flow
+                                didCompleteOnboarding = false
+                                didLogin = false
+                                didRegister = false
+                            }
+                            DebugButton(title: "Skip Paywall (Active Trial)") { 
+                                hasActiveSubscription = true
+                                // Set up for normal flow
+                                didCompleteOnboarding = false
+                                didLogin = true
+                                didRegister = true
+                            }
+                        }
+                        Text("Use these to test paywall vs normal onboarding flow")
+                            .foregroundColor(.secondary)
+                            .font(.custom("Inter-Regular_Medium", size: 20))
+                    }
+                }
                 SettingsSection(title: "App State Shortcuts") {
                     VStack(alignment: .trailing, spacing: 16) {
                         DebugButton(title: "Go to Home (bypass onboarding)") {
