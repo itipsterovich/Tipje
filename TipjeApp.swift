@@ -28,6 +28,7 @@ struct TipjeApp: App {
                             .environmentObject(store)
                             .environmentObject(authManager)
                             .environmentObject(onboardingState)
+                            .environmentObject(localizationManager)
                     case .subscription:
                         SubscriptionView(onPlanSelected: { plan in
                             onboardingState.hasActiveSubscription = true
@@ -36,6 +37,7 @@ struct TipjeApp: App {
                             .environmentObject(store)
                             .environmentObject(authManager)
                             .environmentObject(onboardingState)
+                            .environmentObject(localizationManager)
                     case .kidsProfile:
                         KidsProfileView(userId: onboardingState.userId, onNext: {
                             onboardingState.refreshState(for: onboardingState.userId)
@@ -43,6 +45,7 @@ struct TipjeApp: App {
                         .environmentObject(store)
                         .environmentObject(authManager)
                         .environmentObject(onboardingState)
+                        .environmentObject(localizationManager)
                     case .pinSetup:
                         PinSetupView(userId: onboardingState.userId, onPinSet: {
                             onboardingState.refreshState(for: onboardingState.userId)
@@ -50,6 +53,7 @@ struct TipjeApp: App {
                         .environmentObject(store)
                         .environmentObject(authManager)
                         .environmentObject(onboardingState)
+                        .environmentObject(localizationManager)
                     case .cardsSetup:
                         AdminView(onComplete: {
                             onboardingState.refreshState(for: onboardingState.userId)
@@ -57,11 +61,13 @@ struct TipjeApp: App {
                         .environmentObject(store)
                         .environmentObject(authManager)
                         .environmentObject(onboardingState)
+                        .environmentObject(localizationManager)
                     case .main:
                         MainView()
                             .environmentObject(store)
                             .environmentObject(authManager)
                             .environmentObject(onboardingState)
+                            .environmentObject(localizationManager)
                     }
                 }
             }
