@@ -10,7 +10,7 @@ class StoreKitManager: ObservableObject {
     @Published var error: String? = nil
     @Published var isSubscribed: Bool = false
 
-    let productIDs = ["com.Tipje.month", "com.Tipje.year"]
+    let productIDs = ["com.Tipje.month", "com.Tipje.year", "com.tipje.monthly", "com.tipje.monthly.v2", "com.tipje.yearly", "com.tipje.yearly.v2"]
 
     init() {
         Task { await loadProducts() }
@@ -79,6 +79,7 @@ class StoreKitManager: ObservableObject {
             // First check current entitlements
             for await result in StoreKit.Transaction.currentEntitlements {
                 if case .verified(let transaction) = result {
+                    print("[StoreKitManager] Found transaction in currentEntitlements: \(transaction.productID)")
                     if productIDs.contains(transaction.productID) {
                         print("[StoreKitManager] Found transaction for product: \(transaction.productID)")
                         print("[StoreKitManager] Purchase date: \(transaction.purchaseDate)")
@@ -103,6 +104,8 @@ class StoreKitManager: ObservableObject {
                                 print("[StoreKitManager] ❌ Transaction expired for product: \(transaction.productID)")
                             }
                         }
+                    } else {
+                        print("[StoreKitManager] ⚠️ Transaction product ID not in our list: \(transaction.productID)")
                     }
                 } else {
                     print("[StoreKitManager] ⚠️ Unverified transaction found")
@@ -115,6 +118,7 @@ class StoreKitManager: ObservableObject {
             // Also check all transactions (including pending ones)
             for await result in StoreKit.Transaction.all {
                 if case .verified(let transaction) = result {
+                    print("[StoreKitManager] Found transaction in all transactions: \(transaction.productID)")
                     if productIDs.contains(transaction.productID) {
                         print("[StoreKitManager] Found transaction in all transactions for product: \(transaction.productID)")
                         print("[StoreKitManager] Purchase date: \(transaction.purchaseDate)")
@@ -139,6 +143,8 @@ class StoreKitManager: ObservableObject {
                                 print("[StoreKitManager] ❌ Transaction expired for product: \(transaction.productID)")
                             }
                         }
+                    } else {
+                        print("[StoreKitManager] ⚠️ Transaction product ID not in our list: \(transaction.productID)")
                     }
                 } else {
                     print("[StoreKitManager] ⚠️ Unverified transaction found in all transactions")
@@ -164,9 +170,18 @@ class StoreKitManager: ObservableObject {
             guard let self = self else { return }
             if #available(iOS 15.0, *) {
                 print("[StoreKitManager] Starting transaction listener...")
+                var processedTransactions = Set<String>()
                 for await result in StoreKit.Transaction.updates {
                     print("[StoreKitManager] Transaction update received")
                     if case .verified(let transaction) = result {
+                        // Prevent processing the same transaction multiple times
+                        let transactionKey = "\(transaction.productID)_\(transaction.purchaseDate.timeIntervalSince1970)"
+                        if processedTransactions.contains(transactionKey) {
+                            print("[StoreKitManager] ⏭️ Skipping already processed transaction: \(transaction.productID)")
+                            continue
+                        }
+                        processedTransactions.insert(transactionKey)
+                        
                         print("[StoreKitManager] ✅ Verified transaction update for product: \(transaction.productID)")
                         // CRITICAL: Finish the transaction
                         await transaction.finish()
