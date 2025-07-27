@@ -42,42 +42,42 @@ struct TipjeApp: App {
                         })
                         .environmentObject(store)
                         .environmentObject(authManager)
+                        .environmentObject(onboardingState)
                     case .pinSetup:
                         PinSetupView(userId: onboardingState.userId, onPinSet: {
                             onboardingState.refreshState(for: onboardingState.userId)
                         })
                         .environmentObject(store)
                         .environmentObject(authManager)
+                        .environmentObject(onboardingState)
                     case .cardsSetup:
                         AdminView(onComplete: {
                             onboardingState.refreshState(for: onboardingState.userId)
                         })
                         .environmentObject(store)
                         .environmentObject(authManager)
+                        .environmentObject(onboardingState)
                     case .main:
                         MainView()
                             .environmentObject(store)
                             .environmentObject(authManager)
+                            .environmentObject(onboardingState)
                     }
                 }
             }
-            .id(localizationManager.currentLanguage)
-            .environmentObject(localizationManager)
-            .preferredColorScheme(.light) // Force light mode
+            .preferredColorScheme(.light)
             .onAppear {
-                Task {
-                    // Simulate async setup (replace with your real checks)
-                    if let user = Auth.auth().currentUser {
-                        await onboardingState.refreshState(for: user.uid)
-                    } else {
-                        onboardingState.userId = ""
-                        onboardingState.didLogin = false
-                        onboardingState.hasActiveSubscription = false
-                        // Optionally reset other onboarding flags if needed
-                    }
-                    // Add a small delay to show the loading view (remove in production)
-                    try? await Task.sleep(nanoseconds: 800_000_000)
+                // App is ready after a short delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     isAppReady = true
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                // Refresh subscription status when app becomes active (catches promo code redemptions)
+                if onboardingState.didLogin {
+                    Task {
+                        await onboardingState.refreshSubscriptionStatus()
+                    }
                 }
             }
         }

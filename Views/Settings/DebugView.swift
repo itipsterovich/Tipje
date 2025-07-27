@@ -79,6 +79,19 @@ struct DebugView: View {
                                 didRegister = true
                             }
                         }
+                        HStack(spacing: 16) {
+                            DebugButton(title: "Refresh Subscription Status") { 
+                                Task {
+                                    await OnboardingStateManager.shared.refreshSubscriptionStatus()
+                                }
+                            }
+                            DebugButton(title: "Check StoreKit Entitlements") { 
+                                Task {
+                                    let isSubscribed = await StoreKitManager.shared.hasActiveSubscription()
+                                    print("[DEBUG] Manual subscription check: \(isSubscribed)")
+                                }
+                            }
+                        }
                         Text("Use these to test paywall vs normal onboarding flow")
                             .foregroundColor(.secondary)
                             .font(.custom("Inter-Regular_Medium", size: 20))

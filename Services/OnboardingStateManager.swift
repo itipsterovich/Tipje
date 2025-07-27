@@ -43,6 +43,15 @@ class OnboardingStateManager: ObservableObject {
         #endif
     }
 
+    /// Refreshes subscription status from StoreKit (useful for catching promo code redemptions)
+    func refreshSubscriptionStatus() async {
+        await StoreKitManager.shared.refreshSubscriptionStatus()
+        await MainActor.run {
+            self.hasActiveSubscription = StoreKitManager.shared.isSubscribed
+            print("[OnboardingStateManager] Subscription status refreshed: \(self.hasActiveSubscription)")
+        }
+    }
+
     /// Enum representing the current onboarding step
     enum Step {
         case intro
