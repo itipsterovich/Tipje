@@ -51,7 +51,7 @@
 "pinsetup_save_fail" = "Failed to save PIN. Please try again.";
 
 /* Login */
-"login_title" = "Build your mindful family home with a 7-day free trial";
+"login_title" = "Build your mindful family home with a 1-month free trial";
 "login_google" = "Sign in with Google";
 "login_or" = "OR";
 "login_email" = "Email";

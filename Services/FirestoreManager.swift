@@ -16,7 +16,7 @@ struct User: Identifiable, Codable {
     var pinLockoutUntil: Date?
     // Onboarding completion
     var adminOnboardingComplete: Bool?
-    // 7-day trial start date
+    // 1-month trial start date
     var trialStartDate: Date?
     
     func toDict() -> [String: Any] {

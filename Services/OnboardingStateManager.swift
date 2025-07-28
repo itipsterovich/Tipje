@@ -61,12 +61,12 @@ class OnboardingStateManager: ObservableObject {
         case cardsSetup
         case main
     }
-    /// Returns true if the user is within the 7-day free trial period
+    /// Returns true if the user is within the 1-month free trial period
     var isInTrialPeriod: Bool {
         guard let start = trialStartDate else { return false }
         let now = Date()
         let days = Calendar.current.dateComponents([.day], from: start, to: now).day ?? 0
-        return days < 7
+        return days < 30
     }
     /// Returns the current onboarding step based on all flags and trial period
     var currentStep: Step {

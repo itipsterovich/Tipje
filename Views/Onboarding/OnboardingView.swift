@@ -21,7 +21,7 @@ struct OnboardingView: View {
 #if DEBUG
         VStack {
             Button("Expire Trial (DEBUG)") {
-                onboardingState.trialStartDate = Calendar.current.date(byAdding: .day, value: -8, to: Date())
+                onboardingState.trialStartDate = Calendar.current.date(byAdding: .day, value: -31, to: Date())
             }
             .padding()
             .background(Color.red.opacity(0.1))
