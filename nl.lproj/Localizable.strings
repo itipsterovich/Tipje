@@ -106,7 +106,7 @@
 "login_passwords_no_match" = "Wachtwoorden komen niet overeen"; 
 
 // Login Page
-"login_free_trial" = "Gratis proefperiode. Geen verplichtingen. Gewoon duidelijkheid.";
+"login_free_trial" = "1-maand gratis proefperiode. Geen verplichtingen. Gewoon duidelijkheid.";
 "login_apple" = "Inloggen met Apple";
 "login_start_free_trial" = "Begin je gratis proefperiode";
 
